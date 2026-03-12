@@ -3,574 +3,199 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chepallet — Calcolatore Pallettizzazione 3D</title>
+<title>Chepallet — Pallettizzazione & Container 3D</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 :root {
-  --bg: #0a0c10;
-  --surface: #111318;
-  --surface2: #181b22;
-  --border: #252932;
-  --accent: #f0a500;
-  --accent2: #e05c2a;
-  --text: #eef0f4;
-  --muted: #6b7280;
-  --green: #22c55e;
-  --radius: 12px;
+  --bg:#0a0c10;--surface:#111318;--surface2:#181b22;--border:#252932;
+  --accent:#f0a500;--accent2:#e05c2a;--blue:#3b82f6;--text:#eef0f4;
+  --muted:#6b7280;--green:#22c55e;--radius:12px;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;}
 
 /* HEADER */
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 40px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(10,12,16,0.95);
-  backdrop-filter: blur(12px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.5rem;
-  letter-spacing: -0.03em;
-}
-.logo span { color: var(--accent); }
-.header-badge {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  padding: 6px 14px;
-  border-radius: 100px;
-  font-size: 0.72rem;
-  color: var(--muted);
-  letter-spacing: 0.06em;
-}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid var(--border);background:rgba(10,12,16,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;gap:16px;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:-0.03em;white-space:nowrap;}
+.logo span{color:var(--accent);}
+.main-nav{display:flex;gap:6px;background:var(--surface2);border-radius:10px;padding:4px;}
+.nav-btn{padding:9px 22px;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.8rem;cursor:pointer;border-radius:8px;transition:all 0.2s;letter-spacing:0.02em;white-space:nowrap;}
+.nav-btn.active{background:var(--accent);color:#000;font-weight:500;}
+.header-badge{background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:100px;font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;white-space:nowrap;}
 
 /* HERO */
-.hero {
-  padding: 60px 40px 40px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -100px; left: 50%;
-  transform: translateX(-50%);
-  width: 600px; height: 300px;
-  background: radial-gradient(ellipse, rgba(240,165,0,0.12) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-  margin-bottom: 16px;
-}
-.hero h1 em { font-style: normal; color: var(--accent); }
-.hero p {
-  color: var(--muted);
-  font-size: 0.92rem;
-  max-width: 500px;
-  margin: 0 auto;
-  line-height: 1.7;
-}
+.hero{padding:52px 40px 36px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(240,165,0,0.11) 0%,transparent 70%);pointer-events:none;}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.05;letter-spacing:-0.04em;margin-bottom:14px;}
+.hero h1 em{font-style:normal;color:var(--accent);}
+.hero p{color:var(--muted);font-size:0.9rem;max-width:500px;margin:0 auto;line-height:1.7;}
+
+/* PAGE VISIBILITY */
+.page{display:none;}
+.page.active{display:block;}
 
 /* MAIN LAYOUT */
-.app-grid {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 24px;
-  padding: 24px 40px 60px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-@media (max-width: 900px) {
-  .app-grid { grid-template-columns: 1fr; padding: 16px; }
-  header { padding: 14px 20px; }
-  .hero { padding: 40px 20px 24px; }
-}
+.app-grid{display:grid;grid-template-columns:380px 1fr;gap:24px;padding:24px 40px 60px;max-width:1440px;margin:0 auto;}
+@media(max-width:960px){.app-grid{grid-template-columns:1fr;padding:16px;}header{padding:12px 16px;}.hero{padding:36px 16px 24px;}.main-nav .nav-btn{padding:8px 14px;font-size:0.72rem;}}
 
 /* PANEL */
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.panel-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.panel-header h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.panel-icon {
-  width: 28px; height: 28px;
-  background: var(--surface2);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-}
-.panel-body { padding: 20px; }
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.panel-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.panel-header h3{font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+.panel-icon{width:28px;height:28px;background:var(--surface2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.panel-body{padding:20px;}
 
 /* TABS */
-.tabs {
-  display: flex;
-  gap: 4px;
-  background: var(--surface2);
-  border-radius: 8px;
-  padding: 4px;
-  margin-bottom: 20px;
-}
-.tab {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-family: 'DM Mono', monospace;
-  font-size: 0.75rem;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s;
-  letter-spacing: 0.03em;
-}
-.tab.active {
-  background: var(--accent);
-  color: #000;
-  font-weight: 500;
-}
+.tabs{display:flex;gap:4px;background:var(--surface2);border-radius:8px;padding:4px;margin-bottom:20px;}
+.tab{flex:1;padding:8px;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.73rem;cursor:pointer;border-radius:6px;transition:all 0.2s;letter-spacing:0.03em;}
+.tab.active{background:var(--accent);color:#000;font-weight:500;}
 
-/* FORM GROUPS */
-.section-label {
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 12px;
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.section-label::before {
-  content: '';
-  width: 16px; height: 1px;
-  background: var(--accent);
-  display: inline-block;
-}
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-group label {
-  font-size: 0.72rem;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-}
-.form-group input, .form-group select {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 12px;
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  font-size: 0.85rem;
-  outline: none;
-  transition: border-color 0.2s;
-  width: 100%;
-}
-.form-group input:focus, .form-group select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(240,165,0,0.1);
-}
-.form-group input[type="color"] {
-  padding: 4px 6px;
-  height: 38px;
-  cursor: pointer;
-}
-.input-unit {
-  position: relative;
-}
-.input-unit input { padding-right: 36px; }
-.input-unit span {
-  position: absolute;
-  right: 10px; top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.7rem;
-  color: var(--muted);
-}
+/* FORM */
+.section-label{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;margin-top:18px;display:flex;align-items:center;gap:8px;}
+.section-label::before{content:'';width:14px;height:1px;background:var(--accent);display:inline-block;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:0.7rem;color:var(--muted);letter-spacing:0.04em;}
+.form-group input,.form-group select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.84rem;outline:none;transition:border-color 0.2s;width:100%;}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(240,165,0,0.1);}
+.form-group input[type="color"]{padding:4px 6px;height:38px;cursor:pointer;}
+.input-unit{position:relative;}
+.input-unit input{padding-right:36px;}
+.input-unit span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:0.68rem;color:var(--muted);}
 
 /* SLIDER */
-.slider-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-.slider-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-.slider-label strong {
-  color: var(--accent);
-  font-weight: 500;
-}
-input[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  outline: none;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px; height: 16px;
-  background: var(--accent);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform 0.15s;
-}
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.slider-group{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;}
+.slider-label{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--muted);}
+.slider-label strong{color:var(--accent);font-weight:500;}
+input[type="range"]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:2px;outline:none;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--accent);border-radius:50%;cursor:pointer;transition:transform 0.15s;}
+input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 
-/* CALCULATE BUTTON */
-.btn-calc {
-  width: 100%;
-  padding: 14px;
-  background: var(--accent);
-  color: #000;
-  border: none;
-  border-radius: 10px;
-  font-family: 'Syne', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: all 0.2s;
-  margin-top: 20px;
-  position: relative;
-  overflow: hidden;
-}
-.btn-calc::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-.btn-calc:hover { background: #ffb820; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(240,165,0,0.3); }
-.btn-calc:hover::after { left: 100%; }
-.btn-calc:active { transform: translateY(0); }
+/* BUTTONS */
+.btn-calc{width:100%;padding:13px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:0.92rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:all 0.2s;margin-top:18px;position:relative;overflow:hidden;}
+.btn-calc::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s;}
+.btn-calc:hover{background:#ffb820;transform:translateY(-1px);box-shadow:0 8px 24px rgba(240,165,0,0.3);}
+.btn-calc:hover::after{left:100%;}
+.btn-export{padding:9px 16px;background:transparent;border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-family:'DM Mono',monospace;font-size:0.75rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;}
+.btn-export:hover{background:var(--accent);color:#000;}
+.btn-blue{border-color:var(--blue);color:var(--blue);}
+.btn-blue:hover{background:var(--blue);color:#fff;}
 
-/* RIGHT COLUMN */
-.right-col { display: flex; flex-direction: column; gap: 24px; }
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;position:relative;overflow:hidden;transition:border-color 0.2s;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transition:transform 0.4s;}
+.stat-card.active::before{transform:scaleX(1);}
+.stat-value{font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;color:var(--accent);line-height:1;margin-bottom:4px;}
+.stat-label{font-size:0.63rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
 
-/* 3D VIEWER */
-.viewer-panel { flex: 1; min-height: 520px; }
-#canvas-container {
-  width: 100%;
-  height: 460px;
-  background: radial-gradient(ellipse at 40% 40%, #161920 0%, #0a0c10 100%);
-  border-radius: 0 0 var(--radius) var(--radius);
-  position: relative;
-  overflow: hidden;
-}
-#canvas-container canvas { width: 100% !important; height: 100% !important; }
-.viewer-controls {
-  position: absolute;
-  bottom: 16px; right: 16px;
-  display: flex;
-  gap: 6px;
-}
-.ctrl-btn {
-  width: 34px; height: 34px;
-  background: rgba(17,19,24,0.9);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-  backdrop-filter: blur(8px);
-}
-.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
-.viewer-info {
-  position: absolute;
-  top: 14px; left: 14px;
-  background: rgba(10,12,16,0.85);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.72rem;
-  color: var(--muted);
-  backdrop-filter: blur(8px);
-  line-height: 1.8;
-}
-.viewer-info strong { color: var(--accent); }
+/* 3D CANVAS */
+.viewer-panel{flex:1;}
+.canvas-wrap{width:100%;height:460px;background:radial-gradient(ellipse at 40% 40%,#161920 0%,#0a0c10 100%);border-radius:0 0 var(--radius) var(--radius);position:relative;overflow:hidden;}
+.canvas-wrap canvas{width:100%!important;height:100%!important;}
+.viewer-controls{position:absolute;bottom:14px;right:14px;display:flex;gap:6px;}
+.ctrl-btn{width:32px;height:32px;background:rgba(17,19,24,0.9);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;backdrop-filter:blur(8px);}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent);}
+.viewer-info{position:absolute;top:12px;left:12px;background:rgba(10,12,16,0.85);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:0.7rem;color:var(--muted);backdrop-filter:blur(8px);line-height:1.8;}
+.viewer-info strong{color:var(--accent);}
 
-/* STATS GRID */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-@media (max-width: 700px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.2s;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transition: transform 0.4s;
-}
-.stat-card.active::before { transform: scaleX(1); }
-.stat-value {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.stat-label {
-  font-size: 0.65rem;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+/* PATTERN */
+.pattern-row{display:flex;gap:5px;margin-bottom:4px;}
+.pattern-cell{width:18px;height:18px;border-radius:3px;background:var(--border);transition:background 0.2s;border:1px solid transparent;}
+.pattern-cell.filled{background:var(--accent);border-color:rgba(240,165,0,0.5);box-shadow:0 0 6px rgba(240,165,0,0.25);}
+.pattern-cell.filled2{background:var(--blue);border-color:rgba(59,130,246,0.5);}
 
-/* PATTERN GRID */
-.pattern-section .panel-body { padding: 16px 20px; }
-.pattern-row {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-.pattern-cell {
-  width: 20px; height: 20px;
-  border-radius: 3px;
-  background: var(--border);
-  transition: background 0.2s;
-  border: 1px solid transparent;
-}
-.pattern-cell.filled {
-  background: var(--accent);
-  border-color: rgba(240,165,0,0.5);
-  box-shadow: 0 0 8px rgba(240,165,0,0.3);
-}
+/* TOGGLE */
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.78rem;}
+.toggle-row:last-child{border-bottom:none;}
+.toggle{position:relative;width:38px;height:20px;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:0.2s;}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:white;border-radius:50%;transition:0.2s;}
+.toggle input:checked + .toggle-slider{background:var(--accent);}
+.toggle input:checked + .toggle-slider::before{transform:translateX(18px);}
 
-/* CUSTOMIZATION SECTION */
-.color-picker-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.texture-upload {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: var(--surface2);
-  border: 1px dashed var(--border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  margin-bottom: 14px;
-}
-.texture-upload:hover { border-color: var(--accent); }
-.texture-upload input { display: none; }
-.texture-upload span { font-size: 0.78rem; color: var(--muted); }
-.texture-upload .icon { font-size: 18px; }
+/* PRESET */
+.preset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.preset-btn{padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.66rem;cursor:pointer;text-align:center;transition:all 0.2s;line-height:1.5;}
+.preset-btn:hover,.preset-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(240,165,0,0.06);}
 
-/* LEGEND */
-.legend {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-.legend-dot {
-  width: 10px; height: 10px;
-  border-radius: 2px;
-}
+/* CONTAINER TYPES */
+.container-type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
+.ctype-btn{padding:12px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.7rem;cursor:pointer;text-align:center;transition:all 0.2s;line-height:1.6;}
+.ctype-btn .ctype-icon{font-size:1.4rem;display:block;margin-bottom:4px;}
+.ctype-btn .ctype-name{color:var(--text);font-size:0.8rem;font-weight:500;}
+.ctype-btn .ctype-dim{color:var(--muted);font-size:0.65rem;}
+.ctype-btn:hover,.ctype-btn.active{border-color:var(--blue);background:rgba(59,130,246,0.07);}
+.ctype-btn.active .ctype-name{color:var(--blue);}
 
-/* TOGGLE SWITCH */
-.toggle-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.8rem;
-}
-.toggle-row:last-child { border-bottom: none; }
-.toggle {
-  position: relative;
-  width: 38px; height: 20px;
-}
-.toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute;
-  inset: 0;
-  background: var(--border);
-  border-radius: 20px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.toggle-slider::before {
-  content: '';
-  position: absolute;
-  width: 14px; height: 14px;
-  left: 3px; top: 3px;
-  background: white;
-  border-radius: 50%;
-  transition: 0.2s;
-}
-.toggle input:checked + .toggle-slider { background: var(--accent); }
-.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+/* LOAD MODE TOGGLE */
+.mode-toggle{display:flex;gap:4px;background:var(--surface2);border-radius:8px;padding:4px;margin-bottom:18px;}
+.mode-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.75rem;cursor:pointer;border-radius:6px;transition:all 0.2s;}
+.mode-btn.active{background:var(--blue);color:#fff;font-weight:500;}
 
-/* EXPORT BUTTON */
-.btn-export {
-  padding: 10px 18px;
-  background: transparent;
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  color: var(--accent);
-  font-family: 'DM Mono', monospace;
-  font-size: 0.78rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.04em;
-}
-.btn-export:hover { background: var(--accent); color: #000; }
+/* CONTAINER STATS */
+.cstats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.cstat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
+.cstat-card::before{content:'';display:block;height:2px;background:var(--blue);border-radius:1px;margin-bottom:12px;transform:scaleX(0);transition:transform 0.4s;}
+.cstat-card.active::before{transform:scaleX(1);}
+.cstat-value{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--blue);line-height:1;margin-bottom:4px;}
+.cstat-label{font-size:0.62rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
+
+/* WEIGHT BAR */
+.weight-bar-wrap{margin:10px 0;}
+.weight-bar-track{width:100%;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.weight-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),var(--accent));transition:width 0.6s ease;}
+.weight-bar-fill.danger{background:linear-gradient(90deg,var(--accent),var(--accent2));}
 
 /* ALERT */
-.alert {
-  background: rgba(34,197,94,0.08);
-  border: 1px solid rgba(34,197,94,0.3);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.78rem;
-  color: var(--green);
-  display: none;
-  margin-top: 12px;
-}
+.alert{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:8px;padding:9px 13px;font-size:0.76rem;color:var(--green);display:none;margin-top:10px;}
 
-/* PALLET PRESETS */
-.preset-grid {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 8px;
-  margin-bottom: 14px;
-}
-.preset-btn {
-  padding: 8px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--muted);
-  font-family: 'DM Mono', monospace;
-  font-size: 0.68rem;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.2s;
-  line-height: 1.4;
-}
-.preset-btn:hover, .preset-btn.active {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: rgba(240,165,0,0.06);
-}
+/* LEGEND */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.7rem;color:var(--muted);}
+.legend-dot{width:10px;height:10px;border-radius:2px;}
 
 /* SCROLLBAR */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
 
-/* ANIMATION */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.stat-card { animation: fadeUp 0.4s ease both; }
-.stat-card:nth-child(2) { animation-delay: 0.05s; }
-.stat-card:nth-child(3) { animation-delay: 0.1s; }
-.stat-card:nth-child(4) { animation-delay: 0.15s; }
+/* COLOR PICKER */
+.color-picker-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.texture-upload{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;cursor:pointer;transition:border-color 0.2s;margin-bottom:12px;}
+.texture-upload:hover{border-color:var(--accent);}
+.texture-upload input{display:none;}
+.texture-upload span{font-size:0.76rem;color:var(--muted);}
 
-/* TOOLTIP */
-.tooltip {
-  position: absolute;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 0.72rem;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.stat-card,.cstat-card{animation:fadeUp 0.4s ease both;}
+
+.right-col{display:flex;flex-direction:column;gap:20px;}
+.info-tag{display:inline-block;padding:3px 8px;border-radius:4px;font-size:0.65rem;letter-spacing:0.04em;background:rgba(240,165,0,0.12);color:var(--accent);border:1px solid rgba(240,165,0,0.25);margin-left:8px;}
+.info-tag.blue{background:rgba(59,130,246,0.12);color:var(--blue);border-color:rgba(59,130,246,0.25);}
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">Che<span>pallet</span></div>
-  <div class="header-badge">CALCOLATORE 3D v2.0</div>
+  <nav class="main-nav">
+    <button class="nav-btn active" onclick="showPage('pallet')">📦 Pallettizzazione</button>
+    <button class="nav-btn" onclick="showPage('container')">🚢 Container</button>
+  </nav>
+  <div class="header-badge">v2.1</div>
 </header>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: PALLET
+═══════════════════════════════════════════════════ -->
+<div id="page-pallet" class="page active">
 
 <section class="hero">
   <h1>Ottimizza la tua<br><em>pallettizzazione</em></h1>
@@ -578,135 +203,69 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 </section>
 
 <div class="app-grid">
-  <!-- LEFT: INPUT PANEL -->
+  <!-- LEFT -->
   <div style="display:flex;flex-direction:column;gap:16px;">
-
     <div class="panel">
       <div class="panel-header">
         <div class="panel-icon">📦</div>
         <h3>Parametri</h3>
       </div>
       <div class="panel-body">
-
         <div class="tabs">
-          <button class="tab active" onclick="switchTab('box')">Scatola</button>
-          <button class="tab" onclick="switchTab('pallet')">Pallet</button>
-          <button class="tab" onclick="switchTab('visual')">Visual</button>
+          <button class="tab active" onclick="switchTab('box',this)">Scatola</button>
+          <button class="tab" onclick="switchTab('pallet',this)">Pallet</button>
+          <button class="tab" onclick="switchTab('visual',this)">Visual</button>
         </div>
 
         <!-- BOX TAB -->
         <div id="tab-box">
           <div class="section-label">Dimensioni scatola</div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Lunghezza (mm)</label>
-              <div class="input-unit">
-                <input type="number" id="boxL" value="400" min="1">
-                <span>mm</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Larghezza (mm)</label>
-              <div class="input-unit">
-                <input type="number" id="boxW" value="300" min="1">
-                <span>mm</span>
-              </div>
-            </div>
+            <div class="form-group"><label>Lunghezza (mm)</label><div class="input-unit"><input type="number" id="boxL" value="400" min="1"><span>mm</span></div></div>
+            <div class="form-group"><label>Larghezza (mm)</label><div class="input-unit"><input type="number" id="boxW" value="300" min="1"><span>mm</span></div></div>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Altezza (mm)</label>
-              <div class="input-unit">
-                <input type="number" id="boxH" value="250" min="1">
-                <span>mm</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Peso (kg)</label>
-              <div class="input-unit">
-                <input type="number" id="boxWeight" value="5.5" step="0.1" min="0">
-                <span>kg</span>
-              </div>
-            </div>
+            <div class="form-group"><label>Altezza (mm)</label><div class="input-unit"><input type="number" id="boxH" value="250" min="1"><span>mm</span></div></div>
+            <div class="form-group"><label>Peso (kg)</label><div class="input-unit"><input type="number" id="boxWeight" value="5.5" step="0.1" min="0"><span>kg</span></div></div>
           </div>
-
           <div class="section-label">Strati e layout</div>
           <div class="slider-group">
-            <div class="slider-label">
-              <span>Numero strati</span>
-              <strong id="layersVal">4</strong>
-            </div>
-            <input type="range" id="layers" min="1" max="12" value="4"
-              oninput="document.getElementById('layersVal').textContent=this.value">
+            <div class="slider-label"><span>Numero strati</span><strong id="layersVal">4</strong></div>
+            <input type="range" id="layers" min="1" max="12" value="4" oninput="document.getElementById('layersVal').textContent=this.value">
           </div>
           <div class="slider-group">
-            <div class="slider-label">
-              <span>Rotazione strati (°)</span>
-              <strong id="rotVal">0°</strong>
-            </div>
-            <input type="range" id="layerRot" min="0" max="1" value="0" step="1"
-              oninput="document.getElementById('rotVal').textContent=this.value==1?'90°':'0°'">
+            <div class="slider-label"><span>Rotazione strati alternati</span><strong id="rotVal">No</strong></div>
+            <input type="range" id="layerRot" min="0" max="1" value="0" step="1" oninput="document.getElementById('rotVal').textContent=this.value==1?'Sì':'No'">
           </div>
-
           <div class="section-label">Opzioni</div>
-          <div class="toggle-row">
-            <span>Sovrapposizione strati</span>
-            <label class="toggle"><input type="checkbox" id="overlap" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <span>Mostra pallet base</span>
-            <label class="toggle"><input type="checkbox" id="showPallet" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <span>Mostra rete/griglia</span>
-            <label class="toggle"><input type="checkbox" id="showGrid" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <span>Vista wireframe</span>
-            <label class="toggle"><input type="checkbox" id="wireframe"><span class="toggle-slider"></span></label>
-          </div>
+          <div class="toggle-row"><span>Sovrapposizione strati</span><label class="toggle"><input type="checkbox" id="overlap" checked><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><span>Mostra pallet base</span><label class="toggle"><input type="checkbox" id="showPallet" checked><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><span>Mostra griglia</span><label class="toggle"><input type="checkbox" id="showGrid" checked><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><span>Vista wireframe</span><label class="toggle"><input type="checkbox" id="wireframe"><span class="toggle-slider"></span></label></div>
         </div>
 
         <!-- PALLET TAB -->
         <div id="tab-pallet" style="display:none;">
           <div class="section-label">Tipo pallet</div>
           <div class="preset-grid">
-            <button class="preset-btn active" onclick="setPallet(1200,800,'EUR');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">EUR<br>1200×800</button>
-            <button class="preset-btn" onclick="setPallet(1200,1000,'EUR2');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">EUR2<br>1200×1000</button>
-            <button class="preset-btn" onclick="setPallet(1200,1200,'EUR3');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">EUR3<br>1200×1200</button>
-            <button class="preset-btn" onclick="setPallet(1219,1016,'US');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">US<br>1219×1016</button>
-            <button class="preset-btn" onclick="setPallet(1100,1100,'AU');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">AU<br>1100×1100</button>
-            <button class="preset-btn" onclick="setPallet(0,0,'custom');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Custom<br>—</button>
+            <button class="preset-btn active" onclick="setPallet(1200,800,this)">EUR<br>1200×800</button>
+            <button class="preset-btn" onclick="setPallet(1200,1000,this)">EUR2<br>1200×1000</button>
+            <button class="preset-btn" onclick="setPallet(1200,1200,this)">EUR3<br>1200×1200</button>
+            <button class="preset-btn" onclick="setPallet(1219,1016,this)">US<br>1219×1016</button>
+            <button class="preset-btn" onclick="setPallet(1100,1100,this)">AU<br>1100×1100</button>
+            <button class="preset-btn" onclick="setPallet(0,0,this)">Custom<br>—</button>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Lunghezza pallet (mm)</label>
-              <input type="number" id="palletL" value="1200" min="1">
-            </div>
-            <div class="form-group">
-              <label>Larghezza pallet (mm)</label>
-              <input type="number" id="palletW" value="800" min="1">
-            </div>
+            <div class="form-group"><label>Lunghezza pallet (mm)</label><input type="number" id="palletL" value="1200" min="1"></div>
+            <div class="form-group"><label>Larghezza pallet (mm)</label><input type="number" id="palletW" value="800" min="1"></div>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Altezza max carico (mm)</label>
-              <input type="number" id="maxHeight" value="1800" min="1">
-            </div>
-            <div class="form-group">
-              <label>Peso max (kg)</label>
-              <input type="number" id="maxWeight" value="1000" min="1">
-            </div>
+            <div class="form-group"><label>Altezza max (mm)</label><input type="number" id="maxHeight" value="1800" min="1"></div>
+            <div class="form-group"><label>Peso max (kg)</label><input type="number" id="maxWeight" value="1000" min="1"></div>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Overhang max (mm)</label>
-              <input type="number" id="overhang" value="0" min="0">
-            </div>
-            <div class="form-group">
-              <label>Spessore pallet (mm)</label>
-              <input type="number" id="palletThick" value="144" min="1">
-            </div>
+            <div class="form-group"><label>Overhang max (mm)</label><input type="number" id="overhang" value="0" min="0"></div>
+            <div class="form-group"><label>Spessore pallet (mm)</label><input type="number" id="palletThick" value="144" min="1"></div>
           </div>
         </div>
 
@@ -714,549 +273,726 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
         <div id="tab-visual" style="display:none;">
           <div class="section-label">Colori scatola</div>
           <div class="color-picker-row">
-            <div class="form-group">
-              <label>Faccia top</label>
-              <input type="color" id="colorTop" value="#f0a500">
-            </div>
-            <div class="form-group">
-              <label>Faccia lato</label>
-              <input type="color" id="colorSide" value="#c47d00">
-            </div>
-            <div class="form-group">
-              <label>Faccia fronte</label>
-              <input type="color" id="colorFront" value="#a86000">
-            </div>
+            <div class="form-group"><label>Top</label><input type="color" id="colorTop" value="#f0a500"></div>
+            <div class="form-group"><label>Lato</label><input type="color" id="colorSide" value="#c47d00"></div>
+            <div class="form-group"><label>Fronte</label><input type="color" id="colorFront" value="#a86000"></div>
           </div>
-          <div class="section-label">Immagine scatola</div>
+          <div class="section-label">Immagine / Logo</div>
           <label class="texture-upload">
             <input type="file" id="boxTexture" accept="image/*" onchange="loadTexture(this)">
-            <span class="icon">🖼</span>
-            <span id="textureLabel">Carica etichetta / logo (PNG, JPG)</span>
+            <span style="font-size:18px">🖼</span>
+            <span id="textureLabel">Carica etichetta (PNG, JPG)</span>
           </label>
-          <div class="form-group" style="margin-bottom:14px;">
-            <label>Su quale faccia applicare?</label>
-            <select id="textureFace">
-              <option value="all">Tutte le facce</option>
-              <option value="top">Solo top</option>
-              <option value="front">Solo fronte</option>
-              <option value="sides">Lato + fronte</option>
-            </select>
-          </div>
-          <div class="section-label">Colori pallet</div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Colore pallet</label>
-              <input type="color" id="colorPallet" value="#8B6914">
-            </div>
-            <div class="form-group">
-              <label>Colore sfondo</label>
-              <input type="color" id="colorBg" value="#0a0c10">
-            </div>
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>Applica su</label>
+            <select id="textureFace"><option value="all">Tutte le facce</option><option value="top">Solo top</option><option value="front">Solo fronte</option><option value="sides">Lato + fronte</option></select>
           </div>
           <div class="section-label">Ambiente</div>
-          <div class="form-group" style="margin-bottom:14px;">
-            <label>Stile illuminazione</label>
-            <select id="lightStyle">
-              <option value="studio">Studio</option>
-              <option value="warm">Warm</option>
-              <option value="cool">Cool</option>
-              <option value="dramatic">Dramatic</option>
-            </select>
+          <div class="form-row">
+            <div class="form-group"><label>Colore pallet</label><input type="color" id="colorPallet" value="#8B6914"></div>
+            <div class="form-group"><label>Sfondo</label><input type="color" id="colorBg" value="#0a0c10"></div>
+          </div>
+          <div class="form-group">
+            <label>Illuminazione</label>
+            <select id="lightStyle"><option value="studio">Studio</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="dramatic">Dramatic</option></select>
           </div>
         </div>
 
-        <button class="btn-calc" onclick="calculate()">
-          ▶ CALCOLA & AGGIORNA 3D
-        </button>
-        <div class="alert" id="alert">✓ Calcolo completato con successo!</div>
+        <button class="btn-calc" onclick="calculate()">▶ CALCOLA &amp; AGGIORNA 3D</button>
+        <div class="alert" id="alert-pallet">✓ Calcolo completato!</div>
       </div>
     </div>
-
   </div>
 
-  <!-- RIGHT: 3D + STATS -->
+  <!-- RIGHT -->
   <div class="right-col">
-
-    <!-- STATS -->
     <div class="stats-grid" id="statsGrid">
-      <div class="stat-card active">
-        <div class="stat-value" id="s-total">—</div>
-        <div class="stat-label">Scatole totali</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="s-layer">—</div>
-        <div class="stat-label">Per strato</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="s-weight">—</div>
-        <div class="stat-label">Peso totale (kg)</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="s-eff">—</div>
-        <div class="stat-label">Efficienza %</div>
-      </div>
+      <div class="stat-card active"><div class="stat-value" id="s-total">—</div><div class="stat-label">Scatole totali</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-layer">—</div><div class="stat-label">Per strato</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-weight">—</div><div class="stat-label">Peso tot (kg)</div></div>
+      <div class="stat-card"><div class="stat-value" id="s-eff">—</div><div class="stat-label">Efficienza %</div></div>
     </div>
 
-    <!-- 3D VIEWER -->
     <div class="panel viewer-panel">
       <div class="panel-header" style="justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="panel-icon">🎲</div>
-          <h3>Visualizzazione 3D</h3>
-        </div>
+        <div style="display:flex;align-items:center;gap:10px;"><div class="panel-icon">🎲</div><h3>Vista 3D Pallet</h3></div>
         <div style="display:flex;gap:8px;">
-          <button class="btn-export" onclick="exportData()">↓ Export JSON</button>
-          <button class="btn-export" onclick="screenshotCanvas()">📷 Screenshot</button>
+          <button class="btn-export" onclick="exportData()">↓ JSON</button>
+          <button class="btn-export" onclick="screenshotCanvas('pallet-canvas')">📷</button>
         </div>
       </div>
-      <div id="canvas-container">
-        <div class="viewer-info" id="viewer-info">
-          Trascina per ruotare · Scroll per zoom
-        </div>
+      <div class="canvas-wrap" id="pallet-canvas">
+        <div class="viewer-info">Trascina per ruotare · Scroll per zoom</div>
         <div class="viewer-controls">
-          <button class="ctrl-btn" title="Reset camera" onclick="resetCamera()">⌂</button>
-          <button class="ctrl-btn" title="Vista frontale" onclick="setView('front')">↔</button>
-          <button class="ctrl-btn" title="Vista top" onclick="setView('top')">↕</button>
-          <button class="ctrl-btn" title="Animazione" onclick="toggleAnim()" id="animBtn">▶</button>
+          <button class="ctrl-btn" onclick="resetCamPallet()">⌂</button>
+          <button class="ctrl-btn" onclick="setViewPallet('front')">↔</button>
+          <button class="ctrl-btn" onclick="setViewPallet('top')">↕</button>
+          <button class="ctrl-btn" onclick="toggleAnimPallet()" id="animBtnPallet">▶</button>
         </div>
       </div>
     </div>
 
-    <!-- PATTERN + INFO -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div class="panel pattern-section">
-        <div class="panel-header">
-          <div class="panel-icon">🔲</div>
-          <h3>Schema strato</h3>
-        </div>
-        <div class="panel-body">
-          <div id="pattern-grid"></div>
-          <div class="legend" id="legend"></div>
-        </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-icon">🔲</div><h3>Schema strato</h3></div>
+        <div class="panel-body"><div id="pattern-grid"></div><div class="legend" id="legend"></div></div>
       </div>
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-icon">📊</div>
-          <h3>Dettagli</h3>
+        <div class="panel-header"><div class="panel-icon">📊</div><h3>Dettagli</h3></div>
+        <div class="panel-body" id="detail-list" style="font-size:0.77rem;line-height:2;color:var(--muted);">Esegui un calcolo per visualizzare i dettagli.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- end page-pallet -->
+
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: CONTAINER
+═══════════════════════════════════════════════════ -->
+<div id="page-container" class="page">
+
+<section class="hero">
+  <h1>Calcola il tuo<br><em>container</em></h1>
+  <p>Carica scatole floor loaded o pallet in container Dry 20", 40", 40" HC e 40" Reefer. Visualizzazione 3D interattiva.</p>
+</section>
+
+<div class="app-grid">
+  <!-- LEFT -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-icon">🚢</div><h3>Configurazione Container</h3></div>
+      <div class="panel-body">
+
+        <div class="section-label">Tipo container</div>
+        <div class="container-type-grid">
+          <button class="ctype-btn active" onclick="selectContainer('20dry',this)">
+            <span class="ctype-icon">📦</span>
+            <span class="ctype-name">20' Dry</span>
+            <span class="ctype-dim">5898×2352×2393mm</span>
+          </button>
+          <button class="ctype-btn" onclick="selectContainer('40dry',this)">
+            <span class="ctype-icon">🚛</span>
+            <span class="ctype-name">40' Dry</span>
+            <span class="ctype-dim">12032×2352×2393mm</span>
+          </button>
+          <button class="ctype-btn" onclick="selectContainer('40hc',this)">
+            <span class="ctype-icon">📐</span>
+            <span class="ctype-name">40' High Cube</span>
+            <span class="ctype-dim">12032×2352×2698mm</span>
+          </button>
+          <button class="ctype-btn" onclick="selectContainer('40ref',this)">
+            <span class="ctype-icon">❄️</span>
+            <span class="ctype-name">40' Reefer</span>
+            <span class="ctype-dim">11580×2286×2400mm</span>
+          </button>
         </div>
-        <div class="panel-body" id="detail-list" style="font-size:0.78rem;line-height:2;color:var(--muted);">
-          <div>Esegui un calcolo per<br>visualizzare i dettagli.</div>
+
+        <div class="section-label">Modalità di carico</div>
+        <div class="mode-toggle">
+          <button class="mode-btn active" onclick="selectMode('boxes',this)">📦 Floor Loaded (scatole)</button>
+          <button class="mode-btn" onclick="selectMode('pallets',this)">🪵 Su Pallet</button>
+        </div>
+
+        <!-- FLOOR LOADED BOXES -->
+        <div id="mode-boxes">
+          <div class="section-label">Dimensioni scatola</div>
+          <div class="form-row">
+            <div class="form-group"><label>Lunghezza (mm)</label><div class="input-unit"><input type="number" id="cBoxL" value="400" min="1"><span>mm</span></div></div>
+            <div class="form-group"><label>Larghezza (mm)</label><div class="input-unit"><input type="number" id="cBoxW" value="300" min="1"><span>mm</span></div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Altezza (mm)</label><div class="input-unit"><input type="number" id="cBoxH" value="250" min="1"><span>mm</span></div></div>
+            <div class="form-group"><label>Peso (kg)</label><div class="input-unit"><input type="number" id="cBoxWgt" value="5.5" step="0.1" min="0"><span>kg</span></div></div>
+          </div>
+          <div class="toggle-row"><span>Rotazione strati alternati</span><label class="toggle"><input type="checkbox" id="cBoxRot"><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><span>Ottimizza orientamento</span><label class="toggle"><input type="checkbox" id="cBoxOpt" checked><span class="toggle-slider"></span></label></div>
+        </div>
+
+        <!-- PALLET MODE -->
+        <div id="mode-pallets" style="display:none;">
+          <div class="section-label">Tipo pallet</div>
+          <div class="preset-grid">
+            <button class="preset-btn active" onclick="setCPallet(1200,800,144,this)">EUR<br>1200×800</button>
+            <button class="preset-btn" onclick="setCPallet(1200,1000,144,this)">EUR2<br>1200×1000</button>
+            <button class="preset-btn" onclick="setCPallet(1200,1200,144,this)">EUR3<br>1200×1200</button>
+            <button class="preset-btn" onclick="setCPallet(1219,1016,152,this)">US<br>1219×1016</button>
+            <button class="preset-btn" onclick="setCPallet(1100,1100,144,this)">AU<br>1100×1100</button>
+            <button class="preset-btn" onclick="setCPallet(0,0,0,this)">Custom<br>—</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Lunghezza pallet (mm)</label><input type="number" id="cPalL" value="1200" min="1"></div>
+            <div class="form-group"><label>Larghezza pallet (mm)</label><input type="number" id="cPalW" value="800" min="1"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Altezza pallet (mm)</label><input type="number" id="cPalT" value="144" min="1"></div>
+            <div class="form-group"><label>Altezza carico (mm)</label><input type="number" id="cPalCargoH" value="1200" min="1"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Peso per pallet (kg)</label><input type="number" id="cPalWgt" value="500" min="0"></div>
+            <div class="form-group"><label>File pallet (righe)</label><input type="number" id="cPalRows" value="1" min="1" max="3"></div>
+          </div>
+          <div class="toggle-row"><span>Pallet impilabili (doppio strato)</span><label class="toggle"><input type="checkbox" id="cPalStack"><span class="toggle-slider"></span></label></div>
+        </div>
+
+        <div class="section-label">Margine di sicurezza</div>
+        <div class="form-row">
+          <div class="form-group"><label>Margine lato (mm)</label><input type="number" id="cMarginSide" value="20" min="0"></div>
+          <div class="form-group"><label>Margine alto (mm)</label><input type="number" id="cMarginTop" value="50" min="0"></div>
+        </div>
+
+        <button class="btn-calc" style="background:var(--blue);box-shadow:none;" onclick="calculateContainer()" onmouseover="this.style.background='#60a5fa'" onmouseout="this.style.background='var(--blue)'">
+          ▶ CALCOLA CONTAINER 3D
+        </button>
+        <div class="alert" id="alert-container">✓ Calcolo container completato!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT CONTAINER -->
+  <div class="right-col">
+    <!-- STATS -->
+    <div class="cstats-grid">
+      <div class="cstat-card active"><div class="cstat-value" id="c-total">—</div><div class="cstat-label">Unità totali</div></div>
+      <div class="cstat-card"><div class="cstat-value" id="c-vol">—</div><div class="cstat-label">Utilizzo vol %</div></div>
+      <div class="cstat-card"><div class="cstat-value" id="c-weight">—</div><div class="cstat-label">Peso tot (kg)</div></div>
+      <div class="cstat-card"><div class="cstat-value" id="c-layers">—</div><div class="cstat-label">Strati / file</div></div>
+    </div>
+
+    <!-- 3D CONTAINER VIEWER -->
+    <div class="panel viewer-panel">
+      <div class="panel-header" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;"><div class="panel-icon">🎲</div><h3>Vista 3D Container</h3><span class="info-tag blue" id="container-label">20' Dry</span></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-export btn-blue" onclick="exportContainerData()">↓ JSON</button>
+          <button class="btn-export btn-blue" onclick="screenshotCanvas('container-canvas')">📷</button>
+        </div>
+      </div>
+      <div class="canvas-wrap" id="container-canvas">
+        <div class="viewer-info" id="c-viewer-info">Trascina per ruotare · Scroll per zoom</div>
+        <div class="viewer-controls">
+          <button class="ctrl-btn" onclick="resetCamContainer()">⌂</button>
+          <button class="ctrl-btn" onclick="setViewContainer('front')">↔</button>
+          <button class="ctrl-btn" onclick="setViewContainer('top')">↕</button>
+          <button class="ctrl-btn" onclick="setViewContainer('side')">↗</button>
+          <button class="ctrl-btn" onclick="toggleAnimContainer()" id="animBtnContainer">▶</button>
         </div>
       </div>
     </div>
 
+    <!-- DETAILS + WEIGHT -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-icon">📊</div><h3>Dettagli container</h3></div>
+        <div class="panel-body" id="c-detail-list" style="font-size:0.77rem;line-height:2;color:var(--muted);">Esegui un calcolo per visualizzare i dettagli.</div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-icon">⚖️</div><h3>Peso &amp; limiti</h3></div>
+        <div class="panel-body" id="c-weight-panel" style="font-size:0.77rem;color:var(--muted);">
+          <div style="line-height:2;">Esegui un calcolo<br>per vedere i limiti.</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+</div><!-- end page-container -->
+
 
 <script>
-// ── THREE.JS SETUP ─────────────────────────────────────────────
-const container = document.getElementById('canvas-container');
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.setSize(container.clientWidth, container.clientHeight);
-container.appendChild(renderer.domElement);
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 20000);
-camera.position.set(2200, 2000, 2200);
-camera.lookAt(0, 400, 0);
-
-// Grid
-const gridHelper = new THREE.GridHelper(3000, 30, 0x252932, 0x181b22);
-scene.add(gridHelper);
-
-// Lights
-let lights = [];
-function setupLights(style) {
-  lights.forEach(l => scene.remove(l));
-  lights = [];
-  const amb = new THREE.AmbientLight(0xffffff, 0.55);
-  scene.add(amb); lights.push(amb);
-  const dir = new THREE.DirectionalLight(0xffffff, 1.1);
-  dir.position.set(1500, 2500, 1500);
-  dir.castShadow = true;
-  dir.shadow.mapSize.set(2048, 2048);
-  scene.add(dir); lights.push(dir);
-  if (style === 'warm') {
-    const warm = new THREE.PointLight(0xff8844, 0.6, 5000);
-    warm.position.set(-800, 600, 800); scene.add(warm); lights.push(warm);
-  } else if (style === 'cool') {
-    const cool = new THREE.PointLight(0x4488ff, 0.5, 5000);
-    cool.position.set(800, 600, -800); scene.add(cool); lights.push(cool);
-  } else if (style === 'dramatic') {
-    dir.intensity = 2.5;
-    amb.intensity = 0.15;
-  }
+// ══════════════════════════════════════════════
+//  PAGE SWITCHER
+// ══════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', ['pallet','container'][i]===name));
+  if (name === 'pallet') { setTimeout(resizePalletCanvas, 100); }
+  if (name === 'container') { setTimeout(resizeContainerCanvas, 100); }
 }
-setupLights('studio');
 
-// Orbit controls (manual)
-let isDragging = false, prevMouse = { x: 0, y: 0 };
-let camTheta = Math.PI / 4, camPhi = Math.PI / 3.5, camRadius = 3200;
-let camTarget = new THREE.Vector3(0, 400, 0);
-let autoRotate = false;
+// ══════════════════════════════════════════════
+//  PALLET 3D
+// ══════════════════════════════════════════════
+const palletCanvasWrap = document.getElementById('pallet-canvas');
+const rendererP = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+rendererP.setPixelRatio(window.devicePixelRatio);
+rendererP.shadowMap.enabled = true;
+rendererP.shadowMap.type = THREE.PCFSoftShadowMap;
+rendererP.setSize(palletCanvasWrap.clientWidth, palletCanvasWrap.clientHeight);
+palletCanvasWrap.appendChild(rendererP.domElement);
 
-function updateCamera() {
-  camera.position.x = camTarget.x + camRadius * Math.sin(camPhi) * Math.sin(camTheta);
-  camera.position.y = camTarget.y + camRadius * Math.cos(camPhi);
-  camera.position.z = camTarget.z + camRadius * Math.sin(camPhi) * Math.cos(camTheta);
-  camera.lookAt(camTarget);
+const sceneP = new THREE.Scene();
+const cameraP = new THREE.PerspectiveCamera(45, palletCanvasWrap.clientWidth / palletCanvasWrap.clientHeight, 1, 20000);
+const gridP = new THREE.GridHelper(3000, 30, 0x252932, 0x181b22);
+sceneP.add(gridP);
+
+let lightsP = [];
+function setupLightsP(style) {
+  lightsP.forEach(l => sceneP.remove(l)); lightsP = [];
+  const a = new THREE.AmbientLight(0xffffff, 0.55); sceneP.add(a); lightsP.push(a);
+  const d = new THREE.DirectionalLight(0xffffff, 1.1);
+  d.position.set(1500,2500,1500); d.castShadow = true; d.shadow.mapSize.set(2048,2048);
+  sceneP.add(d); lightsP.push(d);
+  if (style==='warm'){const w=new THREE.PointLight(0xff8844,0.6,5000);w.position.set(-800,600,800);sceneP.add(w);lightsP.push(w);}
+  else if(style==='cool'){const c=new THREE.PointLight(0x4488ff,0.5,5000);c.position.set(800,600,-800);sceneP.add(c);lightsP.push(c);}
+  else if(style==='dramatic'){d.intensity=2.5;a.intensity=0.15;}
 }
-updateCamera();
+setupLightsP('studio');
 
-renderer.domElement.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
-window.addEventListener('mouseup', () => isDragging = false);
-window.addEventListener('mousemove', e => {
-  if (!isDragging) return;
-  const dx = (e.clientX - prevMouse.x) * 0.008;
-  const dy = (e.clientY - prevMouse.y) * 0.008;
-  camTheta += dx;
-  camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi + dy));
-  prevMouse = { x: e.clientX, y: e.clientY };
-  updateCamera();
+let isDraggingP=false,prevMP={x:0,y:0},camTP=Math.PI/4,camPhiP=Math.PI/3.5,camRP=3200;
+let camTargetP=new THREE.Vector3(0,400,0),autoRotP=false;
+function updateCamP(){
+  cameraP.position.x=camTargetP.x+camRP*Math.sin(camPhiP)*Math.sin(camTP);
+  cameraP.position.y=camTargetP.y+camRP*Math.cos(camPhiP);
+  cameraP.position.z=camTargetP.z+camRP*Math.sin(camPhiP)*Math.cos(camTP);
+  cameraP.lookAt(camTargetP);
+}
+updateCamP();
+rendererP.domElement.addEventListener('mousedown',e=>{isDraggingP=true;prevMP={x:e.clientX,y:e.clientY};});
+window.addEventListener('mouseup',()=>{isDraggingP=false;});
+window.addEventListener('mousemove',e=>{
+  if(!isDraggingP)return;
+  camTP+=(e.clientX-prevMP.x)*0.008;
+  camPhiP=Math.max(0.1,Math.min(Math.PI/2-0.05,camPhiP+(e.clientY-prevMP.y)*0.008));
+  prevMP={x:e.clientX,y:e.clientY};updateCamP();
 });
-renderer.domElement.addEventListener('wheel', e => {
-  camRadius = Math.max(800, Math.min(8000, camRadius + e.deltaY * 1.5));
-  updateCamera();
-});
-// Touch
-let lastTouches = null;
-renderer.domElement.addEventListener('touchstart', e => { lastTouches = e.touches; isDragging = true; });
-renderer.domElement.addEventListener('touchend', () => { isDragging = false; lastTouches = null; });
-renderer.domElement.addEventListener('touchmove', e => {
-  if (!lastTouches) return;
-  if (e.touches.length === 1) {
-    const dx = (e.touches[0].clientX - lastTouches[0].clientX) * 0.01;
-    const dy = (e.touches[0].clientY - lastTouches[0].clientY) * 0.01;
-    camTheta += dx;
-    camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi + dy));
-  } else if (e.touches.length === 2) {
-    const d0 = Math.hypot(lastTouches[0].clientX - lastTouches[1].clientX, lastTouches[0].clientY - lastTouches[1].clientY);
-    const d1 = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    camRadius = Math.max(800, Math.min(8000, camRadius - (d1 - d0) * 4));
-  }
-  lastTouches = e.touches;
-  updateCamera();
-});
+rendererP.domElement.addEventListener('wheel',e=>{camRP=Math.max(800,Math.min(8000,camRP+e.deltaY*1.5));updateCamP();});
+function resetCamPallet(){camTP=Math.PI/4;camPhiP=Math.PI/3.5;camRP=3200;camTargetP.set(0,400,0);updateCamP();}
+function setViewPallet(v){if(v==='front'){camTP=0;camPhiP=Math.PI/4;}else if(v==='top'){camTP=0;camPhiP=0.05;}updateCamP();}
+function toggleAnimPallet(){autoRotP=!autoRotP;document.getElementById('animBtnPallet').textContent=autoRotP?'⏸':'▶';}
+function resizePalletCanvas(){rendererP.setSize(palletCanvasWrap.clientWidth,palletCanvasWrap.clientHeight);cameraP.aspect=palletCanvasWrap.clientWidth/palletCanvasWrap.clientHeight;cameraP.updateProjectionMatrix();}
+window.addEventListener('resize',resizePalletCanvas);
 
-function resetCamera() {
-  camTheta = Math.PI / 4; camPhi = Math.PI / 3.5; camRadius = 3200;
-  camTarget.set(0, 400, 0); updateCamera();
-}
-function setView(v) {
-  if (v === 'front') { camTheta = 0; camPhi = Math.PI / 4; }
-  else if (v === 'top') { camTheta = 0; camPhi = 0.05; }
-  updateCamera();
-}
-function toggleAnim() {
-  autoRotate = !autoRotate;
-  document.getElementById('animBtn').textContent = autoRotate ? '⏸' : '▶';
-}
-
-// Resize
-window.addEventListener('resize', () => {
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  camera.aspect = container.clientWidth / container.clientHeight;
-  camera.updateProjectionMatrix();
-});
-
-// ── SCENE OBJECTS ───────────────────────────────────────────────
-let palletGroup = new THREE.Group();
-scene.add(palletGroup);
+let palletGroup = new THREE.Group(); sceneP.add(palletGroup);
 let customTexture = null;
+function h2t(hex){return parseInt(hex.replace('#',''),16);}
 
-function hexToThree(hex) {
-  return parseInt(hex.replace('#', ''), 16);
+function buildBoxMats(wireframe){
+  const ct=document.getElementById('colorTop').value;
+  const cs=document.getElementById('colorSide').value;
+  const cf=document.getElementById('colorFront').value;
+  const face=document.getElementById('textureFace').value;
+  const m=(color,useTex)=>{const o={color:h2t(color),roughness:0.55,metalness:0.1};if(useTex&&customTexture)o.map=customTexture;const mat=new THREE.MeshStandardMaterial(o);if(wireframe)mat.wireframe=true;return mat;};
+  const u=f=>customTexture&&(face==='all'||face===f||(face==='sides'&&(f==='side'||f==='front')));
+  return[m(cs,u('side')),m(cs,u('side')),m(ct,u('top')),m(cs,u('side')),m(cf,u('front')),m(cs,u('side'))];
 }
 
-function buildBoxMaterials(colorTop, colorSide, colorFront, wire) {
-  const face = document.getElementById('textureFace').value;
-  const makeM = (color, useTexture) => {
-    const opts = { color: hexToThree(color), roughness: 0.55, metalness: 0.1 };
-    if (useTexture && customTexture) opts.map = customTexture;
-    const m = new THREE.MeshStandardMaterial(opts);
-    if (wire) { m.wireframe = true; }
-    return m;
-  };
-  const useTex = (f) => customTexture && (face === 'all' || face === f || (face === 'sides' && (f === 'side' || f === 'front')));
-  return [
-    makeM(colorSide, useTex('side')),   // right
-    makeM(colorSide, useTex('side')),   // left
-    makeM(colorTop,  useTex('top')),    // top
-    makeM(colorSide, useTex('side')),   // bottom
-    makeM(colorFront,useTex('front')),  // front
-    makeM(colorSide, useTex('side')),   // back
-  ];
-}
-
-function buildScene(result) {
-  while (palletGroup.children.length) palletGroup.remove(palletGroup.children[0]);
-
-  const { bL, bW, bH, pL, pW, pT, layers, positions, rotated, wireframe, showPalletBase } = result;
-  const colorTop   = document.getElementById('colorTop').value;
-  const colorSide  = document.getElementById('colorSide').value;
-  const colorFront = document.getElementById('colorFront').value;
-  const colorPallet = document.getElementById('colorPallet').value;
-  const showGrid = document.getElementById('showGrid').checked;
-
-  // update bg
-  const bgColor = document.getElementById('colorBg').value;
-  renderer.setClearColor(hexToThree(bgColor), 1);
-
-  // Grid visibility
-  gridHelper.visible = showGrid;
-
-  // Pallet base
-  if (showPalletBase) {
-    const palMat = new THREE.MeshStandardMaterial({ color: hexToThree(colorPallet), roughness: 0.8 });
-    const palGeo = new THREE.BoxGeometry(pL, pT, pW);
-    const palMesh = new THREE.Mesh(palGeo, palMat);
-    palMesh.position.set(0, pT / 2, 0);
-    palMesh.castShadow = true; palMesh.receiveShadow = true;
-    palletGroup.add(palMesh);
-    // deck boards detail
-    for (let i = 0; i < 3; i++) {
-      const bg = new THREE.BoxGeometry(pL, pT * 0.4, pW * 0.18);
-      const bm = new THREE.Mesh(bg, new THREE.MeshStandardMaterial({ color: hexToThree(colorPallet), roughness: 0.9 }));
-      bm.position.set(0, pT * 0.7, (i - 1) * pW * 0.35);
-      palletGroup.add(bm);
-    }
+function buildPalletScene(res){
+  while(palletGroup.children.length)palletGroup.remove(palletGroup.children[0]);
+  const{bL,bW,bH,pL,pW,pT,layers,positions,wireframe,showBase}=res;
+  const cp=document.getElementById('colorPallet').value;
+  const cb=document.getElementById('colorBg').value;
+  const showG=document.getElementById('showGrid').checked;
+  rendererP.setClearColor(h2t(cb),1);
+  gridP.visible=showG;
+  if(showBase){
+    const pm=new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.8});
+    const pb=new THREE.Mesh(new THREE.BoxGeometry(pL,pT,pW),pm);
+    pb.position.set(0,pT/2,0);pb.castShadow=true;pb.receiveShadow=true;palletGroup.add(pb);
+    for(let i=0;i<3;i++){const bg=new THREE.BoxGeometry(pL,pT*0.4,pW*0.18);const bm=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.9}));bm.position.set(0,pT*0.7,(i-1)*pW*0.35);palletGroup.add(bm);}
   }
+  const mats=buildBoxMats(wireframe);
+  positions.forEach(({x,z,layer,rot})=>{
+    const geo=rot?new THREE.BoxGeometry(bW,bH,bL):new THREE.BoxGeometry(bL,bH,bW);
+    const mesh=new THREE.Mesh(geo,mats);
+    mesh.position.set(x+(rot?bW:bL)/2-pL/2,pT+layer*bH+bH/2,z+(rot?bL:bW)/2-pW/2);
+    mesh.castShadow=true;mesh.receiveShadow=true;
+    const el=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.22}));
+    el.position.copy(mesh.position);
+    palletGroup.add(mesh);palletGroup.add(el);
+  });
+  camTargetP.set(0,pT+layers*bH/2,0);
+  camRP=Math.max(2000,(pL+pW+layers*bH)*1.6);updateCamP();
+}
 
-  // Boxes
-  const boxMats = buildBoxMaterials(colorTop, colorSide, colorFront, wireframe);
-  const boxGeo = new THREE.BoxGeometry(bL, bH, bW);
+let lastPalletResult=null;
+function calculate(){
+  const bL=+document.getElementById('boxL').value,bW=+document.getElementById('boxW').value,bH=+document.getElementById('boxH').value,bWgt=+document.getElementById('boxWeight').value;
+  const pL=+document.getElementById('palletL').value,pW=+document.getElementById('palletW').value,pT=+document.getElementById('palletThick').value;
+  const maxH=+document.getElementById('maxHeight').value,maxWgt=+document.getElementById('maxWeight').value;
+  const oh=+document.getElementById('overhang').value,nL=+document.getElementById('layers').value;
+  const doRot=+document.getElementById('layerRot').value===1;
+  const wireframe=document.getElementById('wireframe').checked;
+  const showBase=document.getElementById('showPallet').checked;
+  function fitLayer(rot){
+    const bx=rot?bW:bL,bz=rot?bL:bW;
+    const nx=Math.floor((pL+oh*2)/bx),nz=Math.floor((pW+oh*2)/bz);
+    const pos=[];
+    for(let i=0;i<nx;i++)for(let j=0;j<nz;j++)pos.push({x:i*bx,z:j*bz,rot});
+    return{pos,nx,nz};
+  }
+  const fA=fitLayer(false),fB=fitLayer(true);
+  const best=fA.pos.length>=fB.pos.length?fA:fB;
+  const actualL=Math.min(nL,Math.floor((maxH-pT)/bH));
+  let allPos=[];
+  for(let l=0;l<actualL;l++){
+    const alt=doRot&&l%2===1;
+    const cur=alt?fitLayer(!best.pos[0]?.rot).pos:best.pos;
+    allPos=allPos.concat(cur.map(p=>({...p,layer:l})));
+  }
+  const total=allPos.length,perLayer=best.pos.length,totWgt=total*bWgt;
+  const eff=Math.min(100,Math.round((perLayer*bL*bW)/(pL*pW)*100));
+  const totH=pT+actualL*bH;
+  document.getElementById('s-total').textContent=total;
+  document.getElementById('s-layer').textContent=perLayer;
+  document.getElementById('s-weight').textContent=Math.round(totWgt*10)/10;
+  document.getElementById('s-eff').textContent=eff+'%';
+  document.querySelectorAll('.stat-card').forEach(c=>c.classList.add('active'));
+  document.getElementById('detail-list').innerHTML=`
+    <div>📦 Scatola: <strong style="color:var(--text)">${bL}×${bW}×${bH} mm</strong></div>
+    <div>🏗 Pallet: <strong style="color:var(--text)">${pL}×${pW} mm</strong></div>
+    <div>📐 Colonne: <strong style="color:var(--text)">${best.nx} × ${best.nz}</strong></div>
+    <div>🔢 Strati: <strong style="color:var(--text)">${actualL}</strong></div>
+    <div>📏 Altezza tot: <strong style="${totH>maxH?'color:var(--accent2)':'color:var(--text)'}">${Math.round(totH)} mm${totH>maxH?' ⚠':''}</strong></div>
+    <div>⚖️ Peso: <strong style="${totWgt>maxWgt?'color:var(--accent2)':'color:var(--text)'}">${Math.round(totWgt*10)/10} kg${totWgt>maxWgt?' ⚠':''}</strong></div>
+    <div>🎯 Efficienza: <strong style="color:var(--green)">${eff}%</strong></div>`;
+  // pattern
+  const pg=document.getElementById('pattern-grid'); pg.innerHTML='';
+  const maxD=20,dnx=Math.min(best.nx,maxD),dnz=Math.min(best.nz,maxD);
+  for(let j=0;j<dnz;j++){const row=document.createElement('div');row.className='pattern-row';for(let i=0;i<dnx;i++){const c=document.createElement('div');c.className='pattern-cell filled';row.appendChild(c);}pg.appendChild(row);}
+  document.getElementById('legend').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Scatola (${best.nx}×${best.nz})</div>`;
+  lastPalletResult={bL,bW,bH,pL,pW,pT,layers:actualL,positions:allPos,wireframe,showBase};
+  buildPalletScene(lastPalletResult);
+  setupLightsP(document.getElementById('lightStyle').value);
+  const a=document.getElementById('alert-pallet');a.style.display='block';setTimeout(()=>a.style.display='none',2500);
+}
 
-  positions.forEach(({ x, z, layer, rot }) => {
-    const w = rot ? bL : bL;
-    const d = rot ? bW : bW;
-    const geo = rot ? new THREE.BoxGeometry(bW, bH, bL) : boxGeo;
-    const mesh = new THREE.Mesh(geo, boxMats);
-    mesh.position.set(
-      x + (rot ? bW : bL) / 2 - pL / 2,
-      pT + layer * bH + bH / 2,
-      z + (rot ? bL : bW) / 2 - pW / 2
-    );
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    // Edge lines
-    const edges = new THREE.EdgesGeometry(geo);
-    const lineMat = new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 });
-    const line = new THREE.LineSegments(edges, lineMat);
-    line.position.copy(mesh.position);
-    palletGroup.add(mesh);
-    palletGroup.add(line);
+// ══════════════════════════════════════════════
+//  CONTAINER SPECS
+// ══════════════════════════════════════════════
+const CONTAINERS = {
+  '20dry': { name:"20' Dry",    iL:5898, iW:2352, iH:2393, maxPayload:28200, tare:2300 },
+  '40dry': { name:"40' Dry",    iL:12032,iW:2352, iH:2393, maxPayload:26680, tare:3800 },
+  '40hc':  { name:"40' HC",     iL:12032,iW:2352, iH:2698, maxPayload:26460, tare:4020 },
+  '40ref': { name:"40' Reefer", iL:11580,iW:2286, iH:2400, maxPayload:27700, tare:4400 },
+};
+let selectedContainer='20dry';
+let selectedMode='boxes';
+let lastContainerResult=null;
+
+function selectContainer(type,btn){
+  selectedContainer=type;
+  document.querySelectorAll('.ctype-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('container-label').textContent=CONTAINERS[type].name;
+}
+function selectMode(mode,btn){
+  selectedMode=mode;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mode-boxes').style.display=mode==='boxes'?'block':'none';
+  document.getElementById('mode-pallets').style.display=mode==='pallets'?'block':'none';
+}
+function setCPallet(l,w,t,btn){
+  if(l){document.getElementById('cPalL').value=l;document.getElementById('cPalW').value=w;document.getElementById('cPalT').value=t;}
+  btn.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+//  CONTAINER 3D
+// ══════════════════════════════════════════════
+const contCanvasWrap = document.getElementById('container-canvas');
+const rendererC = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+rendererC.setPixelRatio(window.devicePixelRatio);
+rendererC.shadowMap.enabled = true;
+rendererC.setSize(contCanvasWrap.clientWidth, contCanvasWrap.clientHeight);
+contCanvasWrap.appendChild(rendererC.domElement);
+
+const sceneC = new THREE.Scene();
+const cameraC = new THREE.PerspectiveCamera(45, contCanvasWrap.clientWidth / contCanvasWrap.clientHeight, 10, 100000);
+const gridC = new THREE.GridHelper(20000, 40, 0x1a1d24, 0x14161c);
+sceneC.add(gridC);
+
+const ambC = new THREE.AmbientLight(0xffffff, 0.6); sceneC.add(ambC);
+const dirC = new THREE.DirectionalLight(0xffffff, 1.2);
+dirC.position.set(8000, 10000, 6000); dirC.castShadow = true; sceneC.add(dirC);
+const fillC = new THREE.DirectionalLight(0x8899ff, 0.35);
+fillC.position.set(-5000, 3000, -3000); sceneC.add(fillC);
+
+let isDraggingC=false,prevMC={x:0,y:0},camTC=Math.PI/5,camPhiC=Math.PI/4,camRC=18000;
+let camTargetC=new THREE.Vector3(0,1200,0),autoRotC=false;
+function updateCamC(){
+  cameraC.position.x=camTargetC.x+camRC*Math.sin(camPhiC)*Math.sin(camTC);
+  cameraC.position.y=camTargetC.y+camRC*Math.cos(camPhiC);
+  cameraC.position.z=camTargetC.z+camRC*Math.sin(camPhiC)*Math.cos(camTC);
+  cameraC.lookAt(camTargetC);
+}
+updateCamC();
+rendererC.domElement.addEventListener('mousedown',e=>{isDraggingC=true;prevMC={x:e.clientX,y:e.clientY};});
+window.addEventListener('mouseup',()=>isDraggingC=false);
+window.addEventListener('mousemove',e=>{
+  if(!isDraggingC)return;
+  camTC+=(e.clientX-prevMC.x)*0.008;
+  camPhiC=Math.max(0.08,Math.min(Math.PI/2-0.05,camPhiC+(e.clientY-prevMC.y)*0.008));
+  prevMC={x:e.clientX,y:e.clientY};updateCamC();
+});
+rendererC.domElement.addEventListener('wheel',e=>{camRC=Math.max(3000,Math.min(40000,camRC+e.deltaY*3));updateCamC();});
+function resetCamContainer(){camTC=Math.PI/5;camPhiC=Math.PI/4;camRC=18000;camTargetC.set(0,1200,0);updateCamC();}
+function setViewContainer(v){
+  if(v==='front'){camTC=Math.PI;camPhiC=Math.PI/4;}
+  else if(v==='top'){camTC=0;camPhiC=0.08;}
+  else if(v==='side'){camTC=Math.PI/2;camPhiC=Math.PI/4;}
+  updateCamC();
+}
+function toggleAnimContainer(){autoRotC=!autoRotC;document.getElementById('animBtnContainer').textContent=autoRotC?'⏸':'▶';}
+function resizeContainerCanvas(){rendererC.setSize(contCanvasWrap.clientWidth,contCanvasWrap.clientHeight);cameraC.aspect=contCanvasWrap.clientWidth/contCanvasWrap.clientHeight;cameraC.updateProjectionMatrix();}
+window.addEventListener('resize',resizeContainerCanvas);
+
+let containerGroup = new THREE.Group(); sceneC.add(containerGroup);
+
+function buildContainerScene(res) {
+  while(containerGroup.children.length) containerGroup.remove(containerGroup.children[0]);
+  const { cL, cW, cH, items, mode } = res;
+  const wallT = 30;
+
+  // Container shell — semi-transparent walls
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, transparent: true, opacity: 0.07, side: THREE.BackSide });
+  const outerGeo = new THREE.BoxGeometry(cL, cH, cW);
+  const outerMesh = new THREE.Mesh(outerGeo, wallMat);
+  outerMesh.position.set(cL/2, cH/2, cW/2);
+  containerGroup.add(outerMesh);
+
+  // Container wireframe outline
+  const edges = new THREE.EdgesGeometry(outerGeo);
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.7 });
+  const edgeMesh = new THREE.LineSegments(edges, lineMat);
+  edgeMesh.position.copy(outerMesh.position);
+  containerGroup.add(edgeMesh);
+
+  // Floor
+  const floorGeo = new THREE.BoxGeometry(cL, wallT, cW);
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
+  const floor = new THREE.Mesh(floorGeo, floorMat);
+  floor.position.set(cL/2, wallT/2, cW/2);
+  floor.receiveShadow = true;
+  containerGroup.add(floor);
+
+  // Door frame
+  const doorGeo = new THREE.BoxGeometry(wallT, cH, cW);
+  const doorMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.7, transparent: true, opacity: 0.18 });
+  const door = new THREE.Mesh(doorGeo, doorMat);
+  door.position.set(wallT/2, cH/2, cW/2);
+  containerGroup.add(door);
+
+  // ITEMS (boxes or pallets)
+  const palettaColors = [0xf0a500, 0xe05c2a, 0x22c55e, 0x3b82f6, 0xa855f7, 0xec4899];
+  items.forEach((item, idx) => {
+    const col = palettaColors[idx % palettaColors.length];
+    if (mode === 'pallets') {
+      // Pallet base
+      const palGeo = new THREE.BoxGeometry(item.pw, item.pt, item.pl);
+      const palMat = new THREE.MeshStandardMaterial({ color: 0x8B6914, roughness: 0.85 });
+      const palMesh = new THREE.Mesh(palGeo, palMat);
+      palMesh.position.set(item.x + item.pw/2, item.y + item.pt/2, item.z + item.pl/2);
+      palMesh.castShadow = true;
+      containerGroup.add(palMesh);
+      // Cargo on pallet
+      const cargoGeo = new THREE.BoxGeometry(item.pw * 0.97, item.ch, item.pl * 0.97);
+      const cargoMat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.5 });
+      const cargoMesh = new THREE.Mesh(cargoGeo, cargoMat);
+      cargoMesh.position.set(item.x + item.pw/2, item.y + item.pt + item.ch/2, item.z + item.pl/2);
+      cargoMesh.castShadow = true;
+      containerGroup.add(cargoMesh);
+      // edges
+      const ce = new THREE.LineSegments(new THREE.EdgesGeometry(cargoGeo), new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.18}));
+      ce.position.copy(cargoMesh.position);
+      containerGroup.add(ce);
+    } else {
+      const geo = new THREE.BoxGeometry(item.w, item.h, item.l);
+      const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.5, metalness: 0.05 });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(item.x + item.w/2, item.y + item.h/2, item.z + item.l/2);
+      mesh.castShadow = true;
+      containerGroup.add(mesh);
+      const el = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.2}));
+      el.position.copy(mesh.position);
+      containerGroup.add(el);
+    }
   });
 
-  // center group
-  camTarget.set(0, pT + layers * bH / 2, 0);
-  camRadius = Math.max(2000, (pL + pW + layers * bH) * 1.6);
-  updateCamera();
+  // Camera
+  camTargetC.set(cL/2, cH/2, cW/2);
+  camRC = Math.max(8000, (cL + cW + cH) * 1.3);
+  updateCamC();
 }
 
-// ── CALCULATION ─────────────────────────────────────────────────
-let lastResult = null;
+function calculateContainer() {
+  const spec = CONTAINERS[selectedContainer];
+  const mS = +document.getElementById('cMarginSide').value;
+  const mT = +document.getElementById('cMarginTop').value;
+  const usableL = spec.iL - mS*2;
+  const usableW = spec.iW - mS*2;
+  const usableH = spec.iH - mT;
 
-function calculate() {
-  const bL = parseFloat(document.getElementById('boxL').value);
-  const bW = parseFloat(document.getElementById('boxW').value);
-  const bH = parseFloat(document.getElementById('boxH').value);
-  const bWgt = parseFloat(document.getElementById('boxWeight').value);
-  const pL = parseFloat(document.getElementById('palletL').value);
-  const pW = parseFloat(document.getElementById('palletW').value);
-  const pT = parseFloat(document.getElementById('palletThick').value);
-  const maxH = parseFloat(document.getElementById('maxHeight').value);
-  const maxWgt = parseFloat(document.getElementById('maxWeight').value);
-  const oh = parseFloat(document.getElementById('overhang').value);
-  const nLayers = parseInt(document.getElementById('layers').value);
-  const alternateRot = document.getElementById('overlap').checked;
-  const wireframe = document.getElementById('wireframe').checked;
-  const showPalletBase = document.getElementById('showPallet').checked;
-  const doRot = parseInt(document.getElementById('layerRot').value) === 1;
+  let items = [], totalUnits = 0, totalWeight = 0, usedVol = 0;
+  const baseX = mS, baseZ = mS, baseY = 0;
 
-  // Layer fitting
-  function fitLayer(rot) {
-    const bx = rot ? bW : bL;
-    const bz = rot ? bL : bW;
-    const usableL = pL + oh * 2;
-    const usableW = pW + oh * 2;
-    const nx = Math.floor(usableL / bx);
-    const nz = Math.floor(usableW / bz);
-    const positions = [];
-    for (let i = 0; i < nx; i++) {
-      for (let j = 0; j < nz; j++) {
-        positions.push({ x: i * bx, z: j * bz, rot });
+  if (selectedMode === 'boxes') {
+    const bL=+document.getElementById('cBoxL').value, bW=+document.getElementById('cBoxW').value;
+    const bH=+document.getElementById('cBoxH').value, bWgt=+document.getElementById('cBoxWgt').value;
+    const doRot=document.getElementById('cBoxRot').checked;
+    const doOpt=document.getElementById('cBoxOpt').checked;
+
+    function tryFit(rot) {
+      const bx=rot?bW:bL, bz=rot?bL:bW;
+      return { nx:Math.floor(usableL/bx), nz:Math.floor(usableW/bz), bx, bz, rot };
+    }
+    const fA=tryFit(false), fB=tryFit(true);
+    const best = doOpt && (fA.nx*fA.nz < fB.nx*fB.nz) ? fB : fA;
+    const nLayers = Math.floor(usableH / bH);
+
+    for (let ly=0; ly<nLayers; ly++) {
+      const useRot = doRot && (ly%2===1);
+      const fit = useRot ? (best.rot ? tryFit(false) : tryFit(true)) : best;
+      for (let ix=0; ix<fit.nx; ix++) {
+        for (let iz=0; iz<fit.nz; iz++) {
+          items.push({
+            x: baseX + ix*fit.bx, y: baseY + ly*bH, z: baseZ + iz*fit.bz,
+            w: fit.rot?bW:bL, h: bH, l: fit.rot?bL:bW
+          });
+        }
       }
     }
-    return { positions, nx, nz };
-  }
+    totalUnits = items.length;
+    totalWeight = totalUnits * bWgt;
+    usedVol = totalUnits * bL * bW * bH;
 
-  // Optimal single layer (try both orientations)
-  const fitA = fitLayer(false);
-  const fitB = fitLayer(true);
-  const fitMixed = fitA.positions.length >= fitB.positions.length ? fitA : fitB;
-  const basePositions = fitMixed.positions;
-  const baseRot = fitMixed.positions[0]?.rot || false;
+    const volEff = Math.round(usedVol / (spec.iL*spec.iW*spec.iH) * 100);
+    document.getElementById('c-total').textContent = totalUnits;
+    document.getElementById('c-vol').textContent = volEff + '%';
+    document.getElementById('c-weight').textContent = Math.round(totalWeight);
+    document.getElementById('c-layers').textContent = nLayers;
 
-  let allPositions = [];
-  const actualLayers = Math.min(nLayers, Math.floor((maxH - pT) / bH));
+    document.getElementById('c-detail-list').innerHTML=`
+      <div>📦 Scatola: <strong style="color:var(--text)">${bL}×${bW}×${bH}mm</strong></div>
+      <div>🚢 Container: <strong style="color:var(--text)">${spec.name}</strong></div>
+      <div>📐 Per fila: <strong style="color:var(--text)">${best.nx} × ${best.nz}</strong></div>
+      <div>🔢 Strati: <strong style="color:var(--text)">${nLayers}</strong></div>
+      <div>📏 Spazio usato: <strong style="color:var(--text)">${Math.round(usedVol/1e9*100)/100} m³</strong></div>
+      <div>📦 Volume container: <strong style="color:var(--text)">${Math.round(spec.iL*spec.iW*spec.iH/1e9*100)/100} m³</strong></div>`;
 
-  for (let layer = 0; layer < actualLayers; layer++) {
-    let layerPositions;
-    if (alternateRot && layer % 2 === 1 && doRot) {
-      const altFit = fitLayer(!baseRot);
-      layerPositions = altFit.positions.map(p => ({ ...p, layer }));
-    } else {
-      layerPositions = basePositions.map(p => ({ ...p, layer }));
+    lastContainerResult = { cL:spec.iL, cW:spec.iW, cH:spec.iH, items, mode:'boxes' };
+
+  } else {
+    // PALLET MODE
+    const pL=+document.getElementById('cPalL').value, pW=+document.getElementById('cPalW').value;
+    const pT=+document.getElementById('cPalT').value, pCH=+document.getElementById('cPalCargoH').value;
+    const pWgt=+document.getElementById('cPalWgt').value;
+    const doStack=document.getElementById('cPalStack').checked;
+    const totalPH = pT + pCH;
+    const stackLayers = doStack ? Math.floor(usableH / totalPH) : 1;
+
+    // Try both orientations
+    function tryPalFit(rot) {
+      const pl=rot?pW:pL, pw=rot?pL:pW;
+      return { nx:Math.floor(usableL/pl), nz:Math.floor(usableW/pw), pl, pw, rot };
     }
-    allPositions = allPositions.concat(layerPositions);
+    const fA=tryPalFit(false), fB=tryPalFit(true);
+    const best = (fA.nx*fA.nz >= fB.nx*fB.nz) ? fA : fB;
+
+    for (let sl=0; sl<stackLayers; sl++) {
+      for (let ix=0; ix<best.nx; ix++) {
+        for (let iz=0; iz<best.nz; iz++) {
+          items.push({
+            x: baseX + ix*best.pl, y: baseY + sl*totalPH, z: baseZ + iz*best.pw,
+            pw: best.pl, pt: pT, pl: best.pw, ch: pCH
+          });
+        }
+      }
+    }
+    totalUnits = items.length;
+    totalWeight = totalUnits * pWgt;
+    usedVol = totalUnits * pL * pW * totalPH;
+    const volEff = Math.round(usedVol / (spec.iL*spec.iW*spec.iH) * 100);
+
+    document.getElementById('c-total').textContent = totalUnits;
+    document.getElementById('c-vol').textContent = volEff + '%';
+    document.getElementById('c-weight').textContent = Math.round(totalWeight);
+    document.getElementById('c-layers').textContent = stackLayers + ' strati';
+
+    document.getElementById('c-detail-list').innerHTML=`
+      <div>🪵 Pallet: <strong style="color:var(--text)">${pL}×${pW}mm</strong></div>
+      <div>🚢 Container: <strong style="color:var(--text)">${spec.name}</strong></div>
+      <div>📐 Per fila: <strong style="color:var(--text)">${best.nx} × ${best.nz}</strong></div>
+      <div>🔢 Strati pallet: <strong style="color:var(--text)">${stackLayers}</strong></div>
+      <div>📏 H totale carico: <strong style="color:var(--text)">${totalPH}mm</strong></div>
+      <div>📦 Vol container: <strong style="color:var(--text)">${Math.round(spec.iL*spec.iW*spec.iH/1e9*100)/100} m³</strong></div>`;
+
+    lastContainerResult = { cL:spec.iL, cW:spec.iW, cH:spec.iH, items, mode:'pallets' };
   }
 
-  const totalBoxes = allPositions.length;
-  const perLayer = basePositions.length;
-  const totalWeight = totalBoxes * bWgt;
-  const palletSurface = pL * pW;
-  const boxSurface = perLayer * (bL * bW);
-  const efficiency = Math.min(100, Math.round((boxSurface / palletSurface) * 100));
-  const totalHeight = pT + actualLayers * bH;
+  // Weight panel
+  const pctWgt = Math.min(100, Math.round(totalWeight / spec.maxPayload * 100));
+  const danger = pctWgt > 90;
+  document.getElementById('c-weight-panel').innerHTML = `
+    <div style="font-size:0.77rem;line-height:2.2;color:var(--muted);">
+      <div>Max payload: <strong style="color:var(--text)">${spec.maxPayload.toLocaleString()} kg</strong></div>
+      <div>Carico: <strong style="color:${danger?'var(--accent2)':'var(--green)'}">${Math.round(totalWeight).toLocaleString()} kg</strong></div>
+      <div>Tare: <strong style="color:var(--text)">${spec.tare.toLocaleString()} kg</strong></div>
+      <div>Peso lordo: <strong style="color:var(--text)">${(Math.round(totalWeight)+spec.tare).toLocaleString()} kg</strong></div>
+    </div>
+    <div style="margin-top:10px;font-size:0.68rem;color:var(--muted);margin-bottom:5px;">${pctWgt}% payload usato</div>
+    <div class="weight-bar-track"><div class="weight-bar-fill ${danger?'danger':''}" style="width:${pctWgt}%"></div></div>
+    ${danger?'<div style="color:var(--accent2);font-size:0.72rem;margin-top:6px;">⚠ Attenzione: vicino al limite di peso!</div>':''}`;
 
-  // Over-weight check
-  const overWeight = totalWeight > maxWgt;
-  const overHeight = totalHeight > maxH;
-
-  lastResult = { bL, bW, bH, pL, pW, pT, layers: actualLayers, positions: allPositions, wireframe, showPalletBase };
-
-  // Stats
-  document.getElementById('s-total').textContent = totalBoxes;
-  document.getElementById('s-layer').textContent = perLayer;
-  document.getElementById('s-weight').textContent = Math.round(totalWeight * 10) / 10;
-  document.getElementById('s-eff').textContent = efficiency + '%';
-  document.querySelectorAll('.stat-card').forEach(c => c.classList.add('active'));
-
-  // Details
-  document.getElementById('detail-list').innerHTML = `
-    <div>📦 Dimensioni scatola: <strong style="color:var(--text)">${bL}×${bW}×${bH} mm</strong></div>
-    <div>🏗 Pallet: <strong style="color:var(--text)">${pL}×${pW} mm</strong></div>
-    <div>📐 Colonne per strato: <strong style="color:var(--text)">${fitMixed.nx} × ${fitMixed.nz}</strong></div>
-    <div>🔢 Strati effettivi: <strong style="color:var(--text)">${actualLayers}</strong></div>
-    <div>📏 Altezza totale: <strong style="${overHeight ? 'color:var(--accent2)' : 'color:var(--text)'}">${Math.round(totalHeight)} mm${overHeight ? ' ⚠' : ''}</strong></div>
-    <div>⚖️ Peso totale: <strong style="${overWeight ? 'color:var(--accent2)' : 'color:var(--text)'}">${Math.round(totalWeight * 10) / 10} kg${overWeight ? ' ⚠' : ''}</strong></div>
-    <div>📊 Superficie pallet: <strong style="color:var(--text)">${(palletSurface / 1e6).toFixed(3)} m²</strong></div>
-    <div>🎯 Efficienza: <strong style="color:var(--green)">${efficiency}%</strong></div>
-  `;
-
-  // Pattern grid
-  renderPattern(fitMixed.nx, fitMixed.nz);
-
-  // 3D
-  buildScene(lastResult);
-
-  // Alert
-  const a = document.getElementById('alert');
-  a.style.display = 'block';
-  setTimeout(() => a.style.display = 'none', 2500);
-
-  setupLights(document.getElementById('lightStyle').value);
+  document.querySelectorAll('.cstat-card').forEach(c=>c.classList.add('active'));
+  buildContainerScene(lastContainerResult);
+  const a=document.getElementById('alert-container');a.style.display='block';setTimeout(()=>a.style.display='none',2500);
 }
 
-function renderPattern(nx, nz) {
-  const grid = document.getElementById('pattern-grid');
-  grid.innerHTML = '';
-  const maxDisplay = 20;
-  const displayNx = Math.min(nx, maxDisplay);
-  const displayNz = Math.min(nz, maxDisplay);
-  for (let j = 0; j < displayNz; j++) {
-    const row = document.createElement('div');
-    row.className = 'pattern-row';
-    for (let i = 0; i < displayNx; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'pattern-cell filled';
-      row.appendChild(cell);
-    }
-    grid.appendChild(row);
-  }
-  document.getElementById('legend').innerHTML = `
-    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Scatola (${nx}×${nz})</div>
-  `;
-}
-
-// ── ANIMATION LOOP ───────────────────────────────────────────────
+// ══════════════════════════════════════════════
+//  ANIMATION LOOP
+// ══════════════════════════════════════════════
 function animate() {
   requestAnimationFrame(animate);
-  if (autoRotate) {
-    camTheta += 0.005;
-    updateCamera();
-  }
-  renderer.render(scene, camera);
+  if (autoRotP) { camTP += 0.005; updateCamP(); }
+  if (autoRotC) { camTC += 0.004; updateCamC(); }
+  rendererP.render(sceneP, cameraP);
+  rendererC.render(sceneC, cameraC);
 }
 animate();
 
-// ── UTILS ────────────────────────────────────────────────────────
-function switchTab(name) {
-  ['box', 'pallet', 'visual'].forEach(t => {
-    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
-  });
-  document.querySelectorAll('.tab').forEach((b, i) => {
-    b.classList.toggle('active', ['box', 'pallet', 'visual'][i] === name);
-  });
+// ══════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════
+function switchTab(name, btn) {
+  ['box','pallet','visual'].forEach(t=>{document.getElementById('tab-'+t).style.display=t===name?'block':'none';});
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setPallet(l,w,btn){
+  if(l){document.getElementById('palletL').value=l;document.getElementById('palletW').value=w;}
+  btn.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function loadTexture(input){
+  const file=input.files[0];if(!file)return;
+  document.getElementById('textureLabel').textContent=file.name;
+  new THREE.TextureLoader().load(URL.createObjectURL(file),tex=>{customTexture=tex;if(lastPalletResult)buildPalletScene(lastPalletResult);});
+}
+function exportData(){
+  if(!lastPalletResult){alert('Esegui prima un calcolo.');return;}
+  const d={scatola:{L:document.getElementById('boxL').value,W:document.getElementById('boxW').value,H:document.getElementById('boxH').value,kg:document.getElementById('boxWeight').value},pallet:{L:document.getElementById('palletL').value,W:document.getElementById('palletW').value},risultati:{totale:document.getElementById('s-total').textContent,perStrato:document.getElementById('s-layer').textContent,pesoKg:document.getElementById('s-weight').textContent,efficienza:document.getElementById('s-eff').textContent}};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download='pallettizzazione.json';a.click();
+}
+function exportContainerData(){
+  if(!lastContainerResult){alert('Esegui prima un calcolo.');return;}
+  const d={container:CONTAINERS[selectedContainer].name,modalita:selectedMode,unita:document.getElementById('c-total').textContent,pesoKg:document.getElementById('c-weight').textContent,volUtilizzo:document.getElementById('c-vol').textContent};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download='container.json';a.click();
+}
+function screenshotCanvas(id){
+  const r=id==='pallet-canvas'?rendererP:rendererC;
+  const cam=id==='pallet-canvas'?cameraP:cameraC;
+  const sc=id==='pallet-canvas'?sceneP:sceneC;
+  r.render(sc,cam);
+  const a=document.createElement('a');a.href=r.domElement.toDataURL('image/png');a.download=id+'.png';a.click();
 }
 
-function setPallet(l, w, type) {
-  if (l) {
-    document.getElementById('palletL').value = l;
-    document.getElementById('palletW').value = w;
-  }
-}
-
-function loadTexture(input) {
-  const file = input.files[0];
-  if (!file) return;
-  document.getElementById('textureLabel').textContent = file.name;
-  const url = URL.createObjectURL(file);
-  new THREE.TextureLoader().load(url, tex => {
-    customTexture = tex;
-    if (lastResult) buildScene(lastResult);
-  });
-}
-
-function exportData() {
-  if (!lastResult) { alert('Esegui prima un calcolo.'); return; }
-  const data = {
-    scatola: {
-      lunghezza: document.getElementById('boxL').value,
-      larghezza: document.getElementById('boxW').value,
-      altezza: document.getElementById('boxH').value,
-      peso: document.getElementById('boxWeight').value
-    },
-    pallet: {
-      lunghezza: document.getElementById('palletL').value,
-      larghezza: document.getElementById('palletW').value,
-    },
-    risultati: {
-      scatole_totali: document.getElementById('s-total').textContent,
-      per_strato: document.getElementById('s-layer').textContent,
-      peso_totale: document.getElementById('s-weight').textContent,
-      efficienza: document.getElementById('s-eff').textContent,
-    }
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'pallettizzazione.json'; a.click();
-}
-
-function screenshotCanvas() {
-  renderer.render(scene, camera);
-  const url = renderer.domElement.toDataURL('image/png');
-  const a = document.createElement('a'); a.href = url;
-  a.download = 'pallet3d.png'; a.click();
-}
-
-// Reactive update on visual changes
-['colorTop','colorSide','colorFront','colorPallet','colorBg','textureFace','lightStyle','wireframe','showPallet','showGrid'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('change', () => { if (lastResult) { setupLights(document.getElementById('lightStyle').value); buildScene(lastResult); } });
+// Reactive pallet visual updates
+['colorTop','colorSide','colorFront','colorPallet','colorBg','textureFace','lightStyle','wireframe','showPallet','showGrid'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('change',()=>{if(lastPalletResult){setupLightsP(document.getElementById('lightStyle').value);buildPalletScene(lastPalletResult);}});
 });
 
 // Initial calc
