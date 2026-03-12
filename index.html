@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chepallet — Calcolatore Pallettizzazione 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #111318;
+  --surface2: #181b22;
+  --border: #252932;
+  --accent: #f0a500;
+  --accent2: #e05c2a;
+  --text: #eef0f4;
+  --muted: #6b7280;
+  --green: #22c55e;
+  --radius: 12px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 40px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,12,16,0.95);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+.logo span { color: var(--accent); }
+.header-badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+/* HERO */
+.hero {
+  padding: 60px 40px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 600px; height: 300px;
+  background: radial-gradient(ellipse, rgba(240,165,0,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* MAIN LAYOUT */
+.app-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  padding: 24px 40px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+@media (max-width: 900px) {
+  .app-grid { grid-template-columns: 1fr; padding: 16px; }
+  header { padding: 14px 20px; }
+  .hero { padding: 40px 20px 24px; }
+}
+
+/* PANEL */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.panel-header h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.panel-icon {
+  width: 28px; height: 28px;
+  background: var(--surface2);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.panel-body { padding: 20px; }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+.tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.tab.active {
+  background: var(--accent);
+  color: #000;
+  font-weight: 500;
+}
+
+/* FORM GROUPS */
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::before {
+  content: '';
+  width: 16px; height: 1px;
+  background: var(--accent);
+  display: inline-block;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.form-group input, .form-group select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(240,165,0,0.1);
+}
+.form-group input[type="color"] {
+  padding: 4px 6px;
+  height: 38px;
+  cursor: pointer;
+}
+.input-unit {
+  position: relative;
+}
+.input-unit input { padding-right: 36px; }
+.input-unit span {
+  position: absolute;
+  right: 10px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* SLIDER */
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.slider-label strong {
+  color: var(--accent);
+  font-weight: 500;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+/* CALCULATE BUTTON */
+.btn-calc {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all 0.2s;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-calc::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+.btn-calc:hover { background: #ffb820; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(240,165,0,0.3); }
+.btn-calc:hover::after { left: 100%; }
+.btn-calc:active { transform: translateY(0); }
+
+/* RIGHT COLUMN */
+.right-col { display: flex; flex-direction: column; gap: 24px; }
+
+/* 3D VIEWER */
+.viewer-panel { flex: 1; min-height: 520px; }
+#canvas-container {
+  width: 100%;
+  height: 460px;
+  background: radial-gradient(ellipse at 40% 40%, #161920 0%, #0a0c10 100%);
+  border-radius: 0 0 var(--radius) var(--radius);
+  position: relative;
+  overflow: hidden;
+}
+#canvas-container canvas { width: 100% !important; height: 100% !important; }
+.viewer-controls {
+  position: absolute;
+  bottom: 16px; right: 16px;
+  display: flex;
+  gap: 6px;
+}
+.ctrl-btn {
+  width: 34px; height: 34px;
+  background: rgba(17,19,24,0.9);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.viewer-info {
+  position: absolute;
+  top: 14px; left: 14px;
+  background: rgba(10,12,16,0.85);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  backdrop-filter: blur(8px);
+  line-height: 1.8;
+}
+.viewer-info strong { color: var(--accent); }
+
+/* STATS GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 700px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform 0.4s;
+}
+.stat-card.active::before { transform: scaleX(1); }
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* PATTERN GRID */
+.pattern-section .panel-body { padding: 16px 20px; }
+.pattern-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.pattern-cell {
+  width: 20px; height: 20px;
+  border-radius: 3px;
+  background: var(--border);
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+.pattern-cell.filled {
+  background: var(--accent);
+  border-color: rgba(240,165,0,0.5);
+  box-shadow: 0 0 8px rgba(240,165,0,0.3);
+}
+
+/* CUSTOMIZATION SECTION */
+.color-picker-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.texture-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  margin-bottom: 14px;
+}
+.texture-upload:hover { border-color: var(--accent); }
+.texture-upload input { display: none; }
+.texture-upload span { font-size: 0.78rem; color: var(--muted); }
+.texture-upload .icon { font-size: 18px; }
+
+/* LEGEND */
+.legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+}
+
+/* TOGGLE SWITCH */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle {
+  position: relative;
+  width: 38px; height: 20px;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  left: 3px; top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.toggle input:checked + .toggle-slider { background: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+/* EXPORT BUTTON */
+.btn-export {
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.04em;
+}
+.btn-export:hover { background: var(--accent); color: #000; }
+
+/* ALERT */
+.alert {
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: var(--green);
+  display: none;
+  margin-top: 12px;
+}
+
+/* PALLET PRESETS */
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.preset-btn {
+  padding: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+.preset-btn:hover, .preset-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(240,165,0,0.06);
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ANIMATION */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stat-card { animation: fadeUp 0.4s ease both; }
+.stat-card:nth-child(2) { animation-delay: 0.05s; }
+.stat-card:nth-child(3) { animation-delay: 0.1s; }
+.stat-card:nth-child(4) { animation-delay: 0.15s; }
+
+/* TOOLTIP */
+.tooltip {
+  position: absolute;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Che<span>pallet</span></div>
+  <div class="header-badge">CALCOLATORE 3D v2.0</div>
+</header>
+
+<section class="hero">
+  <h1>Ottimizza la tua<br><em>pallettizzazione</em></h1>
+  <p>Calcolo automatico della disposizione, visualizzazione 3D interattiva e personalizzazione completa dei parametri.</p>
+</section>
+
+<div class="app-grid">
+  <!-- LEFT: INPUT PANEL -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-icon">📦</div>
+        <h3>Parametri</h3>
+      </div>
+      <div class="panel-body">
+
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('box')">Scatola</button>
+          <button class="tab" onclick="switchTab('pallet')">Pallet</button>
+          <button class="tab" onclick="switchTab('visual')">Visual</button>
+        </div>
+
+        <!-- BOX TAB -->
+        <div id="tab-box">
+          <div class="section-label">Dimensioni scatola</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Lunghezza (mm)</label>
+              <div class="input-unit">
+                <input type="number" id="boxL" value="400" min="1">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Larghezza (mm)</label>
+              <div class="input-unit">
+                <input type="number" id="boxW" value="300" min="1">
+                <span>mm</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Altezza (mm)</label>
+              <div class="input-unit">
+                <input type="number" id="boxH" value="250" min="1">
+                <span>mm</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Peso (kg)</label>
+              <div class="input-unit">
+                <input type="number" id="boxWeight" value="5.5" step="0.1" min="0">
+                <span>kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-label">Strati e layout</div>
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Numero strati</span>
+              <strong id="layersVal">4</strong>
+            </div>
+            <input type="range" id="layers" min="1" max="12" value="4"
+              oninput="document.getElementById('layersVal').textContent=this.value">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Rotazione strati (°)</span>
+              <strong id="rotVal">0°</strong>
+            </div>
+            <input type="range" id="layerRot" min="0" max="1" value="0" step="1"
+              oninput="document.getElementById('rotVal').textContent=this.value==1?'90°':'0°'">
+          </div>
+
+          <div class="section-label">Opzioni</div>
+          <div class="toggle-row">
+            <span>Sovrapposizione strati</span>
+            <label class="toggle"><input type="checkbox" id="overlap" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <span>Mostra pallet base</span>
+            <label class="toggle"><input type="checkbox" id="showPallet" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <span>Mostra rete/griglia</span>
+            <label class="toggle"><input type="checkbox" id="showGrid" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <span>Vista wireframe</span>
+            <label class="toggle"><input type="checkbox" id="wireframe"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+        <!-- PALLET TAB -->
+        <div id="tab-pallet" style="display:none;">
+          <div class="section-label">Tipo pallet</div>
+          <div class="preset-grid">
+            <button class="preset-btn active" onclick="setPallet(1200,800,'EUR');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">EUR<br>1200×800</button>
+            <button class="preset-btn" onclick="setPallet(1200,1000,'EUR2');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">EUR2<br>1200×1000</button>
+            <button class="preset-btn" onclick="setPallet(1200,1200,'EUR3');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">EUR3<br>1200×1200</button>
+            <button class="preset-btn" onclick="setPallet(1219,1016,'US');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">US<br>1219×1016</button>
+            <button class="preset-btn" onclick="setPallet(1100,1100,'AU');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">AU<br>1100×1100</button>
+            <button class="preset-btn" onclick="setPallet(0,0,'custom');this.closest('.preset-grid').querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Custom<br>—</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Lunghezza pallet (mm)</label>
+              <input type="number" id="palletL" value="1200" min="1">
+            </div>
+            <div class="form-group">
+              <label>Larghezza pallet (mm)</label>
+              <input type="number" id="palletW" value="800" min="1">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Altezza max carico (mm)</label>
+              <input type="number" id="maxHeight" value="1800" min="1">
+            </div>
+            <div class="form-group">
+              <label>Peso max (kg)</label>
+              <input type="number" id="maxWeight" value="1000" min="1">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Overhang max (mm)</label>
+              <input type="number" id="overhang" value="0" min="0">
+            </div>
+            <div class="form-group">
+              <label>Spessore pallet (mm)</label>
+              <input type="number" id="palletThick" value="144" min="1">
+            </div>
+          </div>
+        </div>
+
+        <!-- VISUAL TAB -->
+        <div id="tab-visual" style="display:none;">
+          <div class="section-label">Colori scatola</div>
+          <div class="color-picker-row">
+            <div class="form-group">
+              <label>Faccia top</label>
+              <input type="color" id="colorTop" value="#f0a500">
+            </div>
+            <div class="form-group">
+              <label>Faccia lato</label>
+              <input type="color" id="colorSide" value="#c47d00">
+            </div>
+            <div class="form-group">
+              <label>Faccia fronte</label>
+              <input type="color" id="colorFront" value="#a86000">
+            </div>
+          </div>
+          <div class="section-label">Immagine scatola</div>
+          <label class="texture-upload">
+            <input type="file" id="boxTexture" accept="image/*" onchange="loadTexture(this)">
+            <span class="icon">🖼</span>
+            <span id="textureLabel">Carica etichetta / logo (PNG, JPG)</span>
+          </label>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>Su quale faccia applicare?</label>
+            <select id="textureFace">
+              <option value="all">Tutte le facce</option>
+              <option value="top">Solo top</option>
+              <option value="front">Solo fronte</option>
+              <option value="sides">Lato + fronte</option>
+            </select>
+          </div>
+          <div class="section-label">Colori pallet</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Colore pallet</label>
+              <input type="color" id="colorPallet" value="#8B6914">
+            </div>
+            <div class="form-group">
+              <label>Colore sfondo</label>
+              <input type="color" id="colorBg" value="#0a0c10">
+            </div>
+          </div>
+          <div class="section-label">Ambiente</div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>Stile illuminazione</label>
+            <select id="lightStyle">
+              <option value="studio">Studio</option>
+              <option value="warm">Warm</option>
+              <option value="cool">Cool</option>
+              <option value="dramatic">Dramatic</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-calc" onclick="calculate()">
+          ▶ CALCOLA & AGGIORNA 3D
+        </button>
+        <div class="alert" id="alert">✓ Calcolo completato con successo!</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: 3D + STATS -->
+  <div class="right-col">
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card active">
+        <div class="stat-value" id="s-total">—</div>
+        <div class="stat-label">Scatole totali</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="s-layer">—</div>
+        <div class="stat-label">Per strato</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="s-weight">—</div>
+        <div class="stat-label">Peso totale (kg)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="s-eff">—</div>
+        <div class="stat-label">Efficienza %</div>
+      </div>
+    </div>
+
+    <!-- 3D VIEWER -->
+    <div class="panel viewer-panel">
+      <div class="panel-header" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="panel-icon">🎲</div>
+          <h3>Visualizzazione 3D</h3>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-export" onclick="exportData()">↓ Export JSON</button>
+          <button class="btn-export" onclick="screenshotCanvas()">📷 Screenshot</button>
+        </div>
+      </div>
+      <div id="canvas-container">
+        <div class="viewer-info" id="viewer-info">
+          Trascina per ruotare · Scroll per zoom
+        </div>
+        <div class="viewer-controls">
+          <button class="ctrl-btn" title="Reset camera" onclick="resetCamera()">⌂</button>
+          <button class="ctrl-btn" title="Vista frontale" onclick="setView('front')">↔</button>
+          <button class="ctrl-btn" title="Vista top" onclick="setView('top')">↕</button>
+          <button class="ctrl-btn" title="Animazione" onclick="toggleAnim()" id="animBtn">▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATTERN + INFO -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="panel pattern-section">
+        <div class="panel-header">
+          <div class="panel-icon">🔲</div>
+          <h3>Schema strato</h3>
+        </div>
+        <div class="panel-body">
+          <div id="pattern-grid"></div>
+          <div class="legend" id="legend"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-icon">📊</div>
+          <h3>Dettagli</h3>
+        </div>
+        <div class="panel-body" id="detail-list" style="font-size:0.78rem;line-height:2;color:var(--muted);">
+          <div>Esegui un calcolo per<br>visualizzare i dettagli.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── THREE.JS SETUP ─────────────────────────────────────────────
+const container = document.getElementById('canvas-container');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setSize(container.clientWidth, container.clientHeight);
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 20000);
+camera.position.set(2200, 2000, 2200);
+camera.lookAt(0, 400, 0);
+
+// Grid
+const gridHelper = new THREE.GridHelper(3000, 30, 0x252932, 0x181b22);
+scene.add(gridHelper);
+
+// Lights
+let lights = [];
+function setupLights(style) {
+  lights.forEach(l => scene.remove(l));
+  lights = [];
+  const amb = new THREE.AmbientLight(0xffffff, 0.55);
+  scene.add(amb); lights.push(amb);
+  const dir = new THREE.DirectionalLight(0xffffff, 1.1);
+  dir.position.set(1500, 2500, 1500);
+  dir.castShadow = true;
+  dir.shadow.mapSize.set(2048, 2048);
+  scene.add(dir); lights.push(dir);
+  if (style === 'warm') {
+    const warm = new THREE.PointLight(0xff8844, 0.6, 5000);
+    warm.position.set(-800, 600, 800); scene.add(warm); lights.push(warm);
+  } else if (style === 'cool') {
+    const cool = new THREE.PointLight(0x4488ff, 0.5, 5000);
+    cool.position.set(800, 600, -800); scene.add(cool); lights.push(cool);
+  } else if (style === 'dramatic') {
+    dir.intensity = 2.5;
+    amb.intensity = 0.15;
+  }
+}
+setupLights('studio');
+
+// Orbit controls (manual)
+let isDragging = false, prevMouse = { x: 0, y: 0 };
+let camTheta = Math.PI / 4, camPhi = Math.PI / 3.5, camRadius = 3200;
+let camTarget = new THREE.Vector3(0, 400, 0);
+let autoRotate = false;
+
+function updateCamera() {
+  camera.position.x = camTarget.x + camRadius * Math.sin(camPhi) * Math.sin(camTheta);
+  camera.position.y = camTarget.y + camRadius * Math.cos(camPhi);
+  camera.position.z = camTarget.z + camRadius * Math.sin(camPhi) * Math.cos(camTheta);
+  camera.lookAt(camTarget);
+}
+updateCamera();
+
+renderer.domElement.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
+window.addEventListener('mouseup', () => isDragging = false);
+window.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  const dx = (e.clientX - prevMouse.x) * 0.008;
+  const dy = (e.clientY - prevMouse.y) * 0.008;
+  camTheta += dx;
+  camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi + dy));
+  prevMouse = { x: e.clientX, y: e.clientY };
+  updateCamera();
+});
+renderer.domElement.addEventListener('wheel', e => {
+  camRadius = Math.max(800, Math.min(8000, camRadius + e.deltaY * 1.5));
+  updateCamera();
+});
+// Touch
+let lastTouches = null;
+renderer.domElement.addEventListener('touchstart', e => { lastTouches = e.touches; isDragging = true; });
+renderer.domElement.addEventListener('touchend', () => { isDragging = false; lastTouches = null; });
+renderer.domElement.addEventListener('touchmove', e => {
+  if (!lastTouches) return;
+  if (e.touches.length === 1) {
+    const dx = (e.touches[0].clientX - lastTouches[0].clientX) * 0.01;
+    const dy = (e.touches[0].clientY - lastTouches[0].clientY) * 0.01;
+    camTheta += dx;
+    camPhi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, camPhi + dy));
+  } else if (e.touches.length === 2) {
+    const d0 = Math.hypot(lastTouches[0].clientX - lastTouches[1].clientX, lastTouches[0].clientY - lastTouches[1].clientY);
+    const d1 = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    camRadius = Math.max(800, Math.min(8000, camRadius - (d1 - d0) * 4));
+  }
+  lastTouches = e.touches;
+  updateCamera();
+});
+
+function resetCamera() {
+  camTheta = Math.PI / 4; camPhi = Math.PI / 3.5; camRadius = 3200;
+  camTarget.set(0, 400, 0); updateCamera();
+}
+function setView(v) {
+  if (v === 'front') { camTheta = 0; camPhi = Math.PI / 4; }
+  else if (v === 'top') { camTheta = 0; camPhi = 0.05; }
+  updateCamera();
+}
+function toggleAnim() {
+  autoRotate = !autoRotate;
+  document.getElementById('animBtn').textContent = autoRotate ? '⏸' : '▶';
+}
+
+// Resize
+window.addEventListener('resize', () => {
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  camera.aspect = container.clientWidth / container.clientHeight;
+  camera.updateProjectionMatrix();
+});
+
+// ── SCENE OBJECTS ───────────────────────────────────────────────
+let palletGroup = new THREE.Group();
+scene.add(palletGroup);
+let customTexture = null;
+
+function hexToThree(hex) {
+  return parseInt(hex.replace('#', ''), 16);
+}
+
+function buildBoxMaterials(colorTop, colorSide, colorFront, wire) {
+  const face = document.getElementById('textureFace').value;
+  const makeM = (color, useTexture) => {
+    const opts = { color: hexToThree(color), roughness: 0.55, metalness: 0.1 };
+    if (useTexture && customTexture) opts.map = customTexture;
+    const m = new THREE.MeshStandardMaterial(opts);
+    if (wire) { m.wireframe = true; }
+    return m;
+  };
+  const useTex = (f) => customTexture && (face === 'all' || face === f || (face === 'sides' && (f === 'side' || f === 'front')));
+  return [
+    makeM(colorSide, useTex('side')),   // right
+    makeM(colorSide, useTex('side')),   // left
+    makeM(colorTop,  useTex('top')),    // top
+    makeM(colorSide, useTex('side')),   // bottom
+    makeM(colorFront,useTex('front')),  // front
+    makeM(colorSide, useTex('side')),   // back
+  ];
+}
+
+function buildScene(result) {
+  while (palletGroup.children.length) palletGroup.remove(palletGroup.children[0]);
+
+  const { bL, bW, bH, pL, pW, pT, layers, positions, rotated, wireframe, showPalletBase } = result;
+  const colorTop   = document.getElementById('colorTop').value;
+  const colorSide  = document.getElementById('colorSide').value;
+  const colorFront = document.getElementById('colorFront').value;
+  const colorPallet = document.getElementById('colorPallet').value;
+  const showGrid = document.getElementById('showGrid').checked;
+
+  // update bg
+  const bgColor = document.getElementById('colorBg').value;
+  renderer.setClearColor(hexToThree(bgColor), 1);
+
+  // Grid visibility
+  gridHelper.visible = showGrid;
+
+  // Pallet base
+  if (showPalletBase) {
+    const palMat = new THREE.MeshStandardMaterial({ color: hexToThree(colorPallet), roughness: 0.8 });
+    const palGeo = new THREE.BoxGeometry(pL, pT, pW);
+    const palMesh = new THREE.Mesh(palGeo, palMat);
+    palMesh.position.set(0, pT / 2, 0);
+    palMesh.castShadow = true; palMesh.receiveShadow = true;
+    palletGroup.add(palMesh);
+    // deck boards detail
+    for (let i = 0; i < 3; i++) {
+      const bg = new THREE.BoxGeometry(pL, pT * 0.4, pW * 0.18);
+      const bm = new THREE.Mesh(bg, new THREE.MeshStandardMaterial({ color: hexToThree(colorPallet), roughness: 0.9 }));
+      bm.position.set(0, pT * 0.7, (i - 1) * pW * 0.35);
+      palletGroup.add(bm);
+    }
+  }
+
+  // Boxes
+  const boxMats = buildBoxMaterials(colorTop, colorSide, colorFront, wireframe);
+  const boxGeo = new THREE.BoxGeometry(bL, bH, bW);
+
+  positions.forEach(({ x, z, layer, rot }) => {
+    const w = rot ? bL : bL;
+    const d = rot ? bW : bW;
+    const geo = rot ? new THREE.BoxGeometry(bW, bH, bL) : boxGeo;
+    const mesh = new THREE.Mesh(geo, boxMats);
+    mesh.position.set(
+      x + (rot ? bW : bL) / 2 - pL / 2,
+      pT + layer * bH + bH / 2,
+      z + (rot ? bL : bW) / 2 - pW / 2
+    );
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    // Edge lines
+    const edges = new THREE.EdgesGeometry(geo);
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 });
+    const line = new THREE.LineSegments(edges, lineMat);
+    line.position.copy(mesh.position);
+    palletGroup.add(mesh);
+    palletGroup.add(line);
+  });
+
+  // center group
+  camTarget.set(0, pT + layers * bH / 2, 0);
+  camRadius = Math.max(2000, (pL + pW + layers * bH) * 1.6);
+  updateCamera();
+}
+
+// ── CALCULATION ─────────────────────────────────────────────────
+let lastResult = null;
+
+function calculate() {
+  const bL = parseFloat(document.getElementById('boxL').value);
+  const bW = parseFloat(document.getElementById('boxW').value);
+  const bH = parseFloat(document.getElementById('boxH').value);
+  const bWgt = parseFloat(document.getElementById('boxWeight').value);
+  const pL = parseFloat(document.getElementById('palletL').value);
+  const pW = parseFloat(document.getElementById('palletW').value);
+  const pT = parseFloat(document.getElementById('palletThick').value);
+  const maxH = parseFloat(document.getElementById('maxHeight').value);
+  const maxWgt = parseFloat(document.getElementById('maxWeight').value);
+  const oh = parseFloat(document.getElementById('overhang').value);
+  const nLayers = parseInt(document.getElementById('layers').value);
+  const alternateRot = document.getElementById('overlap').checked;
+  const wireframe = document.getElementById('wireframe').checked;
+  const showPalletBase = document.getElementById('showPallet').checked;
+  const doRot = parseInt(document.getElementById('layerRot').value) === 1;
+
+  // Layer fitting
+  function fitLayer(rot) {
+    const bx = rot ? bW : bL;
+    const bz = rot ? bL : bW;
+    const usableL = pL + oh * 2;
+    const usableW = pW + oh * 2;
+    const nx = Math.floor(usableL / bx);
+    const nz = Math.floor(usableW / bz);
+    const positions = [];
+    for (let i = 0; i < nx; i++) {
+      for (let j = 0; j < nz; j++) {
+        positions.push({ x: i * bx, z: j * bz, rot });
+      }
+    }
+    return { positions, nx, nz };
+  }
+
+  // Optimal single layer (try both orientations)
+  const fitA = fitLayer(false);
+  const fitB = fitLayer(true);
+  const fitMixed = fitA.positions.length >= fitB.positions.length ? fitA : fitB;
+  const basePositions = fitMixed.positions;
+  const baseRot = fitMixed.positions[0]?.rot || false;
+
+  let allPositions = [];
+  const actualLayers = Math.min(nLayers, Math.floor((maxH - pT) / bH));
+
+  for (let layer = 0; layer < actualLayers; layer++) {
+    let layerPositions;
+    if (alternateRot && layer % 2 === 1 && doRot) {
+      const altFit = fitLayer(!baseRot);
+      layerPositions = altFit.positions.map(p => ({ ...p, layer }));
+    } else {
+      layerPositions = basePositions.map(p => ({ ...p, layer }));
+    }
+    allPositions = allPositions.concat(layerPositions);
+  }
+
+  const totalBoxes = allPositions.length;
+  const perLayer = basePositions.length;
+  const totalWeight = totalBoxes * bWgt;
+  const palletSurface = pL * pW;
+  const boxSurface = perLayer * (bL * bW);
+  const efficiency = Math.min(100, Math.round((boxSurface / palletSurface) * 100));
+  const totalHeight = pT + actualLayers * bH;
+
+  // Over-weight check
+  const overWeight = totalWeight > maxWgt;
+  const overHeight = totalHeight > maxH;
+
+  lastResult = { bL, bW, bH, pL, pW, pT, layers: actualLayers, positions: allPositions, wireframe, showPalletBase };
+
+  // Stats
+  document.getElementById('s-total').textContent = totalBoxes;
+  document.getElementById('s-layer').textContent = perLayer;
+  document.getElementById('s-weight').textContent = Math.round(totalWeight * 10) / 10;
+  document.getElementById('s-eff').textContent = efficiency + '%';
+  document.querySelectorAll('.stat-card').forEach(c => c.classList.add('active'));
+
+  // Details
+  document.getElementById('detail-list').innerHTML = `
+    <div>📦 Dimensioni scatola: <strong style="color:var(--text)">${bL}×${bW}×${bH} mm</strong></div>
+    <div>🏗 Pallet: <strong style="color:var(--text)">${pL}×${pW} mm</strong></div>
+    <div>📐 Colonne per strato: <strong style="color:var(--text)">${fitMixed.nx} × ${fitMixed.nz}</strong></div>
+    <div>🔢 Strati effettivi: <strong style="color:var(--text)">${actualLayers}</strong></div>
+    <div>📏 Altezza totale: <strong style="${overHeight ? 'color:var(--accent2)' : 'color:var(--text)'}">${Math.round(totalHeight)} mm${overHeight ? ' ⚠' : ''}</strong></div>
+    <div>⚖️ Peso totale: <strong style="${overWeight ? 'color:var(--accent2)' : 'color:var(--text)'}">${Math.round(totalWeight * 10) / 10} kg${overWeight ? ' ⚠' : ''}</strong></div>
+    <div>📊 Superficie pallet: <strong style="color:var(--text)">${(palletSurface / 1e6).toFixed(3)} m²</strong></div>
+    <div>🎯 Efficienza: <strong style="color:var(--green)">${efficiency}%</strong></div>
+  `;
+
+  // Pattern grid
+  renderPattern(fitMixed.nx, fitMixed.nz);
+
+  // 3D
+  buildScene(lastResult);
+
+  // Alert
+  const a = document.getElementById('alert');
+  a.style.display = 'block';
+  setTimeout(() => a.style.display = 'none', 2500);
+
+  setupLights(document.getElementById('lightStyle').value);
+}
+
+function renderPattern(nx, nz) {
+  const grid = document.getElementById('pattern-grid');
+  grid.innerHTML = '';
+  const maxDisplay = 20;
+  const displayNx = Math.min(nx, maxDisplay);
+  const displayNz = Math.min(nz, maxDisplay);
+  for (let j = 0; j < displayNz; j++) {
+    const row = document.createElement('div');
+    row.className = 'pattern-row';
+    for (let i = 0; i < displayNx; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'pattern-cell filled';
+      row.appendChild(cell);
+    }
+    grid.appendChild(row);
+  }
+  document.getElementById('legend').innerHTML = `
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Scatola (${nx}×${nz})</div>
+  `;
+}
+
+// ── ANIMATION LOOP ───────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  if (autoRotate) {
+    camTheta += 0.005;
+    updateCamera();
+  }
+  renderer.render(scene, camera);
+}
+animate();
+
+// ── UTILS ────────────────────────────────────────────────────────
+function switchTab(name) {
+  ['box', 'pallet', 'visual'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((b, i) => {
+    b.classList.toggle('active', ['box', 'pallet', 'visual'][i] === name);
+  });
+}
+
+function setPallet(l, w, type) {
+  if (l) {
+    document.getElementById('palletL').value = l;
+    document.getElementById('palletW').value = w;
+  }
+}
+
+function loadTexture(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('textureLabel').textContent = file.name;
+  const url = URL.createObjectURL(file);
+  new THREE.TextureLoader().load(url, tex => {
+    customTexture = tex;
+    if (lastResult) buildScene(lastResult);
+  });
+}
+
+function exportData() {
+  if (!lastResult) { alert('Esegui prima un calcolo.'); return; }
+  const data = {
+    scatola: {
+      lunghezza: document.getElementById('boxL').value,
+      larghezza: document.getElementById('boxW').value,
+      altezza: document.getElementById('boxH').value,
+      peso: document.getElementById('boxWeight').value
+    },
+    pallet: {
+      lunghezza: document.getElementById('palletL').value,
+      larghezza: document.getElementById('palletW').value,
+    },
+    risultati: {
+      scatole_totali: document.getElementById('s-total').textContent,
+      per_strato: document.getElementById('s-layer').textContent,
+      peso_totale: document.getElementById('s-weight').textContent,
+      efficienza: document.getElementById('s-eff').textContent,
+    }
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'pallettizzazione.json'; a.click();
+}
+
+function screenshotCanvas() {
+  renderer.render(scene, camera);
+  const url = renderer.domElement.toDataURL('image/png');
+  const a = document.createElement('a'); a.href = url;
+  a.download = 'pallet3d.png'; a.click();
+}
+
+// Reactive update on visual changes
+['colorTop','colorSide','colorFront','colorPallet','colorBg','textureFace','lightStyle','wireframe','showPallet','showGrid'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', () => { if (lastResult) { setupLights(document.getElementById('lightStyle').value); buildScene(lastResult); } });
+});
+
+// Initial calc
+calculate();
+</script>
+</body>
+</html>
