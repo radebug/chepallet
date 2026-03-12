@@ -456,7 +456,7 @@ function showPage(n,btn){
 // ══════ SPECS ══════
 const CONTS={'20dry':{name:"20' Dry",iL:5898,iW:2352,iH:2393,maxP:28200,tare:2300},'40dry':{name:"40' Dry",iL:12032,iW:2352,iH:2393,maxP:26680,tare:3800},'40hc':{name:"40' HC",iL:12032,iW:2352,iH:2698,maxP:26460,tare:4020},'40ref':{name:"40' Reefer",iL:11580,iW:2286,iH:2400,maxP:27700,tare:4400}};
 const TRUCKS={'std':{name:"Semirimorchio",iL:13600,iW:2400,iH:2700,maxP:24000,tare:7500},'mega':{name:"Mega Trailer",iL:13600,iW:2400,iH:3000,maxP:24000,tare:7500},'van':{name:"Furgone 7.5t",iL:6200,iW:2200,iH:2200,maxP:4000,tare:3500},'ref':{name:"Reefer Truck",iL:13310,iW:2400,iH:2600,maxP:22000,tare:8000}};
-let selCont='20dry',selTruck='std',cMode='boxes',tMode='boxes';
+let selectedCont='20dry',selectedTruck='std',cMode='boxes',tMode='boxes';
 
 // ══════ THREE.JS RENDERERS ══════
 function makeRenderer(containerId){
@@ -603,7 +603,7 @@ function setupLightsP(){
 // ══════ CONTAINER CALC ══════
 let lastC=null;
 function calcContainer(){
-  const spec=CONTS[selCont];
+  const spec=CONTS[selectedCont];
   const mS=+document.getElementById('cMSide').value,mT=+document.getElementById('cMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
   let items=[],totKg=0,usedVol=0,layers=0;
@@ -662,7 +662,7 @@ function calcHowManyContainers(unitsPerCont,kgPerUnit,spec){
 // ══════ TRUCK CALC ══════
 let lastT=null;
 function calcTruck(){
-  const spec=TRUCKS[selTruck];
+  const spec=TRUCKS[selectedTruck];
   const mS=+document.getElementById('tMSide').value,mT=+document.getElementById('tMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
   let items=[],totKg=0,usedVol=0,layers=0;
@@ -831,8 +831,8 @@ function showAlert(id){const a=document.getElementById(id);a.style.display='bloc
 // Form helpers
 function swTab(n,btn){['box','pallet','visual'].forEach(t=>document.getElementById('tab-'+t).style.display=t===n?'block':'none');btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 function setP(l,w,btn){if(l){document.getElementById('pL').value=l;document.getElementById('pW').value=w;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-function selCont(t,btn){selCont=t;document.querySelectorAll('.ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('clbl').textContent=CONTS[t].name;}
-function selTruck(t,btn){selTruck=t;document.querySelectorAll('.ttb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tlbl').textContent=TRUCKS[t].name;}
+function selCont(t,btn){selectedCont=t;document.querySelectorAll('.ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('clbl').textContent=CONTS[t].name;}
+function selTruck(t,btn){selectedTruck=t;document.querySelectorAll('.ttb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tlbl').textContent=TRUCKS[t].name;}
 function selCMode(m,btn){cMode=m;document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('cm-pallets').style.display=m==='pallets'?'block':'none';}
 function selTMode(m,btn){tMode=m;document.querySelectorAll('#page-truck .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('tm-pallets').style.display=m==='pallets'?'block':'none';}
 function setCPal(l,w,t,btn){if(l){document.getElementById('cpL').value=l;document.getElementById('cpW').value=w;document.getElementById('cpT').value=t;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
