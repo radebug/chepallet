@@ -124,19 +124,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .leg{display:flex;gap:11px;flex-wrap:wrap;margin-top:8px;}
 .li{display:flex;align-items:center;gap:5px;font-size:0.66rem;color:var(--muted);}
 .ld{width:8px;height:8px;border-radius:2px;}
-
-.mix-wrap{margin-top:12px;border:1px solid var(--border);border-radius:10px;padding:10px;background:rgba(255,255,255,0.02);}
-.mix-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
-.mix-row{display:grid;grid-template-columns:1.1fr repeat(3,0.9fr) 0.7fr 0.7fr auto;gap:6px;align-items:end;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);}
-.mix-row.mix-cargo{grid-template-columns:0.9fr repeat(3,0.9fr) 0.8fr 0.8fr auto;}
-.mix-row .fg{gap:3px}
-.icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#191d24;color:var(--text);cursor:pointer;}
-.small-note{font-size:0.66rem;color:var(--muted);line-height:1.5;margin-top:6px;}
-.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media(max-width:960px){.mix-row,.mix-row.mix-cargo{grid-template-columns:1fr 1fr;}.kpi-strip{grid-template-columns:repeat(2,1fr);}}
-.source-link{color:var(--accent);text-decoration:none}
-.source-link:hover{text-decoration:underline}
-
 /* TRANSFER */
 .btn-xfer{width:100%;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.73rem;cursor:pointer;transition:all 0.2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:7px;}
 .btn-xfer:hover{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,0.06);}
@@ -149,6 +136,18 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .sc,.csc{animation:fadeUp 0.35s ease both;}
+
+.mix-box{margin-top:12px;border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
+.mix-box textarea{width:100%;min-height:220px;resize:vertical;border-radius:10px;border:1px solid var(--border);background:#0b0f14;color:var(--text);padding:12px;font-family:'DM Mono',monospace;font-size:0.78rem;line-height:1.7;}
+.mix-box .hint{font-size:0.68rem;color:var(--muted);margin-top:8px;line-height:1.6;}
+.mix-box .title{font-weight:700;color:var(--text);margin-bottom:8px;}
+.route-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;}
+.route-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow);}
+.route-out{white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:0.74rem;line-height:1.75;color:var(--text);background:#0b0f14;border:1px solid var(--border);border-radius:12px;padding:12px;min-height:180px;overflow:auto;}
+.codebox{white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:0.7rem;line-height:1.7;color:var(--muted);background:#0b0f14;border:1px solid var(--border);border-radius:12px;padding:12px;overflow:auto;}
+.route-card .fr{align-items:end;}
+@media(max-width:1024px){.route-grid{grid-template-columns:1fr;}}
+
 </style>
 </head>
 <body>
@@ -159,9 +158,9 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <button class="nav-btn active" onclick="showPage('pallet',this)">📦 Pallet</button>
     <button class="nav-btn nb" onclick="showPage('container',this)">🚢 Container</button>
     <button class="nav-btn nt" onclick="showPage('truck',this)">🚛 Truck</button>
-    <button class="nav-btn" onclick="showPage('fuel',this)">⛽ Fuel</button>
+    <button class="nav-btn nr" onclick="showPage('routes',this)">🌍 Routes</button>
   </nav>
-  <div class="header-badge">v3.0</div>
+  <div class="header-badge">v4.2</div>
 </header>
 
 <!-- ═══════════════════ PALLET PAGE ═══════════════════ -->
@@ -193,13 +192,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <div class="tr"><span>Mostra pallet base</span><label class="tg"><input type="checkbox" id="showP" checked><span class="ts"></span></label></div>
           <div class="tr"><span>Mostra griglia</span><label class="tg"><input type="checkbox" id="showG" checked><span class="ts"></span></label></div>
           <div class="tr"><span>Vista wireframe</span><label class="tg"><input type="checkbox" id="wf"><span class="ts"></span></label></div>
-          <div class="tr"><span>Mix formati su pallet</span><label class="tg"><input type="checkbox" id="pMix"><span class="ts"></span></label></div>
-          <div id="pMixWrap" class="mix-wrap" style="display:none;">
-            <div class="sl">Formati extra pallet</div>
-            <div class="small-note">Aggiungi più scatole con dimensioni e quantità diverse. In modalità mix il sistema costruisce strati dinamici e ignora il cursore “numero strati”.</div>
-            <div id="pMixList" class="mix-list"></div>
-            <button class="be" type="button" onclick="addPalletMixRow()">＋ Aggiungi formato</button>
-          </div>
         </div>
         <!-- PALLET -->
         <div id="tab-pallet" style="display:none;">
@@ -247,7 +239,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <div style="display:flex;gap:6px;">
           <button class="be" onclick="exportPDF('pallet')">📄 PDF</button>
           <button class="be" onclick="doScreenshot('pc')">📷</button>
-          <button class="be" onclick="exportJSON('pallet')">↓ JSON</button>
         </div>
       </div>
       <div class="cw" id="pc">
@@ -290,7 +281,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <div class="mt">
           <button class="mb on" onclick="selCMode('boxes',this)">📦 Floor Loaded</button>
           <button class="mb" onclick="selCMode('pallets',this)">🪵 Su Pallet</button>
-          <button class="mb" onclick="selCMode('mixed',this)">🧩 Misto</button>
+          <button class="mb" onclick="selCMode('mix',this)">🔀 Mix</button>
         </div>
         <div id="cm-boxes">
           <div class="sl b">Dimensioni scatola</div>
@@ -314,12 +305,21 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <div class="fr"><div class="fg"><label>Peso per pallet (kg)</label><input type="number" id="cpKg" value="500" min="0"></div><div class="fg"><label>File pallet</label><input type="number" id="cpRows" value="1" min="1" max="3"></div></div>
           <div class="tr"><span>Doppio strato (impilabili)</span><label class="tg"><input type="checkbox" id="cpStack"><span class="ts"></span></label></div>
         </div>
-        <div id="cm-mixed" class="mix-wrap" style="display:none;">
-          <div class="sl b">Carico misto container</div>
-          <div class="small-note">Puoi combinare pallet e scatole nello stesso container. In questa modalità il calcolo dispone i colli sul piano di carico, senza sovrapposizione verticale.</div>
-          <div id="cMixList" class="mix-list"></div>
-          <button class="be bb" type="button" onclick="addCargoRow('c')">＋ Aggiungi collo</button>
+
+        <div id="cm-mix" style="display:none;">
+          <div class="mix-box">
+            <div class="title">Mix pallet / scatole</div>
+            <textarea id="cmMixText" placeholder="Scrivi una riga per ogni formato:
+PALLET;1200;800;1344;500;10
+PALLET;1200;1000;1600;620;4
+BOX;400;300;250;5.5;80
+
+Formato:
+TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
+            <div class="hint">Le celle sono state allargate. In modalità mix puoi combinare pallet diversi e scatole diverse nello stesso container. Il calcolo è conservativo: disposizione a pavimento con orientamento migliore automatico.</div>
+          </div>
         </div>
+
         <div class="sl b">Margini sicurezza</div>
         <div class="fr"><div class="fg"><label>Margine lato (mm)</label><input type="number" id="cMSide" value="20" min="0"></div><div class="fg"><label>Margine alto (mm)</label><input type="number" id="cMTop" value="50" min="0"></div></div>
 
@@ -351,7 +351,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <div style="display:flex;gap:6px;">
           <button class="be bb" onclick="exportPDF('container')">📄 PDF</button>
           <button class="be bb" onclick="doScreenshot('cc')">📷</button>
-          <button class="be bb" onclick="exportJSON('container')">↓ JSON</button>
         </div>
       </div>
       <div class="cw" id="cc">
@@ -395,7 +394,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <div class="mt">
           <button class="mb ton on" onclick="selTMode('boxes',this)">📦 Floor Loaded</button>
           <button class="mb ton" onclick="selTMode('pallets',this)">🪵 Su Pallet</button>
-          <button class="mb ton" onclick="selTMode('mixed',this)">🧩 Misto</button>
+          <button class="mb ton" onclick="selTMode('mix',this)">🔀 Mix</button>
         </div>
         <div id="tm-boxes">
           <div class="sl t">Dimensioni scatola</div>
@@ -419,12 +418,21 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <div class="fr"><div class="fg"><label>Peso per pallet (kg)</label><input type="number" id="tpKg" value="500" min="0"></div></div>
           <div class="tr"><span>Doppio strato (impilabili)</span><label class="tg"><input type="checkbox" id="tpStack"><span class="ts"></span></label></div>
         </div>
-        <div id="tm-mixed" class="mix-wrap" style="display:none;">
-          <div class="sl t">Carico misto truck</div>
-          <div class="small-note">Puoi combinare pallet e scatole nello stesso truck. In questa modalità il calcolo dispone i colli sul piano di carico, senza sovrapposizione verticale.</div>
-          <div id="tMixList" class="mix-list"></div>
-          <button class="be bt" type="button" onclick="addCargoRow('t')">＋ Aggiungi collo</button>
+
+        <div id="tm-mix" style="display:none;">
+          <div class="mix-box">
+            <div class="title">Mix pallet / scatole</div>
+            <textarea id="tmMixText" placeholder="Scrivi una riga per ogni formato:
+PALLET;1200;800;1344;500;10
+PALLET;1219;1016;1500;650;6
+BOX;400;300;250;5.5;120
+
+Formato:
+TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
+            <div class="hint">Puoi scrivere direttamente qui dentro. Le righe possono contenere pallet diversi e scatole diverse nello stesso truck.</div>
+          </div>
         </div>
+
         <div class="sl t">Margini sicurezza</div>
         <div class="fr"><div class="fg"><label>Margine lato (mm)</label><input type="number" id="tMSide" value="20" min="0"></div><div class="fg"><label>Margine alto (mm)</label><input type="number" id="tMTop" value="50" min="0"></div></div>
 
@@ -456,7 +464,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <div style="display:flex;gap:6px;">
           <button class="be bt" onclick="exportPDF('truck')">📄 PDF</button>
           <button class="be bt" onclick="doScreenshot('tc')">📷</button>
-          <button class="be bt" onclick="exportJSON('truck')">↓ JSON</button>
         </div>
       </div>
       <div class="cw" id="tc">
@@ -479,46 +486,64 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 </div>
 
 
-<!-- ═══════════════════ FUEL PAGE ═══════════════════ -->
-<div id="page-fuel" class="page">
-<section class="hero">
-  <h1>Calcola il costo<br><em>carburante</em></h1>
-  <p>Stima costo viaggio usando i prezzi medi regionali MIMIT per benzina self e gasolio self.</p>
+<!-- ═══════════════════ ROUTES PAGE ═══════════════════ -->
+<div id="page-routes" class="page">
+<section class="hero bh">
+  <h1>Distanze, tempi e<br><em class="b">demurrage</em></h1>
+  <p>Strumento ispirato a SeaRates per preparare richieste API su distanza/transit time e costi di demurrage &amp; storage.</p>
 </section>
-<div class="app-grid">
+<div class="route-grid">
   <div style="display:flex;flex-direction:column;gap:14px;">
-    <div class="panel">
-      <div class="ph"><div class="pi">⛽</div><h3>Calcolatore carburante</h3></div>
+    <div class="route-card">
+      <div class="ph"><div class="pi">🌍</div><h3>Distance &amp; Time</h3></div>
       <div class="pb">
-        <div class="sl">Prezzi medi regionali</div>
-        <div class="fr">
-          <div class="fg"><label>Regione</label><select id="fuelRegion"></select></div>
-          <div class="fg"><label>Carburante</label><select id="fuelType"><option value="benzina">Benzina</option><option value="gasolio">Gasolio</option></select></div>
-        </div>
-        <div class="fr">
-          <div class="fg"><label>Prezzo €/L</label><input type="number" id="fuelPrice" step="0.001"></div>
-          <div class="fg"><label>km totali</label><input type="number" id="fuelKm" value="100" min="1"></div>
-        </div>
-        <div class="fr">
-          <div class="fg"><label>Consumo (L/100km)</label><input type="number" id="fuelConsumption" value="7" step="0.1" min="0.1"></div>
-          <div class="fg"><label>Pedaggio / extra (€)</label><input type="number" id="fuelExtras" value="0" step="0.01" min="0"></div>
-        </div>
-        <div class="tr"><span>Andata e ritorno</span><label class="tg"><input type="checkbox" id="fuelRoundTrip"><span class="ts"></span></label></div>
-        <button class="bc" type="button" onclick="calcFuel()">▶ CALCOLA COSTO</button>
-        <div class="small-note">Fonte dati: <a class="source-link" target="_blank" rel="noopener noreferrer" href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni">MIMIT – Prezzi medi carburanti per regioni</a>. Pagina aggiornata quotidianamente.</div>
+        <div class="fr"><div class="fg"><label>API key</label><input type="password" id="srApiKey" placeholder="Inserisci la tua API key SeaRates"></div><div class="fg"><label>Trasporto</label><select id="srModes"><option value="SEA">SEA</option><option value="ROAD">ROAD</option><option value="SEA,ROAD">SEA + ROAD</option><option value="AIR,ROAD">AIR + ROAD</option><option value="RAIL,ROAD">RAIL + ROAD</option></select></div></div>
+        <div class="fr"><div class="fg"><label>Da</label><input id="srFrom" value="CNSHG" placeholder="UN/LOCODE, città, indirizzo, coordinate"></div><div class="fg"><label>A</label><input id="srTo" value="ITGOA" placeholder="UN/LOCODE, città, indirizzo, coordinate"></div></div>
+        <div class="fr"><div class="fg"><label>Alternative routes</label><select id="srAlt"><option value="false">No</option><option value="true">Sì</option></select></div><div class="fg"><label>Formato</label><select id="srUnits"><option value="metric">Metric</option><option value="imperial">Imperial</option></select></div></div>
+        <button class="bc bb" onclick="runSeaRatesDistance()">▶ CALCOLA DISTANZA / TEMPI</button>
+        <div class="sl b">Risultato</div>
+        <div class="route-out" id="srDistanceOut">Inserisci API key e tratta, poi esegui la richiesta.</div>
+      </div>
+    </div>
+
+    <div class="route-card">
+      <div class="ph"><div class="pi">⏱️</div><h3>Demurrage &amp; Storage</h3></div>
+      <div class="pb">
+        <div class="fr"><div class="fg"><label>Port ID</label><input type="number" id="srPortId" value="11978"></div><div class="fg"><label>Shipping Line ID</label><input type="number" id="srLineId" value="15"></div></div>
+        <div class="fr"><div class="fg"><label>Container ID</label><input type="number" id="srContainerId" value="1"></div><div class="fg"><label>Tipo</label><select id="srTradeType"><option value="import">Import</option><option value="export">Export</option></select></div></div>
+        <div class="fr"><div class="fg"><label>Discharge date</label><input type="date" id="srDischarge" value="2026-03-01"></div><div class="fg"><label>Out full</label><input type="date" id="srOutFull" value="2026-03-07"></div></div>
+        <div class="fr"><div class="fg"><label>In empty</label><input type="date" id="srInEmpty" value="2026-03-20"></div><div class="fg"><label>Valuta attesa</label><input id="srCurrency" value="EUR"></div></div>
+        <div class="fr"><div class="fg"><label>Tariffe (auto da API)</label><button class="btn-xfer" style="margin-top:0" onclick="fetchSeaRatesTariffs()">↻ Recupera tariffe</button></div><div class="fg"><label>Container list</label><button class="btn-xfer" style="margin-top:0" onclick="fetchSeaRatesContainers()">↻ Recupera container</button></div></div>
+        <div class="fg"><label>Tariffe JSON (puoi modificarle)</label><textarea id="srTariffs" style="width:100%;min-height:180px;resize:vertical;border-radius:10px;border:1px solid var(--border);background:#0b0f14;color:var(--text);padding:12px;font-family:'DM Mono',monospace;font-size:0.75rem;">{
+  "storage": [],
+  "demurrage": [],
+  "detention": []
+}</textarea></div>
+        <button class="bc bb" onclick="runSeaRatesDemurrage()">▶ CALCOLA DEMURRAGE</button>
+        <div class="sl b">Risultato</div>
+        <div class="route-out" id="srDemOut">Recupera le tariffe o incollale manualmente, poi esegui il calcolo.</div>
       </div>
     </div>
   </div>
-  <div class="rc">
-    <div class="kpi-strip">
-      <div class="sc"><div class="sv" id="fuelLiters">—</div><div class="slb">Litri stimati</div></div>
-      <div class="sc"><div class="sv" id="fuelCost">—</div><div class="slb">Costo carburante</div></div>
-      <div class="sc"><div class="sv" id="fuelTotal">—</div><div class="slb">Totale con extra</div></div>
-      <div class="sc"><div class="sv" id="fuelPerKm">—</div><div class="slb">Costo €/km</div></div>
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="route-card">
+      <div class="ph"><div class="pi">🧾</div><h3>Request builder</h3></div>
+      <div class="pb">
+        <div class="sl b">Fetch Distance &amp; Time</div>
+        <div class="codebox" id="srDistanceCode">—</div>
+        <div class="sl b" style="margin-top:12px;">Fetch Demurrage</div>
+        <div class="codebox" id="srDemCode">—</div>
+        <div class="hint" style="margin-top:10px;">Questa scheda ti genera anche le chiamate pronte. Utile se vuoi collegare il sito a Supabase, Edge Functions o GitHub Pages con un proxy server-side.</div>
+      </div>
     </div>
-    <div class="panel">
-      <div class="ph"><div class="pi">📊</div><h3>Dettaglio costo viaggio</h3></div>
-      <div class="pb" id="fuelDetail" style="font-size:0.74rem;line-height:2;color:var(--muted);">Seleziona regione, carburante e distanza.</div>
+    <div class="route-card">
+      <div class="ph"><div class="pi">ℹ️</div><h3>Note integrazione</h3></div>
+      <div class="pb" style="font-size:0.76rem;line-height:1.9;color:var(--muted);">
+        <div>• Distance &amp; Time usa endpoint REST dedicato.</div>
+        <div>• Demurrage usa endpoint SeaRates con body JSON e richiede tariffe/container/linea/porto coerenti.</div>
+        <div>• Se il browser blocca CORS, usa un proxy server-side.</div>
+        <div>• La pagina è pronta per lavorare con la tua API key, ma io qui non posso testare chiamate live verso SeaRates.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -537,7 +562,7 @@ function showPage(n,btn){
 // ══════ SPECS ══════
 const CONTS={'20dry':{name:"20' Dry",iL:5898,iW:2352,iH:2393,maxP:28200,tare:2300},'40dry':{name:"40' Dry",iL:12032,iW:2352,iH:2393,maxP:26680,tare:3800},'40hc':{name:"40' HC",iL:12032,iW:2352,iH:2698,maxP:26460,tare:4020},'40ref':{name:"40' Reefer",iL:11580,iW:2286,iH:2400,maxP:27700,tare:4400}};
 const TRUCKS={'std':{name:"Semirimorchio",iL:13600,iW:2400,iH:2700,maxP:24000,tare:7500},'mega':{name:"Mega Trailer",iL:13600,iW:2400,iH:3000,maxP:24000,tare:7500},'van':{name:"Furgone 7.5t",iL:6200,iW:2200,iH:2200,maxP:4000,tare:3500},'ref':{name:"Reefer Truck",iL:13310,iW:2400,iH:2600,maxP:22000,tare:8000}};
-let selectedContType='20dry',selectedTruckType='std',cMode='boxes',tMode='boxes';
+let selectedCont='20dry',selectedTruck='std',cMode='boxes',tMode='boxes';
 
 // ══════ THREE.JS RENDERERS ══════
 function makeRenderer(containerId){
@@ -621,165 +646,19 @@ function clr(grp){while(grp.children.length)grp.remove(grp.children[0]);}
 function boxMesh(geo,color,wire=false){const m=new THREE.MeshStandardMaterial({color,roughness:0.55,metalness:0.05});if(wire)m.wireframe=true;return new THREE.Mesh(geo,m);}
 function addEdges(grp,geo,pos){const l=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.2}));l.position.copy(pos);grp.add(l);}
 
-
-// ══════ MIX HELPERS ══════
-const FUEL_PRICES={
-  "Abruzzo":{benzina:1.810,gasolio:2.030},"Basilicata":{benzina:1.830,gasolio:2.043},"Calabria":{benzina:1.842,gasolio:2.044},
-  "Campania":{benzina:1.812,gasolio:2.046},"Emilia Romagna":{benzina:1.821,gasolio:2.048},"Friuli Venezia Giulia":{benzina:1.834,gasolio:2.069},
-  "Lazio":{benzina:1.806,gasolio:2.037},"Liguria":{benzina:1.834,gasolio:2.047},"Lombardia":{benzina:1.820,gasolio:2.046},
-  "Marche":{benzina:1.802,gasolio:2.021},"Molise":{benzina:1.831,gasolio:2.039},"Piemonte":{benzina:1.816,gasolio:2.046},
-  "Puglia":{benzina:1.826,gasolio:2.034},"Sardegna":{benzina:1.816,gasolio:2.030},"Sicilia":{benzina:1.842,gasolio:2.060},
-  "Toscana":{benzina:1.820,gasolio:2.041},"Umbria":{benzina:1.807,gasolio:2.031},"Valle d'Aosta":{benzina:1.842,gasolio:2.058},
-  "Veneto":{benzina:1.812,gasolio:2.043},"Bolzano":{benzina:1.866,gasolio:2.081},"Trento":{benzina:1.843,gasolio:2.064}
-};
-function newEl(tag,attrs={},html=''){const el=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>{if(k==='class')el.className=v;else if(k==='text')el.textContent=v;else el.setAttribute(k,v);});if(html)el.innerHTML=html;return el;}
-function removeRow(btn){const row=btn.closest('.mix-row');if(row)row.remove();}
-function addPalletMixRow(data={}){
-  const wrap=document.getElementById('pMixList');
-  const row=newEl('div',{class:'mix-row'});
-  row.innerHTML=`
-    <div class="fg"><label>Nome</label><input class="pm-name" value="${data.name||'Formato'}"></div>
-    <div class="fg"><label>L (mm)</label><input type="number" class="pm-l" value="${data.l||400}" min="1"></div>
-    <div class="fg"><label>W (mm)</label><input type="number" class="pm-w" value="${data.w||300}" min="1"></div>
-    <div class="fg"><label>H (mm)</label><input type="number" class="pm-h" value="${data.h||250}" min="1"></div>
-    <div class="fg"><label>kg</label><input type="number" class="pm-kg" value="${data.kg||5.5}" step="0.1" min="0"></div>
-    <div class="fg"><label>Qty</label><input type="number" class="pm-q" value="${data.q||6}" min="1"></div>
-    <button class="icon-btn" type="button" onclick="removeRow(this)">✕</button>`;
-  wrap.appendChild(row);
-}
-function addCargoRow(prefix,data={}){
-  const wrap=document.getElementById(prefix+'MixList');
-  const row=newEl('div',{class:'mix-row mix-cargo'});
-  row.innerHTML=`
-    <div class="fg"><label>Tipo</label><select class="${prefix}m-type"><option value="box" ${data.type==='box'?'selected':''}>Scatola</option><option value="pallet" ${data.type==='pallet'?'selected':''}>Pallet</option></select></div>
-    <div class="fg"><label>L (mm)</label><input type="number" class="${prefix}m-l" value="${data.l||1200}" min="1"></div>
-    <div class="fg"><label>W (mm)</label><input type="number" class="${prefix}m-w" value="${data.w||800}" min="1"></div>
-    <div class="fg"><label>H tot (mm)</label><input type="number" class="${prefix}m-h" value="${data.h||1200}" min="1"></div>
-    <div class="fg"><label>kg</label><input type="number" class="${prefix}m-kg" value="${data.kg||500}" step="0.1" min="0"></div>
-    <div class="fg"><label>Qty</label><input type="number" class="${prefix}m-q" value="${data.q||2}" min="1"></div>
-    <button class="icon-btn" type="button" onclick="removeRow(this)">✕</button>`;
-  wrap.appendChild(row);
-}
-function getPalletMixItems(){
-  return Array.from(document.querySelectorAll('#pMixList .mix-row')).map((row,idx)=>({
-    name:row.querySelector('.pm-name').value||('Formato '+(idx+1)),
-    l:+row.querySelector('.pm-l').value,w:+row.querySelector('.pm-w').value,h:+row.querySelector('.pm-h').value,
-    kg:+row.querySelector('.pm-kg').value,q:+row.querySelector('.pm-q').value
-  })).filter(x=>x.l>0&&x.w>0&&x.h>0&&x.q>0);
-}
-function getCargoItems(prefix){
-  return Array.from(document.querySelectorAll('#'+prefix+'MixList .mix-row')).map((row,idx)=>({
-    type:row.querySelector('.'+prefix+'m-type').value,
-    l:+row.querySelector('.'+prefix+'m-l').value,w:+row.querySelector('.'+prefix+'m-w').value,h:+row.querySelector('.'+prefix+'m-h').value,
-    kg:+row.querySelector('.'+prefix+'m-kg').value,q:+row.querySelector('.'+prefix+'m-q').value,
-    name:(row.querySelector('.'+prefix+'m-type').value==='pallet'?'Pallet ':'Scatola ')+(idx+1)
-  })).filter(x=>x.l>0&&x.w>0&&x.h>0&&x.q>0);
-}
-function expandUnits(items){const out=[];items.forEach((it,idx)=>{for(let i=0;i<it.q;i++)out.push({...it,id:idx+'-'+i,colorIndex:idx});});return out;}
-function fitRectsOnFloor(units,maxL,maxW){
-  let remaining=[...units].sort((a,b)=>(b.l*b.w)-(a.l*a.w)||b.h-a.h), placed=[];
-  let x=0,z=0,rowDepth=0,idx=0;
-  while(idx<remaining.length){
-    const item=remaining[idx];
-    const opts=[{l:item.l,w:item.w,rot:false},{l:item.w,w:item.l,rot:true}].filter((v,i,a)=>v.l!==v.w?true:i===0);
-    let chosen=null, usedNewRow=false;
-    for(const opt of opts){
-      if(x+opt.l<=maxL && z+opt.w<=maxW){chosen=opt;break;}
-      if(opt.l<=maxL && z+rowDepth+opt.w<=maxW){chosen=opt;usedNewRow=true;break;}
-    }
-    if(chosen){
-      if(usedNewRow){x=0;z+=rowDepth;rowDepth=0;}
-      placed.push({...item,x,z,l:chosen.l,w:chosen.w,rot:chosen.rot});
-      x+=chosen.l; rowDepth=Math.max(rowDepth,chosen.w);
-      remaining.splice(idx,1);
-    }else idx++;
-  }
-  return {placed,remaining,usedDepth:z+rowDepth};
-}
-function fitMixedOnPallet(units,pL,pW,maxH,pT){
-  let remaining=[...units], layers=[], y=pT, all=[];
-  while(remaining.length){
-    const fit=fitRectsOnFloor(remaining,pL,pW);
-    if(!fit.placed.length) break;
-    const layerH=Math.max(...fit.placed.map(p=>p.h));
-    if(y+layerH>maxH) break;
-    fit.placed.forEach(p=>all.push({...p,y,layerHeight:layerH,type:'box'}));
-    layers.push({height:layerH,items:fit.placed,util:fit.placed.reduce((s,p)=>s+p.l*p.w,0)/(pL*pW)});
-    y+=layerH; remaining=fit.remaining;
-  }
-  return {positions:all,layers,totalHeight:y,unplaced:remaining};
-}
-function makeSceneColor(index){
-  const colors=['#f0a500','#3b82f6','#22c55e','#e05c2a','#a855f7','#ec4899','#06b6d4','#f59e0b'];
-  return colors[index%colors.length];
-}
-function fitMixedLoad(units,maxL,maxW,maxH){
-  const allowed=units.filter(u=>u.h<=maxH);
-  const fit=fitRectsOnFloor(allowed,maxL,maxW);
-  const items=fit.placed.map(p=>({x:p.x,y:0,z:p.z,w:p.l,h:p.h,l:p.w,type:p.type,colorIndex:p.colorIndex,name:p.name,kg:p.kg}));
-  const totalKg=fit.placed.reduce((s,p)=>s+p.kg,0);
-  const totalVol=fit.placed.reduce((s,p)=>s+p.l*p.w*p.h,0);
-  return {items,unplaced:fit.remaining,totalKg,totalVol,usedDepth:fit.usedDepth};
-}
-function populateFuelRegions(){
-  const sel=document.getElementById('fuelRegion'); if(!sel) return;
-  sel.innerHTML=Object.keys(FUEL_PRICES).map(r=>`<option value="${r}" ${r==='Lombardia'?'selected':''}>${r}</option>`).join('');
-  syncFuelPrice();
-}
-function syncFuelPrice(){
-  const region=document.getElementById('fuelRegion')?.value, type=document.getElementById('fuelType')?.value;
-  if(region && type && FUEL_PRICES[region]) document.getElementById('fuelPrice').value=FUEL_PRICES[region][type].toFixed(3);
-}
-function calcFuel(){
-  const region=document.getElementById('fuelRegion').value, type=document.getElementById('fuelType').value;
-  let price=+document.getElementById('fuelPrice').value, km=+document.getElementById('fuelKm').value, cons=+document.getElementById('fuelConsumption').value, extras=+document.getElementById('fuelExtras').value;
-  if(document.getElementById('fuelRoundTrip').checked) km*=2;
-  const liters=km*cons/100, fuelCost=liters*price, total=fuelCost+extras, perKm=total/Math.max(km,1);
-  document.getElementById('fuelLiters').textContent=liters.toFixed(1);
-  document.getElementById('fuelCost').textContent='€'+fuelCost.toFixed(2);
-  document.getElementById('fuelTotal').textContent='€'+total.toFixed(2);
-  document.getElementById('fuelPerKm').textContent='€'+perKm.toFixed(3);
-  document.getElementById('fuelDetail').innerHTML=`<div>📍 Regione: <b style="color:var(--text)">${region}</b></div><div>⛽ Carburante: <b style="color:var(--text)">${type}</b> · prezzo medio <b style="color:var(--text)">€ ${price.toFixed(3)}/L</b></div><div>🛣 Distanza considerata: <b style="color:var(--text)">${km.toLocaleString()} km</b></div><div>🚗 Consumo: <b style="color:var(--text)">${cons.toFixed(1)} L/100km</b></div><div>🧮 Litri stimati: <b style="color:var(--text)">${liters.toFixed(2)} L</b></div><div>💶 Costo carburante: <b style="color:var(--text)">€ ${fuelCost.toFixed(2)}</b></div><div>➕ Extra: <b style="color:var(--text)">€ ${extras.toFixed(2)}</b></div><div>📦 Totale viaggio: <b style="color:var(--green)">€ ${total.toFixed(2)}</b></div>`;
-  document.querySelectorAll('#page-fuel .sc').forEach(c=>c.classList.add('on'));
-}
-function updateMixVisibility(){const on=document.getElementById('pMix').checked;document.getElementById('pMixWrap').style.display=on?'block':'none';}
-document.addEventListener('change',e=>{if(e.target.id==='pMix') updateMixVisibility(); if(e.target.id==='fuelRegion'||e.target.id==='fuelType') syncFuelPrice();});
-
 // ══════ PALLET CALC ══════
 let lastP=null,customTex=null;
-
 function calcPallet(){
   const bL=+document.getElementById('bL').value,bW=+document.getElementById('bW').value,bH=+document.getElementById('bH').value,bKg=+document.getElementById('bKg').value;
   const pL=+document.getElementById('pL').value,pW=+document.getElementById('pW').value,pT=+document.getElementById('pT').value;
   const maxH=+document.getElementById('maxH').value,maxKg=+document.getElementById('maxKg').value;
   const oh=+document.getElementById('ovh').value,nL=+document.getElementById('layers').value;
   const doRot=+document.getElementById('lrot').value===1,wf=document.getElementById('wf').checked,showBase=document.getElementById('showP').checked;
-  const mixMode=document.getElementById('pMix').checked;
-  if(mixMode){
-    const mixItems=getPalletMixItems();
-    if(!mixItems.length){alert('Aggiungi almeno un formato nella sezione mix pallet.');return;}
-    const expanded=expandUnits(mixItems.map(it=>({...it,l:it.l,w:it.w,h:it.h,kg:it.kg,type:'box'})));
-    const fitted=fitMixedOnPallet(expanded,pL+oh*2,pW+oh*2,maxH,pT);
-    const tot=fitted.positions.length, totKg=fitted.positions.reduce((s,p)=>s+p.kg,0), avgUtil=fitted.layers.length?Math.round(fitted.layers.reduce((s,l)=>s+l.util,0)/fitted.layers.length*100):0;
-    const totH=Math.round(fitted.totalHeight);
-    document.getElementById('sp-tot').textContent=tot;
-    document.getElementById('sp-lay').textContent=fitted.layers.length;
-    document.getElementById('sp-wgt').textContent=Math.round(totKg*10)/10;
-    document.getElementById('sp-eff').textContent=avgUtil+'%';
-    document.querySelectorAll('.sc').forEach(c=>c.classList.add('on'));
-    document.getElementById('pdet').innerHTML=`<div>🧩 Modalità: <b style="color:var(--text)">Mix formati</b></div><div>📦 Formati: <b style="color:var(--text)">${mixItems.length}</b></div><div>🔢 Colli caricati: <b style="color:var(--text)">${tot}</b>${fitted.unplaced.length?` <span style="color:var(--accent2)">(${fitted.unplaced.length} non entrati)</span>`:''}</div><div>🏗 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🔢 Strati dinamici: <b style="color:var(--text)">${fitted.layers.length}</b></div><div>📏 H tot: <b style="color:${totH>maxH?'var(--accent2)':'var(--text)'}">${totH}mm${totH>maxH?' ⚠':''}</b></div><div>⚖️ Peso: <b style="color:${totKg>maxKg?'var(--accent2)':'var(--text)'}">${Math.round(totKg*10)/10}kg${totKg>maxKg?' ⚠':''}</b></div><div>🎯 Utilizzo medio strati: <b style="color:var(--green)">${avgUtil}%</b></div>`;
-    const pg=document.getElementById('pgrid');pg.innerHTML='';
-    const firstLayer=fitted.positions.filter(p=>p.y===pT);
-    firstLayer.forEach((p,i)=>{const row=document.createElement('div');row.className='pr'; const cell=document.createElement('div'); cell.className='pc'; cell.style.width=Math.max(10,Math.min(50,p.l/(pL/200)))+'px'; cell.style.background=makeSceneColor(p.colorIndex); row.appendChild(cell); pg.appendChild(row);});
-    document.getElementById('pleg').innerHTML=mixItems.map((it,idx)=>`<div class="li"><div class="ld" style="background:${makeSceneColor(idx)}"></div>${it.name}</div>`).join('');
-    lastP={pL,pW,pT,layers:fitted.layers.length,positions:fitted.positions,wf,showBase,mixMode:true};
-    buildPScene(lastP); setupLightsP(); showAlert('al-p'); return;
-  }
-  function fit(rot){const bx=rot?bW:bL,bz=rot?bL:bW,nx=Math.floor((pL+oh*2)/bx),nz=Math.floor((pW+oh*2)/bz);const p=[];for(let i=0;i<nx;i++)for(let j=0;j<nz;j++)p.push({x:i*bx,z:j*bz,rot,w:bx,l:bz,h:bH,kg:bKg,colorIndex:0,type:'box'});return{p,nx,nz};}
+  function fit(rot){const bx=rot?bW:bL,bz=rot?bL:bW,nx=Math.floor((pL+oh*2)/bx),nz=Math.floor((pW+oh*2)/bz);const p=[];for(let i=0;i<nx;i++)for(let j=0;j<nz;j++)p.push({x:i*bx,z:j*bz,rot});return{p,nx,nz};}
   const fA=fit(false),fB=fit(true),best=fA.p.length>=fB.p.length?fA:fB;
   const actL=Math.min(nL,Math.floor((maxH-pT)/bH));
   let all=[];
-  for(let l=0;l<actL;l++){const cur=doRot&&l%2===1?fit(!best.p[0]?.rot).p:best.p;all=all.concat(cur.map(p=>({...p,layer:l,y:pT+l*bH}))); }
+  for(let l=0;l<actL;l++){const cur=doRot&&l%2===1?fit(!best.p[0]?.rot).p:best.p;all=all.concat(cur.map(p=>({...p,layer:l})));}
   const tot=all.length,totKg=tot*bKg,eff=Math.min(100,Math.round(best.p.length*bL*bW/(pL*pW)*100)),totH=pT+actL*bH;
   document.getElementById('sp-tot').textContent=tot;
   document.getElementById('sp-lay').textContent=best.p.length;
@@ -787,44 +666,20 @@ function calcPallet(){
   document.getElementById('sp-eff').textContent=eff+'%';
   document.querySelectorAll('.sc').forEach(c=>c.classList.add('on'));
   document.getElementById('pdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🏗 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>📐 Colonne: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${actL}</b></div><div>📏 H tot: <b style="color:${totH>maxH?'var(--accent2)':'var(--text)'}">${Math.round(totH)}mm${totH>maxH?' ⚠':''}</b></div><div>⚖️ Peso: <b style="color:${totKg>maxKg?'var(--accent2)':'var(--text)'}">${Math.round(totKg*10)/10}kg${totKg>maxKg?' ⚠':''}</b></div><div>🎯 Eff: <b style="color:var(--green)">${eff}%</b></div>`;
+  // Pattern
   const pg=document.getElementById('pgrid');pg.innerHTML='';
   const mx=20,dnx=Math.min(best.nx,mx),dnz=Math.min(best.nz,mx);
   for(let j=0;j<dnz;j++){const row=document.createElement('div');row.className='pr';for(let i=0;i<dnx;i++){const c=document.createElement('div');c.className='pc f';row.appendChild(c);}pg.appendChild(row);}
   document.getElementById('pleg').innerHTML=`<div class="li"><div class="ld" style="background:var(--accent)"></div>Scatola (${best.nx}×${best.nz})</div>`;
-  lastP={bL,bW,bH,pL,pW,pT,layers:actL,positions:all,wf,showBase,mixMode:false};
-  buildPScene(lastP); setupLightsP(); showAlert('al-p');
-}
-
-
-
-
-function makeCoverTexture(baseTexture, faceW, faceH){
-  if(!baseTexture || !baseTexture.image) return null;
-  const img=baseTexture.image;
-  const canvas=document.createElement('canvas');
-  canvas.width=1024; canvas.height=Math.max(256, Math.round(1024*(faceH/Math.max(faceW,1))));
-  const ctx=canvas.getContext('2d');
-  const scale=Math.max(canvas.width/img.width, canvas.height/img.height);
-  const dw=img.width*scale, dh=img.height*scale;
-  const dx=(canvas.width-dw)/2, dy=(canvas.height-dh)/2;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(img,dx,dy,dw,dh);
-  const tex=new THREE.CanvasTexture(canvas); tex.needsUpdate=true;
-  return tex;
-}
-function buildBoxMaterials(faceW,faceH,faceD,colors,wf){
-  const tf=document.getElementById('texFace').value;
-  function mk(color,faceType,w,h){
-    const cfg={color:h2t(color),roughness:0.55,metalness:0.1};
-    if(customTex&&(tf==='all'||tf===faceType||(tf==='sides'&&(faceType==='side'||faceType==='front')))) cfg.map=makeCoverTexture(customTex,w,h);
-    const m=new THREE.MeshStandardMaterial(cfg); if(wf) m.wireframe=true; return m;
-  }
-  return [mk(colors.side,'side',faceD,faceH),mk(colors.side,'side',faceD,faceH),mk(colors.top,'top',faceW,faceD),mk(colors.side,'side',faceW,faceD),mk(colors.front,'front',faceW,faceH),mk(colors.side,'side',faceW,faceH)];
+  lastP={bL,bW,bH,pL,pW,pT,layers:actL,positions:all,wf,showBase};
+  buildPScene(lastP);
+  setupLightsP();
+  showAlert('al-p');
 }
 
 function buildPScene(res){
   clr(GRP_P);
-  const{pL,pW,pT,positions,wf,showBase}=res;
+  const{bL,bW,bH,pL,pW,pT,positions,wf,showBase}=res;
   const cp=document.getElementById('cPal').value,cb=document.getElementById('cBg').value;
   RP.r.setClearColor(h2t(cb),1);SP.g.visible=document.getElementById('showG').checked;
   if(showBase){
@@ -832,20 +687,30 @@ function buildPScene(res){
     const pb=new THREE.Mesh(new THREE.BoxGeometry(pL,pT,pW),pm);pb.position.set(0,pT/2,0);pb.receiveShadow=true;GRP_P.add(pb);
     for(let i=0;i<3;i++){const bg=new THREE.BoxGeometry(pL,pT*0.38,pW*0.17);const bm=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.9}));bm.position.set(0,pT*0.69,(i-1)*pW*0.34);GRP_P.add(bm);}
   }
-  positions.forEach((item,idx)=>{
-    const width=item.w || (item.rot?res.bW:res.bL), depth=item.l || (item.rot?res.bL:res.bW), height=item.h || res.bH;
-    const geo=new THREE.BoxGeometry(width,height,depth);
-    const sideColor=item.colorIndex!=null?makeSceneColor(item.colorIndex):document.getElementById('cSide').value;
-    const frontColor=item.colorIndex!=null?makeSceneColor(item.colorIndex):document.getElementById('cFront').value;
-    const topColor=item.colorIndex!=null?makeSceneColor(item.colorIndex):document.getElementById('cTop').value;
-    const mats=buildBoxMaterials(width,height,depth,{side:sideColor,front:frontColor,top:topColor},wf);
+  const tf=document.getElementById('texFace').value;
+  function mat(color,f){
+    const o={color:h2t(color),roughness:0.55,metalness:0.1};
+    if(customTex&&(tf==='all'||tf===f||(tf==='sides'&&(f==='side'||f==='front')))){
+      const tx=customTex.clone();
+      tx.needsUpdate=true;
+      tx.wrapS=THREE.ClampToEdgeWrapping;tx.wrapT=THREE.ClampToEdgeWrapping;
+      tx.center.set(0.5,0.5);
+      tx.rotation=0;
+      tx.repeat.set(1,1);
+      o.map=tx;
+    }
+    const m=new THREE.MeshStandardMaterial(o);if(wf)m.wireframe=true;return m;
+  }
+  const mats=[mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cTop').value,'top'),mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cFront').value,'front'),mat(document.getElementById('cSide').value,'side')];
+  positions.forEach(({x,z,layer,rot})=>{
+    const geo=rot?new THREE.BoxGeometry(bW,bH,bL):new THREE.BoxGeometry(bL,bH,bW);
     const mesh=new THREE.Mesh(geo,mats);
-    const px=item.x+width/2-pL/2, py=(item.y||pT)+height/2, pz=item.z+depth/2-pW/2;
+    const px=x+(rot?bW:bL)/2-pL/2,py=pT+layer*bH+bH/2,pz=z+(rot?bL:bW)/2-pW/2;
     mesh.position.set(px,py,pz);mesh.castShadow=true;GRP_P.add(mesh);addEdges(GRP_P,geo,mesh.position);
   });
-  const maxY=positions.reduce((m,p)=>Math.max(m,(p.y||pT)+(p.h||res.bH||0)),pT);
-  CAM_P.tgt=new THREE.Vector3(0,maxY/2,0);
-  CAM_P.r=Math.max(2000,(pL+pW+maxY)*1.6);CAM_P.upd();
+  const midY=pT+(res.layers||1)*bH/2;
+  CAM_P.tgt=new THREE.Vector3(0,midY,0);
+  CAM_P.r=Math.max(2000,(pL+pW+res.layers*bH)*1.6);CAM_P.upd();
 }
 
 function setupLightsP(){
@@ -853,49 +718,48 @@ function setupLightsP(){
   lP=makeLights(SP.sc,document.getElementById('light').value);
 }
 
-
 // ══════ CONTAINER CALC ══════
 let lastC=null;
 
 function calcContainer(){
-  const spec=CONTS[selectedContType];
+  const spec=CONTS[selectedCont];
   const mS=+document.getElementById('cMSide').value,mT=+document.getElementById('cMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
-  let items=[],totKg=0,usedVol=0,layers=0,detailHtml='';
-  if(cMode==='mixed'){
-    const mixItems=getCargoItems('c');
-    if(!mixItems.length){alert('Aggiungi almeno un collo in modalità mista.');return;}
-    const fitted=fitMixedLoad(expandUnits(mixItems),uL,uW,uH);
-    items=fitted.items; totKg=fitted.totalKg; usedVol=fitted.totalVol; layers=1;
-    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
-    document.getElementById('cs-tot').textContent=items.length;document.getElementById('cs-vol').textContent=ve+'%';document.getElementById('cs-wgt').textContent=Math.round(totKg);document.getElementById('cs-lay').textContent='Misto';
-    detailHtml=`<div>🧩 Modalità: <b style="color:var(--text)">Carico misto</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📦 Colli caricati: <b style="color:var(--text)">${items.length}</b>${fitted.unplaced.length?` <span style="color:var(--accent2)">(${fitted.unplaced.length} non entrati)</span>`:''}</div><div>📏 Profondità usata: <b style="color:var(--text)">${Math.round(fitted.usedDepth)} mm</b></div><div>📐 Volume usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div>`;
-    calcHowManyContainers(items.length,0,spec);
-  } else if(cMode==='boxes'){
+  let items=[],totKg=0,usedVol=0,layers=0,detailHtml='',unitsForCount=0;
+
+  if(cMode==='boxes'){
     const bL=+document.getElementById('cbL').value,bW=+document.getElementById('cbW').value,bH=+document.getElementById('cbH').value,bKg=+document.getElementById('cbKg').value;
     const doRot=document.getElementById('cbRot').checked,doOpt=document.getElementById('cbOpt').checked;
     function ft(rot){const bx=rot?bW:bL,bz=rot?bL:bW;return{nx:Math.floor(uL/bx),nz:Math.floor(uW/bz),bx,bz,rot};}
-    const fA=ft(false),fB=ft(true); const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
+    const fA=ft(false),fB=ft(true);
+    const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
     layers=Math.floor(uH/bH);
-    for(let ly=0;ly<layers;ly++){const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box',colorIndex:0,kg:bKg});}
-    totKg=items.length*bKg; usedVol=items.length*bL*bW*bH;
+    for(let ly=0;ly<layers;ly++){const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});}
+    totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;unitsForCount=items.length;
     const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
     document.getElementById('cs-tot').textContent=items.length;document.getElementById('cs-vol').textContent=ve+'%';document.getElementById('cs-wgt').textContent=Math.round(totKg);document.getElementById('cs-lay').textContent=layers;
     detailHtml=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div><div>📦 Vol tot: <b style="color:var(--text)">${Math.round(spec.iL*spec.iW*spec.iH/1e9*100)/100}m³</b></div>`;
-    calcHowManyContainers(items.length,bKg,spec);
-  } else {
+    calcHowManyContainers(unitsForCount,bKg,spec);
+  } else if(cMode==='pallets') {
     const pL=+document.getElementById('cpL').value,pW=+document.getElementById('cpW').value,pT=+document.getElementById('cpT').value,pCH=+document.getElementById('cpCH').value,pKg=+document.getElementById('cpKg').value;
     const stack=document.getElementById('cpStack').checked;
     const tPH=pT+pCH,stk=stack?Math.floor(uH/tPH):1;
     function ftp(rot){const pl=rot?pW:pL,pw=rot?pL:pW;return{nx:Math.floor(uL/pl),nz:Math.floor(uW/pw),pl,pw,rot};}
     const fA=ftp(false),fB=ftp(true),best=fA.nx*fA.nz>=fB.nx*fB.nz?fA:fB;
     layers=stk;
-    for(let sl=0;sl<stk;sl++)for(let ix=0;ix<best.nx;ix++)for(let iz=0;iz<best.nz;iz++)items.push({x:mS+ix*best.pl,y:sl*tPH,z:mS+iz*best.pw,pw:best.pl,pt:pT,pl:best.pw,ch:pCH,type:'pallet',colorIndex:0,kg:pKg,w:best.pl,h:tPH,l:best.pw});
-    totKg=items.length*pKg; usedVol=items.length*pL*pW*tPH;
+    for(let sl=0;sl<stk;sl++)for(let ix=0;ix<best.nx;ix++)for(let iz=0;iz<best.nz;iz++)items.push({x:mS+ix*best.pl,y:sl*tPH,z:mS+iz*best.pw,pw:best.pl,pt:pT,pl:best.pw,ch:pCH,type:'pallet'});
+    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;unitsForCount=items.length;
     const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
     document.getElementById('cs-tot').textContent=items.length;document.getElementById('cs-vol').textContent=ve+'%';document.getElementById('cs-wgt').textContent=Math.round(totKg);document.getElementById('cs-lay').textContent=stk+' strati';
     detailHtml=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${stk}</b></div><div>📏 H carico: <b style="color:var(--text)">${tPH}mm</b></div>`;
     calcHowManyContainers(items.length,pKg,spec);
+  } else {
+    const mixed=parseMixedLoad(document.getElementById('cmMixText').value,uL,uW,uH,mS,'container');
+    items=mixed.items;totKg=mixed.totKg;usedVol=mixed.usedVol;layers=1;unitsForCount=mixed.loadedCount;
+    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
+    document.getElementById('cs-tot').textContent=mixed.loadedCount;document.getElementById('cs-vol').textContent=ve+'%';document.getElementById('cs-wgt').textContent=Math.round(totKg);document.getElementById('cs-lay').textContent='mix';
+    detailHtml=`<div>🔀 Modalità: <b style="color:var(--text)">Mix pallet / scatole</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>✅ Collo caricati: <b style="color:var(--text)">${mixed.loadedCount}</b></div><div>⛔ Collo esclusi: <b style="color:var(--text)">${mixed.skipped}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div><div>ℹ️ Algoritmo: <b style="color:var(--text)">layout conservativo a pavimento</b></div>`;
+    calcHowManyContainers(mixed.loadedCount,1,spec);
   }
   document.getElementById('cdet').innerHTML=detailHtml;
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
@@ -925,48 +789,49 @@ function calcHowManyContainers(unitsPerCont,kgPerUnit,spec){
 let lastT=null;
 
 function calcTruck(){
-  const spec=TRUCKS[selectedTruckType];
+  const spec=TRUCKS[selectedTruck];
   const mS=+document.getElementById('tMSide').value,mT=+document.getElementById('tMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
-  let items=[],totKg=0,usedVol=0,layers=0,detailHtml='';
-  if(tMode==='mixed'){
-    const mixItems=getCargoItems('t');
-    if(!mixItems.length){alert('Aggiungi almeno un collo in modalità mista.');return;}
-    const fitted=fitMixedLoad(expandUnits(mixItems),uL,uW,uH);
-    items=fitted.items; totKg=fitted.totalKg; usedVol=fitted.totalVol; layers=1;
-    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
-    document.getElementById('ts-tot').textContent=items.length;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent='Misto';
-    detailHtml=`<div>🧩 Modalità: <b style="color:var(--text)">Carico misto</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📦 Colli caricati: <b style="color:var(--text)">${items.length}</b>${fitted.unplaced.length?` <span style="color:var(--accent2)">(${fitted.unplaced.length} non entrati)</span>`:''}</div><div>📏 Profondità usata: <b style="color:var(--text)">${Math.round(fitted.usedDepth)} mm</b></div><div>📐 Volume usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div>`;
-    calcHowManyTrucks(items.length,0,spec);
-  } else if(tMode==='boxes'){
+  let items=[],totKg=0,usedVol=0,layers=0,detailHtml='',unitsForCount=0;
+
+  if(tMode==='boxes'){
     const bL=+document.getElementById('tbL').value,bW=+document.getElementById('tbW').value,bH=+document.getElementById('tbH').value,bKg=+document.getElementById('tbKg').value;
     const doRot=document.getElementById('tbRot').checked,doOpt=document.getElementById('tbOpt').checked;
     function ft(rot){const bx=rot?bW:bL,bz=rot?bL:bW;return{nx:Math.floor(uL/bx),nz:Math.floor(uW/bz),bx,bz,rot};}
-    const fA=ft(false),fB=ft(true); const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
+    const fA=ft(false),fB=ft(true);
+    const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
     layers=Math.floor(uH/bH);
-    for(let ly=0;ly<layers;ly++){const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box',colorIndex:0,kg:bKg});}
-    totKg=items.length*bKg; usedVol=items.length*bL*bW*bH;
+    for(let ly=0;ly<layers;ly++){const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});}
+    totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;unitsForCount=items.length;
     const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
     document.getElementById('ts-tot').textContent=items.length;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent=layers;
     detailHtml=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div>`;
     calcHowManyTrucks(items.length,bKg,spec);
-  } else {
+  } else if(tMode==='pallets') {
     const pL=+document.getElementById('tpL').value,pW=+document.getElementById('tpW').value,pT=+document.getElementById('tpT').value,pCH=+document.getElementById('tpCH').value,pKg=+document.getElementById('tpKg').value;
-    const stack=document.getElementById('tpStack').checked; const tPH=pT+pCH,stk=stack?Math.floor(uH/tPH):1;
+    const stack=document.getElementById('tpStack').checked;
+    const tPH=pT+pCH,stk=stack?Math.floor(uH/tPH):1;
     function ftp(rot){const pl=rot?pW:pL,pw=rot?pL:pW;return{nx:Math.floor(uL/pl),nz:Math.floor(uW/pw),pl,pw,rot};}
     const fA=ftp(false),fB=ftp(true),best=fA.nx*fA.nz>=fB.nx*fB.nz?fA:fB;
     layers=stk;
-    for(let sl=0;sl<stk;sl++)for(let ix=0;ix<best.nx;ix++)for(let iz=0;iz<best.nz;iz++)items.push({x:mS+ix*best.pl,y:sl*tPH,z:mS+iz*best.pw,pw:best.pl,pt:pT,pl:best.pw,ch:pCH,type:'pallet',colorIndex:0,kg:pKg,w:best.pl,h:tPH,l:best.pw});
-    totKg=items.length*pKg; usedVol=items.length*pL*pW*tPH;
+    for(let sl=0;sl<stk;sl++)for(let ix=0;ix<best.nx;ix++)for(let iz=0;iz<best.nz;iz++)items.push({x:mS+ix*best.pl,y:sl*tPH,z:mS+iz*best.pw,pw:best.pl,pt:pT,pl:best.pw,ch:pCH,type:'pallet'});
+    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;unitsForCount=items.length;
     const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
     document.getElementById('ts-tot').textContent=items.length;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent=stk+' strati';
-    detailHtml=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${stk}</b></div><div>📏 H carico: <b style="color:var(--text)">${tPH}mm</b></div>`;
+    detailHtml=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${stk}</b></div>`;
     calcHowManyTrucks(items.length,pKg,spec);
+  } else {
+    const mixed=parseMixedLoad(document.getElementById('tmMixText').value,uL,uW,uH,mS,'truck');
+    items=mixed.items;totKg=mixed.totKg;usedVol=mixed.usedVol;layers=1;unitsForCount=mixed.loadedCount;
+    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
+    document.getElementById('ts-tot').textContent=mixed.loadedCount;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent='mix';
+    detailHtml=`<div>🔀 Modalità: <b style="color:var(--text)">Mix pallet / scatole</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>✅ Collo caricati: <b style="color:var(--text)">${mixed.loadedCount}</b></div><div>⛔ Collo esclusi: <b style="color:var(--text)">${mixed.skipped}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div><div>ℹ️ Algoritmo: <b style="color:var(--text)">layout conservativo a pavimento</b></div>`;
+    calcHowManyTrucks(mixed.loadedCount,1,spec);
   }
   document.getElementById('tdet').innerHTML=detailHtml;
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
-  document.getElementById('twgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
-  document.querySelectorAll('.csc').forEach(c=>c.classList.add('on'));
+  document.getElementById('twgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
+  document.querySelectorAll('.csc.tc').forEach(c=>c.classList.add('on'));
   lastT={cL:spec.iL,cW:spec.iW,cH:spec.iH,items,name:spec.name};
   buildBoxScene(GRP_T,lastT,0x14b8a6);
   CAM_T.tgt=new THREE.Vector3(spec.iL/2,spec.iH/2,spec.iW/2);
@@ -985,28 +850,30 @@ function calcHowManyTrucks(unitsPerTruck,kgPerUnit,spec){
 }
 
 // ══════ SHARED SCENE BUILDER (Container / Truck) ══════
-
 function buildBoxScene(grp,res,accentColor){
   clr(grp);
   const{cL,cW,cH,items}=res;
+  // Shell
   const geo=new THREE.BoxGeometry(cL,cH,cW);
   const shell=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:accentColor,transparent:true,opacity:0.06,side:THREE.BackSide}));
   shell.position.set(cL/2,cH/2,cW/2);grp.add(shell);
   const el=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:accentColor,transparent:true,opacity:0.65}));
   el.position.copy(shell.position);grp.add(el);
+  // Floor
   const fl=new THREE.Mesh(new THREE.BoxGeometry(cL,20,cW),new THREE.MeshStandardMaterial({color:0x1e293b,roughness:0.9}));
   fl.position.set(cL/2,10,cW/2);fl.receiveShadow=true;grp.add(fl);
+  // Items
   const colors=[0xf0a500,0xe05c2a,0x22c55e,0x3b82f6,0xa855f7,0xec4899,0x06b6d4,0xfbbf24];
   items.forEach((item,idx)=>{
-    const col=colors[(item.colorIndex ?? idx)%colors.length];
+    const col=colors[idx%colors.length];
     if(item.type==='pallet'){
-      const pw=item.pw||item.w, pt=item.pt||Math.max(120, Math.round((item.h||0)*0.12)), pl=item.pl||item.l, ch=item.ch||Math.max(0,(item.h||0)-pt);
-      const pg=new THREE.BoxGeometry(pw,pt,pl);
-      const pm=new THREE.Mesh(pg,new THREE.MeshStandardMaterial({color:0x8B6914,roughness:0.85}));
-      pm.position.set(item.x+pw/2,item.y+pt/2,item.z+pl/2);pm.castShadow=true;grp.add(pm);
-      const cg=new THREE.BoxGeometry(pw*0.97,Math.max(1,ch),pl*0.97);
+      const pg=new THREE.BoxGeometry(item.pw,item.pt,item.pl);
+      const palletHex=h2t(document.getElementById('cPal')?.value||'#8B6914');
+      const pm=new THREE.Mesh(pg,new THREE.MeshStandardMaterial({color:palletHex,roughness:0.85}));
+      pm.position.set(item.x+item.pw/2,item.y+item.pt/2,item.z+item.pl/2);pm.castShadow=true;grp.add(pm);
+      const cg=new THREE.BoxGeometry(item.pw*0.97,item.ch,item.pl*0.97);
       const cm=new THREE.Mesh(cg,new THREE.MeshStandardMaterial({color:col,roughness:0.5}));
-      cm.position.set(item.x+pw/2,item.y+pt+Math.max(1,ch)/2,item.z+pl/2);cm.castShadow=true;grp.add(cm);
+      cm.position.set(item.x+item.pw/2,item.y+item.pt+item.ch/2,item.z+item.pl/2);cm.castShadow=true;grp.add(cm);
       addEdges(grp,cg,cm.position);
     } else {
       const g=new THREE.BoxGeometry(item.w,item.h,item.l);
@@ -1016,6 +883,154 @@ function buildBoxScene(grp,res,accentColor){
   });
 }
 
+
+function parseMixedLoad(text,uL,uW,uH,margin,mode){
+  const lines=(text||'').split(/\n+/).map(v=>v.trim()).filter(v=>v && !v.startsWith('#'));
+  const entries=[];
+  for(const line of lines){
+    const p=line.split(/[;,\t|]+/).map(v=>v.trim());
+    if(p.length<6) continue;
+    const type=(p[0]||'BOX').toUpperCase();
+    const L=+p[1],W=+p[2],H=+p[3],KG=+p[4],Q=+p[5];
+    if(!(L>0&&W>0&&H>0&&KG>=0&&Q>0)) continue;
+    entries.push({type,L,W,H,KG,Q});
+  }
+  let x=margin,z=margin,rowDepth=0;
+  let items=[],totKg=0,usedVol=0,loadedCount=0,skipped=0;
+  entries.forEach((e,idx)=>{
+    for(let i=0;i<e.Q;i++){
+      const orientA={L:e.L,W:e.W},orientB={L:e.W,W:e.L};
+      let use=orientA;
+      const aFits=orientA.L<=uL && orientA.W<=uW, bFits=orientB.L<=uL && orientB.W<=uW;
+      if(!aFits && bFits) use=orientB;
+      else if(aFits && bFits) use=(orientB.L*orientB.W<orientA.L*orientA.W?orientB:orientA);
+      if(x+use.L>margin+uL){x=margin;z+=rowDepth;rowDepth=0;}
+      if(z+use.W>margin+uW || e.H>uH){skipped++;continue;}
+      if(e.type==='PALLET'){
+        const pt=Math.max(120,Math.round(e.H*0.1));
+        const ch=Math.max(1,e.H-pt);
+        items.push({x,y:0,z,pw:use.L,pt,pl:use.W,ch,type:'pallet'});
+      }else{
+        items.push({x,y:0,z,w:use.L,h:e.H,l:use.W,type:'box'});
+      }
+      x+=use.L;
+      rowDepth=Math.max(rowDepth,use.W);
+      totKg+=e.KG;
+      usedVol+=use.L*use.W*e.H;
+      loadedCount++;
+    }
+  });
+  return {items,totKg,usedVol,loadedCount,skipped,entries};
+}
+
+async function safeJsonFetch(url, options){
+  const res=await fetch(url, options);
+  const txt=await res.text();
+  let data;
+  try{ data=JSON.parse(txt); }catch(e){ data={raw:txt}; }
+  if(!res.ok) throw new Error((data&&data.message)||txt||('HTTP '+res.status));
+  return data;
+}
+
+function updateSeaRatesCode(){
+  const key=document.getElementById('srApiKey')?.value||'YOUR_API_KEY';
+  const from=encodeURIComponent(document.getElementById('srFrom')?.value||'CNSHG');
+  const to=encodeURIComponent(document.getElementById('srTo')?.value||'ITGOA');
+  const modes=encodeURIComponent(document.getElementById('srModes')?.value||'SEA');
+  const alt=document.getElementById('srAlt')?.value||'false';
+  const distanceUrl=`https://distanceandtime.searates.com/v3/api?api_key=${key}&from=${from}&to=${to}&transport_modes=${modes}&alternative_routes=${alt}`;
+  const demUrl=`https://www.searates.com/container/demurrage-calculate/?api_key=${key}`;
+  const demBody={
+    dischargeDate:document.getElementById('srDischarge')?.value||'2026-03-01',
+    dateOutFull:document.getElementById('srOutFull')?.value||'2026-03-07',
+    dateInEmpty:document.getElementById('srInEmpty')?.value||'2026-03-20',
+    ...(JSON.parse(document.getElementById('srTariffs')?.value||'{}'))
+  };
+  const dCode=`fetch("${distanceUrl}")`;
+  const demCode=`fetch("${demUrl}", {\n  method: "POST",\n  headers: {"Content-Type":"application/json"},\n  body: JSON.stringify(${JSON.stringify(demBody,null,2)})\n})`;
+  if(document.getElementById('srDistanceCode')) document.getElementById('srDistanceCode').textContent=dCode;
+  if(document.getElementById('srDemCode')) document.getElementById('srDemCode').textContent=demCode;
+}
+
+async function runSeaRatesDistance(){
+  try{
+    updateSeaRatesCode();
+    const key=document.getElementById('srApiKey').value.trim();
+    if(!key) throw new Error('Inserisci prima la API key SeaRates.');
+    const params=new URLSearchParams({
+      api_key:key,
+      from:document.getElementById('srFrom').value.trim(),
+      to:document.getElementById('srTo').value.trim(),
+      transport_modes:document.getElementById('srModes').value,
+      alternative_routes:document.getElementById('srAlt').value,
+      units:document.getElementById('srUnits').value
+    });
+    const url='https://distanceandtime.searates.com/v3/api?'+params.toString();
+    document.getElementById('srDistanceOut').textContent='Calcolo in corso...';
+    const data=await safeJsonFetch(url,{method:'GET'});
+    document.getElementById('srDistanceOut').textContent=JSON.stringify(data,null,2);
+  }catch(err){
+    document.getElementById('srDistanceOut').textContent='Errore: '+err.message+'\n\nSe il browser blocca la richiesta, usa un proxy server-side.';
+  }
+}
+
+async function fetchSeaRatesContainers(){
+  try{
+    updateSeaRatesCode();
+    const key=document.getElementById('srApiKey').value.trim();
+    if(!key) throw new Error('Inserisci prima la API key SeaRates.');
+    const url='https://www.searates.com/container/get-container-list?api_key='+encodeURIComponent(key);
+    const data=await safeJsonFetch(url,{method:'GET'});
+    document.getElementById('srDemOut').textContent='Container list:\n'+JSON.stringify(data,null,2);
+  }catch(err){
+    document.getElementById('srDemOut').textContent='Errore container list: '+err.message;
+  }
+}
+
+async function fetchSeaRatesTariffs(){
+  try{
+    updateSeaRatesCode();
+    const key=document.getElementById('srApiKey').value.trim();
+    if(!key) throw new Error('Inserisci prima la API key SeaRates.');
+    const body={
+      portId:+document.getElementById('srPortId').value,
+      type:document.getElementById('srTradeType').value,
+      containerId:+document.getElementById('srContainerId').value,
+      shippingLineId:+document.getElementById('srLineId').value
+    };
+    const url='https://www.searates.com/container/get-demurrage-data?api_key='+encodeURIComponent(key);
+    const data=await safeJsonFetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const tariffs=(data && data.data) ? data.data : data;
+    document.getElementById('srTariffs').value=JSON.stringify(tariffs,null,2);
+    document.getElementById('srDemOut').textContent='Tariffe recuperate:\n'+JSON.stringify(data,null,2);
+    updateSeaRatesCode();
+  }catch(err){
+    document.getElementById('srDemOut').textContent='Errore tariffe: '+err.message+'\n\nControlla API key, portId, shippingLineId e CORS.';
+  }
+}
+
+async function runSeaRatesDemurrage(){
+  try{
+    updateSeaRatesCode();
+    const key=document.getElementById('srApiKey').value.trim();
+    if(!key) throw new Error('Inserisci prima la API key SeaRates.');
+    const tariffs=JSON.parse(document.getElementById('srTariffs').value||'{}');
+    const body={
+      dischargeDate:document.getElementById('srDischarge').value,
+      dateOutFull:document.getElementById('srOutFull').value,
+      dateInEmpty:document.getElementById('srInEmpty').value,
+      storage:tariffs.storage||[],
+      demurrage:tariffs.demurrage||[],
+      detention:tariffs.detention||[]
+    };
+    const url='https://www.searates.com/container/demurrage-calculate/?api_key='+encodeURIComponent(key);
+    document.getElementById('srDemOut').textContent='Calcolo in corso...';
+    const data=await safeJsonFetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    document.getElementById('srDemOut').textContent=JSON.stringify(data,null,2);
+  }catch(err){
+    document.getElementById('srDemOut').textContent='Errore demurrage: '+err.message+'\n\nControlla JSON tariffe e CORS.';
+  }
+}
 
 // ══════ TRANSFER DATA ══════
 function transferToContainer(){
@@ -1069,7 +1084,19 @@ function exportPDF(page){
     .stats{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;font-size:13px;margin-bottom:16px;}
     .det{font-size:12px;line-height:1.9;color:#444;white-space:pre-wrap;}
     .footer{margin-top:32px;font-size:10px;color:#999;border-top:1px solid #e5e7eb;padding-top:10px;}
-  </style></head><body>
+  
+.mix-box{margin-top:12px;border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
+.mix-box textarea{width:100%;min-height:220px;resize:vertical;border-radius:10px;border:1px solid var(--border);background:#0b0f14;color:var(--text);padding:12px;font-family:'DM Mono',monospace;font-size:0.78rem;line-height:1.7;}
+.mix-box .hint{font-size:0.68rem;color:var(--muted);margin-top:8px;line-height:1.6;}
+.mix-box .title{font-weight:700;color:var(--text);margin-bottom:8px;}
+.route-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;}
+.route-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow);}
+.route-out{white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:0.74rem;line-height:1.75;color:var(--text);background:#0b0f14;border:1px solid var(--border);border-radius:12px;padding:12px;min-height:180px;overflow:auto;}
+.codebox{white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:0.7rem;line-height:1.7;color:var(--muted);background:#0b0f14;border:1px solid var(--border);border-radius:12px;padding:12px;overflow:auto;}
+.route-card .fr{align-items:end;}
+@media(max-width:1024px){.route-grid{grid-template-columns:1fr;}}
+
+</style></head><body>
     <h1>${title}</h1>
     <div class="sub">Generato il ${now} · chepallet.app</div>
     <img src="${img}" class="render">
@@ -1090,30 +1117,26 @@ function doScreenshot(id){
   r.render(sc,c);
   const a=document.createElement('a');a.href=r.domElement.toDataURL('image/png');a.download=id+'.png';a.click();
 }
-function exportJSON(page){
-  let d;
-  if(page==='pallet'){if(!lastP){alert('Esegui prima un calcolo.');return;}d={tipo:'pallet',scatola:{L:document.getElementById('bL').value,W:document.getElementById('bW').value,H:document.getElementById('bH').value,kg:document.getElementById('bKg').value},pallet:{L:document.getElementById('pL').value,W:document.getElementById('pW').value},risultati:{totale:document.getElementById('sp-tot').textContent,perStrato:document.getElementById('sp-lay').textContent,pesoKg:document.getElementById('sp-wgt').textContent,efficienza:document.getElementById('sp-eff').textContent}};}
-  else if(page==='container'){if(!lastC){alert('Esegui prima un calcolo.');return;}d={tipo:'container',nome:lastC.name,unita:document.getElementById('cs-tot').textContent,vol:document.getElementById('cs-vol').textContent,pesoKg:document.getElementById('cs-wgt').textContent};}
-  else{if(!lastT){alert('Esegui prima un calcolo.');return;}d={tipo:'truck',nome:lastT.name,unita:document.getElementById('ts-tot').textContent,vol:document.getElementById('ts-vol').textContent,pesoKg:document.getElementById('ts-wgt').textContent};}
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download=page+'.json';a.click();
-}
+function exportJSON(page){ alert('Export JSON rimosso in questa versione.'); }
 function showAlert(id){const a=document.getElementById(id);a.style.display='block';setTimeout(()=>a.style.display='none',2500);}
 
 // Form helpers
-
 function swTab(n,btn){['box','pallet','visual'].forEach(t=>document.getElementById('tab-'+t).style.display=t===n?'block':'none');btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 function setP(l,w,btn){if(l){document.getElementById('pL').value=l;document.getElementById('pW').value=w;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-function selCont(t,btn){selectedContType=t;document.querySelectorAll('#page-container .ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('clbl').textContent=CONTS[t].name;}
-function selTruck(t,btn){selectedTruckType=t;document.querySelectorAll('#page-truck .ttb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tlbl').textContent=TRUCKS[t].name;}
-function selCMode(m,btn){cMode=m;document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('cm-pallets').style.display=m==='pallets'?'block':'none';document.getElementById('cm-mixed').style.display=m==='mixed'?'block':'none';}
-function selTMode(m,btn){tMode=m;document.querySelectorAll('#page-truck .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('tm-pallets').style.display=m==='pallets'?'block':'none';document.getElementById('tm-mixed').style.display=m==='mixed'?'block':'none';}
+function selCont(t,btn){selectedCont=t;document.querySelectorAll('.ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('clbl').textContent=CONTS[t].name;}
+function selTruck(t,btn){selectedTruck=t;document.querySelectorAll('.ttb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tlbl').textContent=TRUCKS[t].name;}
+function selCMode(m,btn){cMode=m;document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('cm-pallets').style.display=m==='pallets'?'block':'none';document.getElementById('cm-mix').style.display=m==='mix'?'block':'none';}
+function selTMode(m,btn){tMode=m;document.querySelectorAll('#page-truck .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('tm-pallets').style.display=m==='pallets'?'block':'none';document.getElementById('tm-mix').style.display=m==='mix'?'block':'none';}
 function setCPal(l,w,t,btn){if(l){document.getElementById('cpL').value=l;document.getElementById('cpW').value=w;document.getElementById('cpT').value=t;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
 function setTPal(l,w,t,btn){if(l){document.getElementById('tpL').value=l;document.getElementById('tpW').value=w;document.getElementById('tpT').value=t;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-function loadTex(input){const f=input.files[0];if(!f)return;document.getElementById('texLbl').textContent=f.name;new THREE.TextureLoader().load(URL.createObjectURL(f),t=>{t.needsUpdate=true;customTex=t;if(lastP)buildPScene(lastP);});}
-['cTop','cSide','cFront','cPal','cBg','texFace','light','wf','showP','showG'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',()=>{if(lastP){setupLightsP();buildPScene(lastP);}});});
-populateFuelRegions(); addPalletMixRow(); addCargoRow('c',{type:'pallet',l:1200,w:800,h:1400,kg:450,q:2}); addCargoRow('t',{type:'pallet',l:1200,w:800,h:1400,kg:450,q:2}); updateMixVisibility();
-calcPallet();
+function loadTex(input){const f=input.files[0];if(!f)return;document.getElementById('texLbl').textContent=f.name;new THREE.TextureLoader().load(URL.createObjectURL(f),t=>{t.colorSpace=THREE.SRGBColorSpace||t.colorSpace;customTex=t;if(lastP)buildPScene(lastP);});}
 
+// Reactive visual updates
+['cTop','cSide','cFront','cPal','cBg','texFace','light','wf','showP','showG','srApiKey','srFrom','srTo','srModes','srAlt','srUnits','srPortId','srLineId','srContainerId','srTradeType','srDischarge','srOutFull','srInEmpty','srTariffs'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',()=>{if(lastP){setupLightsP();buildPScene(lastP);} if(id.startsWith('sr')) updateSeaRatesCode();});});
+
+// Init
+calcPallet();
+updateSeaRatesCode();
 </script>
 </body>
 </html>
