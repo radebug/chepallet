@@ -137,16 +137,22 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .sc,.csc{animation:fadeUp 0.35s ease both;}
 
-.mix-box{margin-top:12px;border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
-.mix-box textarea{width:100%;min-height:220px;resize:vertical;border-radius:10px;border:1px solid var(--border);background:#0b0f14;color:var(--text);padding:12px;font-family:'DM Mono',monospace;font-size:0.78rem;line-height:1.7;}
-.mix-box .hint{font-size:0.68rem;color:var(--muted);margin-top:8px;line-height:1.6;}
-.mix-box .title{font-weight:700;color:var(--text);margin-bottom:8px;}
-.route-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;}
-.route-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow);}
-.route-out{white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:0.74rem;line-height:1.75;color:var(--text);background:#0b0f14;border:1px solid var(--border);border-radius:12px;padding:12px;min-height:180px;overflow:auto;}
-.codebox{white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:0.7rem;line-height:1.7;color:var(--muted);background:#0b0f14;border:1px solid var(--border);border-radius:12px;padding:12px;overflow:auto;}
-.route-card .fr{align-items:end;}
-@media(max-width:1024px){.route-grid{grid-template-columns:1fr;}}
+/* ROUTES */
+.nav-btn.nr{background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.24)}
+.route-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;}
+.route-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
+.route-kpi{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
+.route-kpi .k{font-size:1.2rem;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;}
+.route-kpi .l{font-size:0.68rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+.routes-note{font-size:.7rem;color:var(--muted);line-height:1.6;margin-top:10px;}
+.routes-box{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
+.routes-line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.06);font-size:.78rem;color:var(--muted)}
+.routes-line:last-child{border-bottom:none;}
+.routes-line b{color:var(--text)}
+.badge-soft{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.22);font-size:.68rem;color:var(--text)}
+.routes-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;}
+.routes-warn{font-size:.72rem;color:#fbbf24;margin-top:8px;}
+@media (max-width:960px){.route-grid{grid-template-columns:1fr;}.route-kpis{grid-template-columns:repeat(2,1fr);}}
 
 </style>
 </head>
@@ -158,9 +164,9 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <button class="nav-btn active" onclick="showPage('pallet',this)">📦 Pallet</button>
     <button class="nav-btn nb" onclick="showPage('container',this)">🚢 Container</button>
     <button class="nav-btn nt" onclick="showPage('truck',this)">🚛 Truck</button>
-    <button class="nav-btn nr" onclick="showPage('routes',this)">🌍 Routes</button>
+    <button class="nav-btn nr" onclick="showPage('routes',this);initRoutes()">🌍 Routes</button>
   </nav>
-  <div class="header-badge">v4.2</div>
+  <div class="header-badge">v4.4</div>
 </header>
 
 <!-- ═══════════════════ PALLET PAGE ═══════════════════ -->
@@ -281,7 +287,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <div class="mt">
           <button class="mb on" onclick="selCMode('boxes',this)">📦 Floor Loaded</button>
           <button class="mb" onclick="selCMode('pallets',this)">🪵 Su Pallet</button>
-          <button class="mb" onclick="selCMode('mix',this)">🔀 Mix</button>
         </div>
         <div id="cm-boxes">
           <div class="sl b">Dimensioni scatola</div>
@@ -305,21 +310,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <div class="fr"><div class="fg"><label>Peso per pallet (kg)</label><input type="number" id="cpKg" value="500" min="0"></div><div class="fg"><label>File pallet</label><input type="number" id="cpRows" value="1" min="1" max="3"></div></div>
           <div class="tr"><span>Doppio strato (impilabili)</span><label class="tg"><input type="checkbox" id="cpStack"><span class="ts"></span></label></div>
         </div>
-
-        <div id="cm-mix" style="display:none;">
-          <div class="mix-box">
-            <div class="title">Mix pallet / scatole</div>
-            <textarea id="cmMixText" placeholder="Scrivi una riga per ogni formato:
-PALLET;1200;800;1344;500;10
-PALLET;1200;1000;1600;620;4
-BOX;400;300;250;5.5;80
-
-Formato:
-TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
-            <div class="hint">Le celle sono state allargate. In modalità mix puoi combinare pallet diversi e scatole diverse nello stesso container. Il calcolo è conservativo: disposizione a pavimento con orientamento migliore automatico.</div>
-          </div>
-        </div>
-
         <div class="sl b">Margini sicurezza</div>
         <div class="fr"><div class="fg"><label>Margine lato (mm)</label><input type="number" id="cMSide" value="20" min="0"></div><div class="fg"><label>Margine alto (mm)</label><input type="number" id="cMTop" value="50" min="0"></div></div>
 
@@ -351,6 +341,7 @@ TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
         <div style="display:flex;gap:6px;">
           <button class="be bb" onclick="exportPDF('container')">📄 PDF</button>
           <button class="be bb" onclick="doScreenshot('cc')">📷</button>
+          
         </div>
       </div>
       <div class="cw" id="cc">
@@ -394,7 +385,6 @@ TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
         <div class="mt">
           <button class="mb ton on" onclick="selTMode('boxes',this)">📦 Floor Loaded</button>
           <button class="mb ton" onclick="selTMode('pallets',this)">🪵 Su Pallet</button>
-          <button class="mb ton" onclick="selTMode('mix',this)">🔀 Mix</button>
         </div>
         <div id="tm-boxes">
           <div class="sl t">Dimensioni scatola</div>
@@ -418,21 +408,6 @@ TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
           <div class="fr"><div class="fg"><label>Peso per pallet (kg)</label><input type="number" id="tpKg" value="500" min="0"></div></div>
           <div class="tr"><span>Doppio strato (impilabili)</span><label class="tg"><input type="checkbox" id="tpStack"><span class="ts"></span></label></div>
         </div>
-
-        <div id="tm-mix" style="display:none;">
-          <div class="mix-box">
-            <div class="title">Mix pallet / scatole</div>
-            <textarea id="tmMixText" placeholder="Scrivi una riga per ogni formato:
-PALLET;1200;800;1344;500;10
-PALLET;1219;1016;1500;650;6
-BOX;400;300;250;5.5;120
-
-Formato:
-TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
-            <div class="hint">Puoi scrivere direttamente qui dentro. Le righe possono contenere pallet diversi e scatole diverse nello stesso truck.</div>
-          </div>
-        </div>
-
         <div class="sl t">Margini sicurezza</div>
         <div class="fr"><div class="fg"><label>Margine lato (mm)</label><input type="number" id="tMSide" value="20" min="0"></div><div class="fg"><label>Margine alto (mm)</label><input type="number" id="tMTop" value="50" min="0"></div></div>
 
@@ -464,6 +439,7 @@ TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
         <div style="display:flex;gap:6px;">
           <button class="be bt" onclick="exportPDF('truck')">📄 PDF</button>
           <button class="be bt" onclick="doScreenshot('tc')">📷</button>
+          
         </div>
       </div>
       <div class="cw" id="tc">
@@ -489,60 +465,61 @@ TIPO;L(mm);W(mm);H totale(mm);KG;QTA"></textarea>
 <!-- ═══════════════════ ROUTES PAGE ═══════════════════ -->
 <div id="page-routes" class="page">
 <section class="hero bh">
-  <h1>Distanze, tempi e<br><em class="b">demurrage</em></h1>
-  <p>Strumento ispirato a SeaRates per preparare richieste API su distanza/transit time e costi di demurrage &amp; storage.</p>
+  <h1>Stima <br><em class="b">route & demurrage</em></h1>
+  <p>Solo selezione e click: porti caricati da fonte remota, rotta stimata automaticamente e quadro operativo D&amp;D senza API key.</p>
 </section>
-<div class="route-grid">
-  <div style="display:flex;flex-direction:column;gap:14px;">
-    <div class="route-card">
-      <div class="ph"><div class="pi">🌍</div><h3>Distance &amp; Time</h3></div>
-      <div class="pb">
-        <div class="fr"><div class="fg"><label>API key</label><input type="password" id="srApiKey" placeholder="Inserisci la tua API key SeaRates"></div><div class="fg"><label>Trasporto</label><select id="srModes"><option value="SEA">SEA</option><option value="ROAD">ROAD</option><option value="SEA,ROAD">SEA + ROAD</option><option value="AIR,ROAD">AIR + ROAD</option><option value="RAIL,ROAD">RAIL + ROAD</option></select></div></div>
-        <div class="fr"><div class="fg"><label>Da</label><input id="srFrom" value="CNSHG" placeholder="UN/LOCODE, città, indirizzo, coordinate"></div><div class="fg"><label>A</label><input id="srTo" value="ITGOA" placeholder="UN/LOCODE, città, indirizzo, coordinate"></div></div>
-        <div class="fr"><div class="fg"><label>Alternative routes</label><select id="srAlt"><option value="false">No</option><option value="true">Sì</option></select></div><div class="fg"><label>Formato</label><select id="srUnits"><option value="metric">Metric</option><option value="imperial">Imperial</option></select></div></div>
-        <button class="bc bb" onclick="runSeaRatesDistance()">▶ CALCOLA DISTANZA / TEMPI</button>
-        <div class="sl b">Risultato</div>
-        <div class="route-out" id="srDistanceOut">Inserisci API key e tratta, poi esegui la richiesta.</div>
+<div class="app-grid">
+  <div class="route-grid">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="panel">
+        <div class="ph"><div class="pi">🌍</div><h3>Selezione rotta</h3></div>
+        <div class="pb">
+          <div class="fr"><div class="fg"><label>Paese origine</label><select id="rFromCountry"></select></div><div class="fg"><label>Porto origine</label><select id="rFromPort"></select></div></div>
+          <div class="fr"><div class="fg"><label>Paese destinazione</label><select id="rToCountry"></select></div><div class="fg"><label>Porto destinazione</label><select id="rToPort"></select></div></div>
+          <div class="fr"><div class="fg"><label>Shipping line</label><select id="rLine"><option>MSC</option><option>Maersk</option><option>CMA CGM</option><option>ONE</option><option>Hapag-Lloyd</option><option>Evergreen</option></select></div><div class="fg"><label>Container type</label><select id="rType"><option value="20GP">20' GP</option><option value="40GP">40' GP</option><option value="40HC" selected>40' HC</option><option value="40RF">40' Reefer</option></select></div></div>
+          <div class="routes-actions">
+            <button class="bc" onclick="calcRoutePlanner()">▶ CALCOLA ROTTA</button>
+            <button class="btn-xfer" onclick="presetRouteExample()">✨ ESEMPIO RAPIDO</button>
+          </div>
+          <div class="routes-note">Per evitare input manuali, i menu si popolano da una fonte remota pubblica dei porti. La parte D&amp;D in questa versione è una stima operativa automatica, non una tariffa live di compagnia.</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="pi">📅</div><h3>D&amp;D operativo</h3></div>
+        <div class="pb">
+          <div class="fr"><div class="fg"><label>Discharge</label><input type="date" id="rDischarge"></div><div class="fg"><label>Date out full</label><input type="date" id="rOutFull"></div></div>
+          <div class="fr"><div class="fg"><label>Date in empty</label><input type="date" id="rInEmpty"></div><div class="fg"><label>Profilo</label><select id="rProfile"><option value="import" selected>Import</option><option value="export">Export</option></select></div></div>
+          <div class="routes-note">Le date hanno valori precompilati: puoi anche cliccare direttamente “Calcola rotta” senza scrivere nulla.</div>
+        </div>
       </div>
     </div>
-
-    <div class="route-card">
-      <div class="ph"><div class="pi">⏱️</div><h3>Demurrage &amp; Storage</h3></div>
-      <div class="pb">
-        <div class="fr"><div class="fg"><label>Port ID</label><input type="number" id="srPortId" value="11978"></div><div class="fg"><label>Shipping Line ID</label><input type="number" id="srLineId" value="15"></div></div>
-        <div class="fr"><div class="fg"><label>Container ID</label><input type="number" id="srContainerId" value="1"></div><div class="fg"><label>Tipo</label><select id="srTradeType"><option value="import">Import</option><option value="export">Export</option></select></div></div>
-        <div class="fr"><div class="fg"><label>Discharge date</label><input type="date" id="srDischarge" value="2026-03-01"></div><div class="fg"><label>Out full</label><input type="date" id="srOutFull" value="2026-03-07"></div></div>
-        <div class="fr"><div class="fg"><label>In empty</label><input type="date" id="srInEmpty" value="2026-03-20"></div><div class="fg"><label>Valuta attesa</label><input id="srCurrency" value="EUR"></div></div>
-        <div class="fr"><div class="fg"><label>Tariffe (auto da API)</label><button class="btn-xfer" style="margin-top:0" onclick="fetchSeaRatesTariffs()">↻ Recupera tariffe</button></div><div class="fg"><label>Container list</label><button class="btn-xfer" style="margin-top:0" onclick="fetchSeaRatesContainers()">↻ Recupera container</button></div></div>
-        <div class="fg"><label>Tariffe JSON (puoi modificarle)</label><textarea id="srTariffs" style="width:100%;min-height:180px;resize:vertical;border-radius:10px;border:1px solid var(--border);background:#0b0f14;color:var(--text);padding:12px;font-family:'DM Mono',monospace;font-size:0.75rem;">{
-  "storage": [],
-  "demurrage": [],
-  "detention": []
-}</textarea></div>
-        <button class="bc bb" onclick="runSeaRatesDemurrage()">▶ CALCOLA DEMURRAGE</button>
-        <div class="sl b">Risultato</div>
-        <div class="route-out" id="srDemOut">Recupera le tariffe o incollale manualmente, poi esegui il calcolo.</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="panel">
+        <div class="ph"><div class="pi">📈</div><h3>Risultato</h3></div>
+        <div class="pb">
+          <div class="badge-soft" id="rStatus">In attesa di calcolo</div>
+          <div class="route-kpis">
+            <div class="route-kpi"><div class="k" id="rkKm">—</div><div class="l">Km stimati</div></div>
+            <div class="route-kpi"><div class="k" id="rkNm">—</div><div class="l">Nautical miles</div></div>
+            <div class="route-kpi"><div class="k" id="rkSea">—</div><div class="l">Sea days</div></div>
+            <div class="route-kpi"><div class="k" id="rkEta">—</div><div class="l">ETA totale</div></div>
+          </div>
+          <div class="routes-box" style="margin-top:12px;" id="routeBreakdown">
+            <div class="routes-line"><span>Origine</span><b>—</b></div>
+            <div class="routes-line"><span>Destinazione</span><b>—</b></div>
+            <div class="routes-line"><span>Routing factor</span><b>—</b></div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:14px;">
-    <div class="route-card">
-      <div class="ph"><div class="pi">🧾</div><h3>Request builder</h3></div>
-      <div class="pb">
-        <div class="sl b">Fetch Distance &amp; Time</div>
-        <div class="codebox" id="srDistanceCode">—</div>
-        <div class="sl b" style="margin-top:12px;">Fetch Demurrage</div>
-        <div class="codebox" id="srDemCode">—</div>
-        <div class="hint" style="margin-top:10px;">Questa scheda ti genera anche le chiamate pronte. Utile se vuoi collegare il sito a Supabase, Edge Functions o GitHub Pages con un proxy server-side.</div>
-      </div>
-    </div>
-    <div class="route-card">
-      <div class="ph"><div class="pi">ℹ️</div><h3>Note integrazione</h3></div>
-      <div class="pb" style="font-size:0.76rem;line-height:1.9;color:var(--muted);">
-        <div>• Distance &amp; Time usa endpoint REST dedicato.</div>
-        <div>• Demurrage usa endpoint SeaRates con body JSON e richiede tariffe/container/linea/porto coerenti.</div>
-        <div>• Se il browser blocca CORS, usa un proxy server-side.</div>
-        <div>• La pagina è pronta per lavorare con la tua API key, ma io qui non posso testare chiamate live verso SeaRates.</div>
+      <div class="panel">
+        <div class="ph"><div class="pi">💰</div><h3>Demurrage / Detention</h3></div>
+        <div class="pb" id="rddBox">
+          <div class="routes-line"><span>Free demurrage</span><b>—</b></div>
+          <div class="routes-line"><span>Chargeable demurrage</span><b>—</b></div>
+          <div class="routes-line"><span>Free detention</span><b>—</b></div>
+          <div class="routes-line"><span>Chargeable detention</span><b>—</b></div>
+        </div>
+        <div class="routes-warn" id="rWarn">Le tariffe monetarie cambiano per compagnia/porto/data: qui trovi una stima operativa dei giorni, pronta senza API key.</div>
       </div>
     </div>
   </div>
@@ -688,19 +665,7 @@ function buildPScene(res){
     for(let i=0;i<3;i++){const bg=new THREE.BoxGeometry(pL,pT*0.38,pW*0.17);const bm=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.9}));bm.position.set(0,pT*0.69,(i-1)*pW*0.34);GRP_P.add(bm);}
   }
   const tf=document.getElementById('texFace').value;
-  function mat(color,f){
-    const o={color:h2t(color),roughness:0.55,metalness:0.1};
-    if(customTex&&(tf==='all'||tf===f||(tf==='sides'&&(f==='side'||f==='front')))){
-      const tx=customTex.clone();
-      tx.needsUpdate=true;
-      tx.wrapS=THREE.ClampToEdgeWrapping;tx.wrapT=THREE.ClampToEdgeWrapping;
-      tx.center.set(0.5,0.5);
-      tx.rotation=0;
-      tx.repeat.set(1,1);
-      o.map=tx;
-    }
-    const m=new THREE.MeshStandardMaterial(o);if(wf)m.wireframe=true;return m;
-  }
+  function mat(color,f){const o={color:h2t(color),roughness:0.55,metalness:0.1};if(customTex&&(tf==='all'||tf===f||(tf==='sides'&&(f==='side'||f==='front'))))o.map=customTex;const m=new THREE.MeshStandardMaterial(o);if(wf)m.wireframe=true;return m;}
   const mats=[mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cTop').value,'top'),mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cFront').value,'front'),mat(document.getElementById('cSide').value,'side')];
   positions.forEach(({x,z,layer,rot})=>{
     const geo=rot?new THREE.BoxGeometry(bW,bH,bL):new THREE.BoxGeometry(bL,bH,bW);
@@ -720,12 +685,11 @@ function setupLightsP(){
 
 // ══════ CONTAINER CALC ══════
 let lastC=null;
-
 function calcContainer(){
   const spec=CONTS[selectedCont];
   const mS=+document.getElementById('cMSide').value,mT=+document.getElementById('cMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
-  let items=[],totKg=0,usedVol=0,layers=0,detailHtml='',unitsForCount=0;
+  let items=[],totKg=0,usedVol=0,layers=0;
 
   if(cMode==='boxes'){
     const bL=+document.getElementById('cbL').value,bW=+document.getElementById('cbW').value,bH=+document.getElementById('cbH').value,bKg=+document.getElementById('cbKg').value;
@@ -735,12 +699,14 @@ function calcContainer(){
     const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
     layers=Math.floor(uH/bH);
     for(let ly=0;ly<layers;ly++){const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});}
-    totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;unitsForCount=items.length;
+    totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;
     const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
     document.getElementById('cs-tot').textContent=items.length;document.getElementById('cs-vol').textContent=ve+'%';document.getElementById('cs-wgt').textContent=Math.round(totKg);document.getElementById('cs-lay').textContent=layers;
-    detailHtml=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div><div>📦 Vol tot: <b style="color:var(--text)">${Math.round(spec.iL*spec.iW*spec.iH/1e9*100)/100}m³</b></div>`;
-    calcHowManyContainers(unitsForCount,bKg,spec);
-  } else if(cMode==='pallets') {
+    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div><div>📦 Vol tot: <b style="color:var(--text)">${Math.round(spec.iL*spec.iW*spec.iH/1e9*100)/100}m³</b></div>`;
+    // How many containers
+    const perCont=items.length/layers*layers;
+    calcHowManyContainers(perCont,bKg,spec);
+  } else {
     const pL=+document.getElementById('cpL').value,pW=+document.getElementById('cpW').value,pT=+document.getElementById('cpT').value,pCH=+document.getElementById('cpCH').value,pKg=+document.getElementById('cpKg').value;
     const stack=document.getElementById('cpStack').checked;
     const tPH=pT+pCH,stk=stack?Math.floor(uH/tPH):1;
@@ -748,20 +714,12 @@ function calcContainer(){
     const fA=ftp(false),fB=ftp(true),best=fA.nx*fA.nz>=fB.nx*fB.nz?fA:fB;
     layers=stk;
     for(let sl=0;sl<stk;sl++)for(let ix=0;ix<best.nx;ix++)for(let iz=0;iz<best.nz;iz++)items.push({x:mS+ix*best.pl,y:sl*tPH,z:mS+iz*best.pw,pw:best.pl,pt:pT,pl:best.pw,ch:pCH,type:'pallet'});
-    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;unitsForCount=items.length;
+    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;
     const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
     document.getElementById('cs-tot').textContent=items.length;document.getElementById('cs-vol').textContent=ve+'%';document.getElementById('cs-wgt').textContent=Math.round(totKg);document.getElementById('cs-lay').textContent=stk+' strati';
-    detailHtml=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${stk}</b></div><div>📏 H carico: <b style="color:var(--text)">${tPH}mm</b></div>`;
+    document.getElementById('cdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${stk}</b></div><div>📏 H carico: <b style="color:var(--text)">${tPH}mm</b></div>`;
     calcHowManyContainers(items.length,pKg,spec);
-  } else {
-    const mixed=parseMixedLoad(document.getElementById('cmMixText').value,uL,uW,uH,mS,'container');
-    items=mixed.items;totKg=mixed.totKg;usedVol=mixed.usedVol;layers=1;unitsForCount=mixed.loadedCount;
-    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
-    document.getElementById('cs-tot').textContent=mixed.loadedCount;document.getElementById('cs-vol').textContent=ve+'%';document.getElementById('cs-wgt').textContent=Math.round(totKg);document.getElementById('cs-lay').textContent='mix';
-    detailHtml=`<div>🔀 Modalità: <b style="color:var(--text)">Mix pallet / scatole</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>✅ Collo caricati: <b style="color:var(--text)">${mixed.loadedCount}</b></div><div>⛔ Collo esclusi: <b style="color:var(--text)">${mixed.skipped}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div><div>ℹ️ Algoritmo: <b style="color:var(--text)">layout conservativo a pavimento</b></div>`;
-    calcHowManyContainers(mixed.loadedCount,1,spec);
   }
-  document.getElementById('cdet').innerHTML=detailHtml;
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
   document.getElementById('cwgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
   document.querySelectorAll('.csc').forEach(c=>c.classList.add('on'));
@@ -771,7 +729,6 @@ function calcContainer(){
   CAM_C.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_C.upd();
   showAlert('al-c');
 }
-
 
 function calcHowManyContainers(unitsPerCont,kgPerUnit,spec){
   const n=+document.getElementById('cNUnits').value;
@@ -787,12 +744,11 @@ function calcHowManyContainers(unitsPerCont,kgPerUnit,spec){
 
 // ══════ TRUCK CALC ══════
 let lastT=null;
-
 function calcTruck(){
   const spec=TRUCKS[selectedTruck];
   const mS=+document.getElementById('tMSide').value,mT=+document.getElementById('tMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
-  let items=[],totKg=0,usedVol=0,layers=0,detailHtml='',unitsForCount=0;
+  let items=[],totKg=0,usedVol=0,layers=0;
 
   if(tMode==='boxes'){
     const bL=+document.getElementById('tbL').value,bW=+document.getElementById('tbW').value,bH=+document.getElementById('tbH').value,bKg=+document.getElementById('tbKg').value;
@@ -802,12 +758,12 @@ function calcTruck(){
     const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
     layers=Math.floor(uH/bH);
     for(let ly=0;ly<layers;ly++){const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});}
-    totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;unitsForCount=items.length;
+    totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;
     const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
     document.getElementById('ts-tot').textContent=items.length;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent=layers;
-    detailHtml=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div>`;
+    document.getElementById('tdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div>`;
     calcHowManyTrucks(items.length,bKg,spec);
-  } else if(tMode==='pallets') {
+  } else {
     const pL=+document.getElementById('tpL').value,pW=+document.getElementById('tpW').value,pT=+document.getElementById('tpT').value,pCH=+document.getElementById('tpCH').value,pKg=+document.getElementById('tpKg').value;
     const stack=document.getElementById('tpStack').checked;
     const tPH=pT+pCH,stk=stack?Math.floor(uH/tPH):1;
@@ -815,20 +771,12 @@ function calcTruck(){
     const fA=ftp(false),fB=ftp(true),best=fA.nx*fA.nz>=fB.nx*fB.nz?fA:fB;
     layers=stk;
     for(let sl=0;sl<stk;sl++)for(let ix=0;ix<best.nx;ix++)for(let iz=0;iz<best.nz;iz++)items.push({x:mS+ix*best.pl,y:sl*tPH,z:mS+iz*best.pw,pw:best.pl,pt:pT,pl:best.pw,ch:pCH,type:'pallet'});
-    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;unitsForCount=items.length;
+    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;
     const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
     document.getElementById('ts-tot').textContent=items.length;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent=stk+' strati';
-    detailHtml=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${stk}</b></div>`;
+    document.getElementById('tdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${stk}</b></div>`;
     calcHowManyTrucks(items.length,pKg,spec);
-  } else {
-    const mixed=parseMixedLoad(document.getElementById('tmMixText').value,uL,uW,uH,mS,'truck');
-    items=mixed.items;totKg=mixed.totKg;usedVol=mixed.usedVol;layers=1;unitsForCount=mixed.loadedCount;
-    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
-    document.getElementById('ts-tot').textContent=mixed.loadedCount;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent='mix';
-    detailHtml=`<div>🔀 Modalità: <b style="color:var(--text)">Mix pallet / scatole</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>✅ Collo caricati: <b style="color:var(--text)">${mixed.loadedCount}</b></div><div>⛔ Collo esclusi: <b style="color:var(--text)">${mixed.skipped}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div><div>ℹ️ Algoritmo: <b style="color:var(--text)">layout conservativo a pavimento</b></div>`;
-    calcHowManyTrucks(mixed.loadedCount,1,spec);
   }
-  document.getElementById('tdet').innerHTML=detailHtml;
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
   document.getElementById('twgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
   document.querySelectorAll('.csc.tc').forEach(c=>c.classList.add('on'));
@@ -838,7 +786,6 @@ function calcTruck(){
   CAM_T.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_T.upd();
   showAlert('al-t');
 }
-
 
 function calcHowManyTrucks(unitsPerTruck,kgPerUnit,spec){
   const n=+document.getElementById('tNUnits').value,type=document.getElementById('tNType').value;
@@ -868,8 +815,7 @@ function buildBoxScene(grp,res,accentColor){
     const col=colors[idx%colors.length];
     if(item.type==='pallet'){
       const pg=new THREE.BoxGeometry(item.pw,item.pt,item.pl);
-      const palletHex=h2t(document.getElementById('cPal')?.value||'#8B6914');
-      const pm=new THREE.Mesh(pg,new THREE.MeshStandardMaterial({color:palletHex,roughness:0.85}));
+      const pm=new THREE.Mesh(pg,new THREE.MeshStandardMaterial({color:0x8B6914,roughness:0.85}));
       pm.position.set(item.x+item.pw/2,item.y+item.pt/2,item.z+item.pl/2);pm.castShadow=true;grp.add(pm);
       const cg=new THREE.BoxGeometry(item.pw*0.97,item.ch,item.pl*0.97);
       const cm=new THREE.Mesh(cg,new THREE.MeshStandardMaterial({color:col,roughness:0.5}));
@@ -881,155 +827,6 @@ function buildBoxScene(grp,res,accentColor){
       m.position.set(item.x+item.w/2,item.y+item.h/2,item.z+item.l/2);m.castShadow=true;grp.add(m);addEdges(grp,g,m.position);
     }
   });
-}
-
-
-function parseMixedLoad(text,uL,uW,uH,margin,mode){
-  const lines=(text||'').split(/\n+/).map(v=>v.trim()).filter(v=>v && !v.startsWith('#'));
-  const entries=[];
-  for(const line of lines){
-    const p=line.split(/[;,\t|]+/).map(v=>v.trim());
-    if(p.length<6) continue;
-    const type=(p[0]||'BOX').toUpperCase();
-    const L=+p[1],W=+p[2],H=+p[3],KG=+p[4],Q=+p[5];
-    if(!(L>0&&W>0&&H>0&&KG>=0&&Q>0)) continue;
-    entries.push({type,L,W,H,KG,Q});
-  }
-  let x=margin,z=margin,rowDepth=0;
-  let items=[],totKg=0,usedVol=0,loadedCount=0,skipped=0;
-  entries.forEach((e,idx)=>{
-    for(let i=0;i<e.Q;i++){
-      const orientA={L:e.L,W:e.W},orientB={L:e.W,W:e.L};
-      let use=orientA;
-      const aFits=orientA.L<=uL && orientA.W<=uW, bFits=orientB.L<=uL && orientB.W<=uW;
-      if(!aFits && bFits) use=orientB;
-      else if(aFits && bFits) use=(orientB.L*orientB.W<orientA.L*orientA.W?orientB:orientA);
-      if(x+use.L>margin+uL){x=margin;z+=rowDepth;rowDepth=0;}
-      if(z+use.W>margin+uW || e.H>uH){skipped++;continue;}
-      if(e.type==='PALLET'){
-        const pt=Math.max(120,Math.round(e.H*0.1));
-        const ch=Math.max(1,e.H-pt);
-        items.push({x,y:0,z,pw:use.L,pt,pl:use.W,ch,type:'pallet'});
-      }else{
-        items.push({x,y:0,z,w:use.L,h:e.H,l:use.W,type:'box'});
-      }
-      x+=use.L;
-      rowDepth=Math.max(rowDepth,use.W);
-      totKg+=e.KG;
-      usedVol+=use.L*use.W*e.H;
-      loadedCount++;
-    }
-  });
-  return {items,totKg,usedVol,loadedCount,skipped,entries};
-}
-
-async function safeJsonFetch(url, options){
-  const res=await fetch(url, options);
-  const txt=await res.text();
-  let data;
-  try{ data=JSON.parse(txt); }catch(e){ data={raw:txt}; }
-  if(!res.ok) throw new Error((data&&data.message)||txt||('HTTP '+res.status));
-  return data;
-}
-
-function updateSeaRatesCode(){
-  const key=document.getElementById('srApiKey')?.value||'YOUR_API_KEY';
-  const from=encodeURIComponent(document.getElementById('srFrom')?.value||'CNSHG');
-  const to=encodeURIComponent(document.getElementById('srTo')?.value||'ITGOA');
-  const modes=encodeURIComponent(document.getElementById('srModes')?.value||'SEA');
-  const alt=document.getElementById('srAlt')?.value||'false';
-  const distanceUrl=`https://distanceandtime.searates.com/v3/api?api_key=${key}&from=${from}&to=${to}&transport_modes=${modes}&alternative_routes=${alt}`;
-  const demUrl=`https://www.searates.com/container/demurrage-calculate/?api_key=${key}`;
-  const demBody={
-    dischargeDate:document.getElementById('srDischarge')?.value||'2026-03-01',
-    dateOutFull:document.getElementById('srOutFull')?.value||'2026-03-07',
-    dateInEmpty:document.getElementById('srInEmpty')?.value||'2026-03-20',
-    ...(JSON.parse(document.getElementById('srTariffs')?.value||'{}'))
-  };
-  const dCode=`fetch("${distanceUrl}")`;
-  const demCode=`fetch("${demUrl}", {\n  method: "POST",\n  headers: {"Content-Type":"application/json"},\n  body: JSON.stringify(${JSON.stringify(demBody,null,2)})\n})`;
-  if(document.getElementById('srDistanceCode')) document.getElementById('srDistanceCode').textContent=dCode;
-  if(document.getElementById('srDemCode')) document.getElementById('srDemCode').textContent=demCode;
-}
-
-async function runSeaRatesDistance(){
-  try{
-    updateSeaRatesCode();
-    const key=document.getElementById('srApiKey').value.trim();
-    if(!key) throw new Error('Inserisci prima la API key SeaRates.');
-    const params=new URLSearchParams({
-      api_key:key,
-      from:document.getElementById('srFrom').value.trim(),
-      to:document.getElementById('srTo').value.trim(),
-      transport_modes:document.getElementById('srModes').value,
-      alternative_routes:document.getElementById('srAlt').value,
-      units:document.getElementById('srUnits').value
-    });
-    const url='https://distanceandtime.searates.com/v3/api?'+params.toString();
-    document.getElementById('srDistanceOut').textContent='Calcolo in corso...';
-    const data=await safeJsonFetch(url,{method:'GET'});
-    document.getElementById('srDistanceOut').textContent=JSON.stringify(data,null,2);
-  }catch(err){
-    document.getElementById('srDistanceOut').textContent='Errore: '+err.message+'\n\nSe il browser blocca la richiesta, usa un proxy server-side.';
-  }
-}
-
-async function fetchSeaRatesContainers(){
-  try{
-    updateSeaRatesCode();
-    const key=document.getElementById('srApiKey').value.trim();
-    if(!key) throw new Error('Inserisci prima la API key SeaRates.');
-    const url='https://www.searates.com/container/get-container-list?api_key='+encodeURIComponent(key);
-    const data=await safeJsonFetch(url,{method:'GET'});
-    document.getElementById('srDemOut').textContent='Container list:\n'+JSON.stringify(data,null,2);
-  }catch(err){
-    document.getElementById('srDemOut').textContent='Errore container list: '+err.message;
-  }
-}
-
-async function fetchSeaRatesTariffs(){
-  try{
-    updateSeaRatesCode();
-    const key=document.getElementById('srApiKey').value.trim();
-    if(!key) throw new Error('Inserisci prima la API key SeaRates.');
-    const body={
-      portId:+document.getElementById('srPortId').value,
-      type:document.getElementById('srTradeType').value,
-      containerId:+document.getElementById('srContainerId').value,
-      shippingLineId:+document.getElementById('srLineId').value
-    };
-    const url='https://www.searates.com/container/get-demurrage-data?api_key='+encodeURIComponent(key);
-    const data=await safeJsonFetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const tariffs=(data && data.data) ? data.data : data;
-    document.getElementById('srTariffs').value=JSON.stringify(tariffs,null,2);
-    document.getElementById('srDemOut').textContent='Tariffe recuperate:\n'+JSON.stringify(data,null,2);
-    updateSeaRatesCode();
-  }catch(err){
-    document.getElementById('srDemOut').textContent='Errore tariffe: '+err.message+'\n\nControlla API key, portId, shippingLineId e CORS.';
-  }
-}
-
-async function runSeaRatesDemurrage(){
-  try{
-    updateSeaRatesCode();
-    const key=document.getElementById('srApiKey').value.trim();
-    if(!key) throw new Error('Inserisci prima la API key SeaRates.');
-    const tariffs=JSON.parse(document.getElementById('srTariffs').value||'{}');
-    const body={
-      dischargeDate:document.getElementById('srDischarge').value,
-      dateOutFull:document.getElementById('srOutFull').value,
-      dateInEmpty:document.getElementById('srInEmpty').value,
-      storage:tariffs.storage||[],
-      demurrage:tariffs.demurrage||[],
-      detention:tariffs.detention||[]
-    };
-    const url='https://www.searates.com/container/demurrage-calculate/?api_key='+encodeURIComponent(key);
-    document.getElementById('srDemOut').textContent='Calcolo in corso...';
-    const data=await safeJsonFetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    document.getElementById('srDemOut').textContent=JSON.stringify(data,null,2);
-  }catch(err){
-    document.getElementById('srDemOut').textContent='Errore demurrage: '+err.message+'\n\nControlla JSON tariffe e CORS.';
-  }
 }
 
 // ══════ TRANSFER DATA ══════
@@ -1085,16 +882,22 @@ function exportPDF(page){
     .det{font-size:12px;line-height:1.9;color:#444;white-space:pre-wrap;}
     .footer{margin-top:32px;font-size:10px;color:#999;border-top:1px solid #e5e7eb;padding-top:10px;}
   
-.mix-box{margin-top:12px;border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
-.mix-box textarea{width:100%;min-height:220px;resize:vertical;border-radius:10px;border:1px solid var(--border);background:#0b0f14;color:var(--text);padding:12px;font-family:'DM Mono',monospace;font-size:0.78rem;line-height:1.7;}
-.mix-box .hint{font-size:0.68rem;color:var(--muted);margin-top:8px;line-height:1.6;}
-.mix-box .title{font-weight:700;color:var(--text);margin-bottom:8px;}
-.route-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;}
-.route-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow);}
-.route-out{white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:0.74rem;line-height:1.75;color:var(--text);background:#0b0f14;border:1px solid var(--border);border-radius:12px;padding:12px;min-height:180px;overflow:auto;}
-.codebox{white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:0.7rem;line-height:1.7;color:var(--muted);background:#0b0f14;border:1px solid var(--border);border-radius:12px;padding:12px;overflow:auto;}
-.route-card .fr{align-items:end;}
-@media(max-width:1024px){.route-grid{grid-template-columns:1fr;}}
+/* ROUTES */
+.nav-btn.nr{background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.24)}
+.route-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;}
+.route-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
+.route-kpi{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
+.route-kpi .k{font-size:1.2rem;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;}
+.route-kpi .l{font-size:0.68rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+.routes-note{font-size:.7rem;color:var(--muted);line-height:1.6;margin-top:10px;}
+.routes-box{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
+.routes-line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.06);font-size:.78rem;color:var(--muted)}
+.routes-line:last-child{border-bottom:none;}
+.routes-line b{color:var(--text)}
+.badge-soft{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.22);font-size:.68rem;color:var(--text)}
+.routes-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;}
+.routes-warn{font-size:.72rem;color:#fbbf24;margin-top:8px;}
+@media (max-width:960px){.route-grid{grid-template-columns:1fr;}.route-kpis{grid-template-columns:repeat(2,1fr);}}
 
 </style></head><body>
     <h1>${title}</h1>
@@ -1117,7 +920,13 @@ function doScreenshot(id){
   r.render(sc,c);
   const a=document.createElement('a');a.href=r.domElement.toDataURL('image/png');a.download=id+'.png';a.click();
 }
-function exportJSON(page){ alert('Export JSON rimosso in questa versione.'); }
+function exportJSON(page){
+  let d;
+  if(page==='pallet'){if(!lastP){alert('Esegui prima un calcolo.');return;}d={tipo:'pallet',scatola:{L:document.getElementById('bL').value,W:document.getElementById('bW').value,H:document.getElementById('bH').value,kg:document.getElementById('bKg').value},pallet:{L:document.getElementById('pL').value,W:document.getElementById('pW').value},risultati:{totale:document.getElementById('sp-tot').textContent,perStrato:document.getElementById('sp-lay').textContent,pesoKg:document.getElementById('sp-wgt').textContent,efficienza:document.getElementById('sp-eff').textContent}};}
+  else if(page==='container'){if(!lastC){alert('Esegui prima un calcolo.');return;}d={tipo:'container',nome:lastC.name,unita:document.getElementById('cs-tot').textContent,vol:document.getElementById('cs-vol').textContent,pesoKg:document.getElementById('cs-wgt').textContent};}
+  else{if(!lastT){alert('Esegui prima un calcolo.');return;}d={tipo:'truck',nome:lastT.name,unita:document.getElementById('ts-tot').textContent,vol:document.getElementById('ts-vol').textContent,pesoKg:document.getElementById('ts-wgt').textContent};}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download=page+'.json';a.click();
+}
 function showAlert(id){const a=document.getElementById(id);a.style.display='block';setTimeout(()=>a.style.display='none',2500);}
 
 // Form helpers
@@ -1125,18 +934,144 @@ function swTab(n,btn){['box','pallet','visual'].forEach(t=>document.getElementBy
 function setP(l,w,btn){if(l){document.getElementById('pL').value=l;document.getElementById('pW').value=w;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
 function selCont(t,btn){selectedCont=t;document.querySelectorAll('.ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('clbl').textContent=CONTS[t].name;}
 function selTruck(t,btn){selectedTruck=t;document.querySelectorAll('.ttb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tlbl').textContent=TRUCKS[t].name;}
-function selCMode(m,btn){cMode=m;document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('cm-pallets').style.display=m==='pallets'?'block':'none';document.getElementById('cm-mix').style.display=m==='mix'?'block':'none';}
-function selTMode(m,btn){tMode=m;document.querySelectorAll('#page-truck .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('tm-pallets').style.display=m==='pallets'?'block':'none';document.getElementById('tm-mix').style.display=m==='mix'?'block':'none';}
+function selCMode(m,btn){cMode=m;document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('cm-pallets').style.display=m==='pallets'?'block':'none';}
+function selTMode(m,btn){tMode=m;document.querySelectorAll('#page-truck .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('tm-pallets').style.display=m==='pallets'?'block':'none';}
 function setCPal(l,w,t,btn){if(l){document.getElementById('cpL').value=l;document.getElementById('cpW').value=w;document.getElementById('cpT').value=t;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
 function setTPal(l,w,t,btn){if(l){document.getElementById('tpL').value=l;document.getElementById('tpW').value=w;document.getElementById('tpT').value=t;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-function loadTex(input){const f=input.files[0];if(!f)return;document.getElementById('texLbl').textContent=f.name;new THREE.TextureLoader().load(URL.createObjectURL(f),t=>{t.colorSpace=THREE.SRGBColorSpace||t.colorSpace;customTex=t;if(lastP)buildPScene(lastP);});}
+function loadTex(input){const f=input.files[0];if(!f)return;document.getElementById('texLbl').textContent=f.name;new THREE.TextureLoader().load(URL.createObjectURL(f),t=>{customTex=t;if(lastP)buildPScene(lastP);});}
 
 // Reactive visual updates
-['cTop','cSide','cFront','cPal','cBg','texFace','light','wf','showP','showG','srApiKey','srFrom','srTo','srModes','srAlt','srUnits','srPortId','srLineId','srContainerId','srTradeType','srDischarge','srOutFull','srInEmpty','srTariffs'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',()=>{if(lastP){setupLightsP();buildPScene(lastP);} if(id.startsWith('sr')) updateSeaRatesCode();});});
+['cTop','cSide','cFront','cPal','cBg','texFace','light','wf','showP','showG'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',()=>{if(lastP){setupLightsP();buildPScene(lastP);}});});
+
+
+
+// ══════ ROUTES (remote ports, no API key) ══════
+const ROUTE_REMOTE_PORTS = 'https://cdn.jsdelivr.net/gh/marchah/sea-ports@master/lib/ports.json';
+let ROUTE_PORTS = [];
+let ROUTE_COUNTRIES = [];
+const LINE_PROFILES = {
+  'MSC': {knots:16, portDays:3, freeIn:{'20GP':5,'40GP':5,'40HC':5,'40RF':4}, freeOut:{'20GP':7,'40GP':7,'40HC':7,'40RF':5}},
+  'Maersk': {knots:16.5, portDays:3, freeIn:{'20GP':5,'40GP':5,'40HC':5,'40RF':4}, freeOut:{'20GP':7,'40GP':7,'40HC':7,'40RF':5}},
+  'CMA CGM': {knots:15.8, portDays:3, freeIn:{'20GP':5,'40GP':5,'40HC':5,'40RF':4}, freeOut:{'20GP':7,'40GP':7,'40HC':7,'40RF':5}},
+  'ONE': {knots:16.2, portDays:3, freeIn:{'20GP':5,'40GP':5,'40HC':5,'40RF':4}, freeOut:{'20GP':7,'40GP':7,'40HC':7,'40RF':5}},
+  'Hapag-Lloyd': {knots:16.1, portDays:3, freeIn:{'20GP':5,'40GP':5,'40HC':5,'40RF':4}, freeOut:{'20GP':7,'40GP':7,'40HC':7,'40RF':5}},
+  'Evergreen': {knots:15.9, portDays:3, freeIn:{'20GP':5,'40GP':5,'40HC':5,'40RF':4}, freeOut:{'20GP':7,'40GP':7,'40HC':7,'40RF':5}},
+};
+function fmtNum(n,d=0){return Number(n).toLocaleString('it-IT',{maximumFractionDigits:d,minimumFractionDigits:d});}
+function havKm(lat1,lon1,lat2,lon2){const R=6371, toRad=x=>x*Math.PI/180; const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1); const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2; return 2*R*Math.asin(Math.sqrt(a));}
+function dayDiff(a,b){const ms=24*3600*1000; return Math.max(0, Math.round((new Date(b)-new Date(a))/ms));}
+function setRouteStatus(txt){const el=document.getElementById('rStatus'); if(el) el.textContent=txt;}
+function routeDefaultDates(){
+  const now=new Date();
+  const add=(n)=>{const d=new Date(now);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+  document.getElementById('rDischarge').value ||= add(0);
+  document.getElementById('rOutFull').value ||= add(4);
+  document.getElementById('rInEmpty').value ||= add(10);
+}
+async function initRoutes(){
+  routeDefaultDates();
+  if(ROUTE_PORTS.length) return;
+  setRouteStatus('Caricamento porti remoti…');
+  try{
+    const res = await fetch(ROUTE_REMOTE_PORTS,{cache:'force-cache'});
+    const data = await res.json();
+    ROUTE_PORTS = Object.values(data).filter(p=>Array.isArray(p.coordinates)&&p.coordinates.length===2&&p.country&&p.name)
+      .map(p=>({name:p.name,country:p.country,code:(p.unlocs&&p.unlocs[0])||'',lon:+p.coordinates[0],lat:+p.coordinates[1],city:p.city||p.name}))
+      .sort((a,b)=>a.country.localeCompare(b.country)||a.name.localeCompare(b.name));
+    ROUTE_COUNTRIES = [...new Set(ROUTE_PORTS.map(p=>p.country))].sort((a,b)=>a.localeCompare(b));
+    fillCountrySelect('rFromCountry','Italy');
+    fillCountrySelect('rToCountry','United States');
+    updatePortsForCountry('rFromCountry','rFromPort',['Genoa','Genova','La Spezia']);
+    updatePortsForCountry('rToCountry','rToPort',['New York','Newark','Los Angeles']);
+    setRouteStatus('Porti pronti');
+  }catch(e){
+    console.error(e);
+    setRouteStatus('Errore caricamento porti');
+    const fallback=[
+      {country:'Italy',name:'Genoa',code:'ITGOA',lat:44.4048,lon:8.9444},{country:'Italy',name:'La Spezia',code:'ITSPE',lat:44.1025,lon:9.8241},
+      {country:'United States',name:'New York',code:'USNYC',lat:40.6840,lon:-74.0062},{country:'United States',name:'Los Angeles',code:'USLAX',lat:33.7405,lon:-118.2719},
+      {country:'Morocco',name:'Tangier Med',code:'MAPTM',lat:35.8933,lon:-5.5033},{country:'Spain',name:'Valencia',code:'ESVLC',lat:39.4427,lon:-0.3192}
+    ];
+    ROUTE_PORTS=fallback; ROUTE_COUNTRIES=[...new Set(fallback.map(p=>p.country))];
+    fillCountrySelect('rFromCountry','Italy'); fillCountrySelect('rToCountry','United States');
+    updatePortsForCountry('rFromCountry','rFromPort',['Genoa']); updatePortsForCountry('rToCountry','rToPort',['New York']);
+  }
+}
+function fillCountrySelect(id, preferred){
+  const s=document.getElementById(id); if(!s) return; s.innerHTML='';
+  ROUTE_COUNTRIES.forEach(c=>{const o=document.createElement('option'); o.value=c; o.textContent=c; if(c===preferred) o.selected=true; s.appendChild(o);});
+}
+function updatePortsForCountry(countryId, portId, preferred=[]){
+  const country=document.getElementById(countryId).value, s=document.getElementById(portId); if(!s) return;
+  const ports=ROUTE_PORTS.filter(p=>p.country===country).sort((a,b)=>a.name.localeCompare(b.name));
+  s.innerHTML='';
+  ports.forEach((p,idx)=>{const o=document.createElement('option'); o.value=p.code||(`${p.country}:${p.name}`); o.textContent=`${p.name}${p.code?` · ${p.code}`:''}`; o.dataset.name=p.name; if(preferred.some(x=>p.name.toLowerCase().includes(x.toLowerCase())) || (!preferred.length&&idx===0)) o.selected=true; s.appendChild(o);});
+}
+function getSelectedPort(portId){
+  const code=document.getElementById(portId).value;
+  return ROUTE_PORTS.find(p=>(p.code||(`${p.country}:${p.name}`))===code);
+}
+document.addEventListener('change', (e)=>{
+  if(e.target && e.target.id==='rFromCountry') updatePortsForCountry('rFromCountry','rFromPort');
+  if(e.target && e.target.id==='rToCountry') updatePortsForCountry('rToCountry','rToPort');
+});
+function presetRouteExample(){
+  initRoutes().then(()=>{
+    const setCountry=(id,val)=>{const s=document.getElementById(id); if([...s.options].some(o=>o.value===val)) s.value=val;};
+    setCountry('rFromCountry','Italy'); updatePortsForCountry('rFromCountry','rFromPort',['Genoa','Genova']);
+    setCountry('rToCountry','United States'); updatePortsForCountry('rToCountry','rToPort',['New York','Newark']);
+    document.getElementById('rLine').value='MSC'; document.getElementById('rType').value='40HC';
+    calcRoutePlanner();
+  });
+}
+function calcRoutePlanner(){
+  const from=getSelectedPort('rFromPort'), to=getSelectedPort('rToPort');
+  if(!from || !to){ setRouteStatus('Seleziona i porti'); return; }
+  const line=document.getElementById('rLine').value, cType=document.getElementById('rType').value, profile=document.getElementById('rProfile').value;
+  const cfg=LINE_PROFILES[line] || LINE_PROFILES['MSC'];
+  const geoKm = havKm(from.lat, from.lon, to.lat, to.lon);
+  let factor = 1.12;
+  if(from.country!==to.country) factor += 0.05;
+  if(Math.abs(from.lon-to.lon)>60) factor += 0.07;
+  if(Math.abs(from.lon-to.lon)>120) factor += 0.09;
+  const seaKm = geoKm*factor;
+  const nm = seaKm/1.852;
+  const seaDays = nm / cfg.knots / 24;
+  const eta = seaDays + cfg.portDays;
+  const discharge=document.getElementById('rDischarge').value, outFull=document.getElementById('rOutFull').value, inEmpty=document.getElementById('rInEmpty').value;
+  const freeIn = cfg.freeIn[cType] ?? 5;
+  const freeOut = cfg.freeOut[cType] ?? 7;
+  const usedIn = dayDiff(discharge,outFull);
+  const usedOut = dayDiff(outFull,inEmpty);
+  const demDays = Math.max(0, usedIn - freeIn);
+  const detDays = Math.max(0, usedOut - freeOut);
+  document.getElementById('rkKm').textContent = fmtNum(seaKm,0);
+  document.getElementById('rkNm').textContent = fmtNum(nm,0);
+  document.getElementById('rkSea').textContent = fmtNum(seaDays,1);
+  document.getElementById('rkEta').textContent = fmtNum(eta,1)+' gg';
+  document.getElementById('routeBreakdown').innerHTML = `
+    <div class="routes-line"><span>Origine</span><b>${from.name} ${from.code?`· ${from.code}`:''}</b></div>
+    <div class="routes-line"><span>Destinazione</span><b>${to.name} ${to.code?`· ${to.code}`:''}</b></div>
+    <div class="routes-line"><span>Shipping line</span><b>${line}</b></div>
+    <div class="routes-line"><span>Container type</span><b>${cType}</b></div>
+    <div class="routes-line"><span>Geodesic km</span><b>${fmtNum(geoKm,0)} km</b></div>
+    <div class="routes-line"><span>Routing factor</span><b>x ${fmtNum(factor,2)}</b></div>
+    <div class="routes-line"><span>Port days inclusi</span><b>${cfg.portDays} gg</b></div>`;
+  document.getElementById('rddBox').innerHTML = `
+    <div class="routes-line"><span>Profilo</span><b>${profile}</b></div>
+    <div class="routes-line"><span>Free demurrage</span><b>${freeIn} gg</b></div>
+    <div class="routes-line"><span>Used demurrage window</span><b>${usedIn} gg</b></div>
+    <div class="routes-line"><span>Chargeable demurrage</span><b>${demDays} gg</b></div>
+    <div class="routes-line"><span>Free detention</span><b>${freeOut} gg</b></div>
+    <div class="routes-line"><span>Used detention window</span><b>${usedOut} gg</b></div>
+    <div class="routes-line"><span>Chargeable detention</span><b>${detDays} gg</b></div>`;
+  document.getElementById('rWarn').textContent = 'Stima operativa pronta senza API key: i giorni addebitabili sono utili per planning, ma il costo monetario reale dipende dal tariffario ufficiale di linea/porto/data.';
+  setRouteStatus('Calcolo completato');
+}
 
 // Init
 calcPallet();
-updateSeaRatesCode();
+routeDefaultDates();
 </script>
 </body>
 </html>
