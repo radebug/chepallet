@@ -124,6 +124,31 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .leg{display:flex;gap:11px;flex-wrap:wrap;margin-top:8px;}
 .li{display:flex;align-items:center;gap:5px;font-size:0.66rem;color:var(--muted);}
 .ld{width:8px;height:8px;border-radius:2px;}
+
+.plan-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.plan-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.7rem;color:var(--muted);margin-bottom:8px;flex-wrap:wrap;}
+.plan-box{position:relative;background:#f3f4f6;border-radius:8px;border:1px solid #d1d5db;min-height:210px;overflow:hidden;touch-action:none;user-select:none;}
+.plan-svg{display:block;width:100%;height:auto;pointer-events:none;}
+.plan-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.plan-pill{display:flex;align-items:center;gap:6px;font-size:.64rem;color:var(--muted);}
+.plan-dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+.plan-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.plan-item{position:absolute;border:1.5px solid #475569;border-radius:4px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);}
+.plan-item.box{background:#60a5fa;}
+.plan-item.box.alt{background:#93c5fd;}
+.plan-addbar{display:grid;grid-template-columns:1.15fr 0.9fr 0.9fr auto auto;gap:8px;align-items:end;margin:10px 0 12px;}
+.plan-addbar .fg{margin-bottom:0;}
+.plan-addbar .be{height:36px;}
+@media(max-width:900px){.plan-addbar{grid-template-columns:1fr 1fr;}.plan-addbar .wide{grid-column:1 / -1;}}
+.plan-item.pallet{background:#f59e0b;}
+.plan-item.pallet.alt{background:#fb923c;}
+.plan-item.selected{outline:3px solid #0f172a;z-index:5;}
+.plan-item.editing{cursor:grab;}
+.plan-item.dragging{cursor:grabbing;z-index:10;}
+.plan-box.editing .plan-item{pointer-events:auto;}
+.plan-box::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(15,23,42,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.05) 1px,transparent 1px);background-size:24px 24px;opacity:0;transition:opacity .2s;pointer-events:none;}
+.plan-box.editing::after{opacity:1;}
+
 /* TRANSFER */
 .btn-xfer{width:100%;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.73rem;cursor:pointer;transition:all 0.2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:7px;}
 .btn-xfer:hover{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,0.06);}
@@ -154,14 +179,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .routes-warn{font-size:.72rem;color:#fbbf24;margin-top:8px;}
 @media (max-width:960px){.route-grid{grid-template-columns:1fr;}.route-kpis{grid-template-columns:repeat(2,1fr);}}
 
-
-/* click hardening fix */
-header,.main-nav,.main-nav *{pointer-events:auto!important}
-header,.main-nav,.nav-btn{position:relative;z-index:9999}
-button{pointer-events:auto!important}
-.page{position:relative;z-index:1}
-.cw,.vc,.cb,.plan-wrap,.plan-box{position:relative}
-
 </style>
 </head>
 <body>
@@ -169,10 +186,10 @@ button{pointer-events:auto!important}
 <header>
   <div class="logo">Che<span>pallet</span></div>
   <nav class="main-nav">
-    <button type="button" class="nav-btn active" onclick="showPage('pallet',this)">📦 Pallet</button>
-    <button type="button" class="nav-btn nb" onclick="showPage('container',this)">🚢 Container</button>
-    <button type="button" class="nav-btn nt" onclick="showPage('truck',this)">🚛 Truck</button>
-    <button type="button" class="nav-btn nr" onclick="showPage('routes',this);initRoutes()">🌍 Routes</button>
+    <button class="nav-btn active" onclick="showPage('pallet',this)">📦 Pallet</button>
+    <button class="nav-btn nb" onclick="showPage('container',this)">🚢 Container</button>
+    <button class="nav-btn nt" onclick="showPage('truck',this)">🚛 Truck</button>
+    <button class="nav-btn nr" onclick="showPage('routes',this);initRoutes()">🌍 Routes</button>
   </nav>
   <div class="header-badge">v4.5</div>
 </header>
@@ -189,9 +206,9 @@ button{pointer-events:auto!important}
       <div class="ph"><div class="pi">📦</div><h3>Parametri</h3></div>
       <div class="pb">
         <div class="tabs">
-          <button type="button" class="tab active" onclick="swTab('box',this)">Scatola</button>
-          <button type="button" class="tab" onclick="swTab('pallet',this)">Pallet</button>
-          <button type="button" class="tab" onclick="swTab('visual',this)">Visual</button>
+          <button class="tab active" onclick="swTab('box',this)">Scatola</button>
+          <button class="tab" onclick="swTab('pallet',this)">Pallet</button>
+          <button class="tab" onclick="swTab('visual',this)">Visual</button>
         </div>
         <!-- BOX -->
         <div id="tab-box">
@@ -211,12 +228,12 @@ button{pointer-events:auto!important}
         <div id="tab-pallet" style="display:none;">
           <div class="sl">Preset pallet</div>
           <div class="pg">
-            <button type="button" class="pb2 on" onclick="setP(1200,800,this)">EUR<br>1200×800</button>
-            <button type="button" class="pb2" onclick="setP(1200,1000,this)">EUR2<br>1200×1000</button>
-            <button type="button" class="pb2" onclick="setP(1200,1200,this)">EUR3<br>1200×1200</button>
-            <button type="button" class="pb2" onclick="setP(1219,1016,this)">US<br>1219×1016</button>
-            <button type="button" class="pb2" onclick="setP(1100,1100,this)">AU<br>1100×1100</button>
-            <button type="button" class="pb2" onclick="setP(0,0,this)">Custom<br>—</button>
+            <button class="pb2 on" onclick="setP(1200,800,this)">EUR<br>1200×800</button>
+            <button class="pb2" onclick="setP(1200,1000,this)">EUR2<br>1200×1000</button>
+            <button class="pb2" onclick="setP(1200,1200,this)">EUR3<br>1200×1200</button>
+            <button class="pb2" onclick="setP(1219,1016,this)">US<br>1219×1016</button>
+            <button class="pb2" onclick="setP(1100,1100,this)">AU<br>1100×1100</button>
+            <button class="pb2" onclick="setP(0,0,this)">Custom<br>—</button>
           </div>
           <div class="fr"><div class="fg"><label>Lung. pallet (mm)</label><input type="number" id="pL" value="1200" min="1"></div><div class="fg"><label>Larg. pallet (mm)</label><input type="number" id="pW" value="800" min="1"></div></div>
           <div class="fr"><div class="fg"><label>Altezza max (mm)</label><input type="number" id="maxH" value="1800" min="1"></div><div class="fg"><label>Peso max (kg)</label><input type="number" id="maxKg" value="1000" min="1"></div></div>
@@ -233,9 +250,9 @@ button{pointer-events:auto!important}
           <div class="fr"><div class="fg"><label>Colore pallet</label><input type="color" id="cPal" value="#8B6914"></div><div class="fg"><label>Sfondo</label><input type="color" id="cBg" value="#0a0c10"></div></div>
           <div class="fg"><label>Illuminazione</label><select id="light"><option value="studio">Studio</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="dramatic">Dramatic</option></select></div>
         </div>
-        <button type="button" class="bc" onclick="calcPallet()">▶ CALCOLA &amp; AGGIORNA 3D</button>
-        <button type="button" class="btn-xfer" onclick="transferToContainer()">↗ Trasferisci dati in Container</button>
-        <button type="button" class="btn-xfer" onclick="transferToTruck()" style="margin-top:4px;">↗ Trasferisci dati in Truck</button>
+        <button class="bc" onclick="calcPallet()">▶ CALCOLA &amp; AGGIORNA 3D</button>
+        <button class="btn-xfer" onclick="transferToContainer()">↗ Trasferisci dati in Container</button>
+        <button class="btn-xfer" onclick="transferToTruck()" style="margin-top:4px;">↗ Trasferisci dati in Truck</button>
         <div class="alert" id="al-p">✓ Calcolo completato!</div>
       </div>
     </div>
@@ -251,17 +268,17 @@ button{pointer-events:auto!important}
       <div class="ph" style="justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:8px;"><div class="pi">🎲</div><h3>Vista 3D Pallet</h3></div>
         <div style="display:flex;gap:6px;">
-          <button type="button" class="be" onclick="exportPDF('pallet')">📄 PDF</button>
-          <button type="button" class="be" onclick="doScreenshot('pc')">📷</button>
+          <button class="be" onclick="exportPDF('pallet')">📄 PDF</button>
+          <button class="be" onclick="doScreenshot('pc')">📷</button>
         </div>
       </div>
       <div class="cw" id="pc">
         <div class="vi">Trascina per ruotare · Scroll per zoom</div>
         <div class="vc">
-          <button type="button" class="cb" onclick="rCamP()">⌂</button>
-          <button type="button" class="cb" onclick="vP('front')">↔</button>
-          <button type="button" class="cb" onclick="vP('top')">↕</button>
-          <button type="button" class="cb" onclick="togAnimP()" id="abP">▶</button>
+          <button class="cb" onclick="rCamP()">⌂</button>
+          <button class="cb" onclick="vP('front')">↔</button>
+          <button class="cb" onclick="vP('top')">↕</button>
+          <button class="cb" onclick="togAnimP()" id="abP">▶</button>
         </div>
       </div>
     </div>
@@ -286,15 +303,15 @@ button{pointer-events:auto!important}
       <div class="pb">
         <div class="sl b">Tipo container</div>
         <div class="ct-grid">
-          <button type="button" class="ctb on" onclick="selCont('20dry',this)"><em>📦</em><strong>20' Dry</strong><span>5898×2352×2393mm · 28.2t</span></button>
-          <button type="button" class="ctb" onclick="selCont('40dry',this)"><em>🚛</em><strong>40' Dry</strong><span>12032×2352×2393mm · 26.7t</span></button>
-          <button type="button" class="ctb" onclick="selCont('40hc',this)"><em>📐</em><strong>40' High Cube</strong><span>12032×2352×2698mm · 26.5t</span></button>
-          <button type="button" class="ctb" onclick="selCont('40ref',this)"><em>❄️</em><strong>40' Reefer</strong><span>11580×2286×2400mm · 27.7t</span></button>
+          <button class="ctb on" onclick="selCont('20dry',this)"><em>📦</em><strong>20' Dry</strong><span>5898×2352×2393mm · 28.2t</span></button>
+          <button class="ctb" onclick="selCont('40dry',this)"><em>🚛</em><strong>40' Dry</strong><span>12032×2352×2393mm · 26.7t</span></button>
+          <button class="ctb" onclick="selCont('40hc',this)"><em>📐</em><strong>40' High Cube</strong><span>12032×2352×2698mm · 26.5t</span></button>
+          <button class="ctb" onclick="selCont('40ref',this)"><em>❄️</em><strong>40' Reefer</strong><span>11580×2286×2400mm · 27.7t</span></button>
         </div>
         <div class="sl b">Modalità carico</div>
         <div class="mt">
-          <button type="button" class="mb on" onclick="selCMode('boxes',this)">📦 Floor Loaded</button>
-          <button type="button" class="mb" onclick="selCMode('pallets',this)">🪵 Su Pallet</button>
+          <button class="mb on" onclick="selCMode('boxes',this)">📦 Floor Loaded</button>
+          <button class="mb" onclick="selCMode('pallets',this)">🪵 Su Pallet</button>
         </div>
         <div id="cm-boxes">
           <div class="sl b">Dimensioni scatola</div>
@@ -306,12 +323,12 @@ button{pointer-events:auto!important}
         <div id="cm-pallets" style="display:none;">
           <div class="sl b">Tipo pallet</div>
           <div class="pg">
-            <button type="button" class="pb2 on" onclick="setCPal(1200,800,144,this)">EUR<br>1200×800</button>
-            <button type="button" class="pb2" onclick="setCPal(1200,1000,144,this)">EUR2<br>1200×1000</button>
-            <button type="button" class="pb2" onclick="setCPal(1200,1200,144,this)">EUR3<br>1200×1200</button>
-            <button type="button" class="pb2" onclick="setCPal(1219,1016,152,this)">US<br>1219×1016</button>
-            <button type="button" class="pb2" onclick="setCPal(1100,1100,144,this)">AU<br>1100×1100</button>
-            <button type="button" class="pb2" onclick="setCPal(0,0,0,this)">Custom<br>—</button>
+            <button class="pb2 on" onclick="setCPal(1200,800,144,this)">EUR<br>1200×800</button>
+            <button class="pb2" onclick="setCPal(1200,1000,144,this)">EUR2<br>1200×1000</button>
+            <button class="pb2" onclick="setCPal(1200,1200,144,this)">EUR3<br>1200×1200</button>
+            <button class="pb2" onclick="setCPal(1219,1016,152,this)">US<br>1219×1016</button>
+            <button class="pb2" onclick="setCPal(1100,1100,144,this)">AU<br>1100×1100</button>
+            <button class="pb2" onclick="setCPal(0,0,0,this)">Custom<br>—</button>
           </div>
           <div class="fr"><div class="fg"><label>Lung. pallet (mm)</label><input type="number" id="cpL" value="1200" min="1"></div><div class="fg"><label>Larg. pallet (mm)</label><input type="number" id="cpW" value="800" min="1"></div></div>
           <div class="fr"><div class="fg"><label>Spessore pallet (mm)</label><input type="number" id="cpT" value="144" min="1"></div><div class="fg"><label>H carico (mm)</label><input type="number" id="cpCH" value="1200" min="1"></div></div>
@@ -331,7 +348,7 @@ button{pointer-events:auto!important}
           </div>
         </div>
 
-        <button type="button" class="bc bb" onclick="calcContainer()">▶ CALCOLA CONTAINER 3D</button>
+        <button class="bc bb" onclick="calcContainer()">▶ CALCOLA CONTAINER 3D</button>
         <div class="alert" id="al-c">✓ Calcolo container completato!</div>
       </div>
     </div>
@@ -347,25 +364,56 @@ button{pointer-events:auto!important}
       <div class="ph" style="justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:8px;"><div class="pi">🎲</div><h3>Vista 3D Container</h3><span class="it b" id="clbl">20' Dry</span></div>
         <div style="display:flex;gap:6px;">
-          <button type="button" class="be bb" onclick="exportPDF('container')">📄 PDF</button>
-          <button type="button" class="be bb" onclick="doScreenshot('cc')">📷</button>
+          <button class="be bb" onclick="exportPDF('container')">📄 PDF</button>
+          <button class="be bb" onclick="doScreenshot('cc')">📷</button>
           
         </div>
       </div>
       <div class="cw" id="cc">
         <div class="vi">Trascina per ruotare · Scroll per zoom</div>
         <div class="vc">
-          <button type="button" class="cb" onclick="rCamC()">⌂</button>
-          <button type="button" class="cb" onclick="vC('front')">↔</button>
-          <button type="button" class="cb" onclick="vC('top')">↕</button>
-          <button type="button" class="cb" onclick="vC('side')">↗</button>
-          <button type="button" class="cb" onclick="togAnimC()" id="abC">▶</button>
+          <button class="cb" onclick="rCamC()">⌂</button>
+          <button class="cb" onclick="vC('front')">↔</button>
+          <button class="cb" onclick="vC('top')">↕</button>
+          <button class="cb" onclick="vC('side')">↗</button>
+          <button class="cb" onclick="togAnimC()" id="abC">▶</button>
         </div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div class="panel"><div class="ph"><div class="pi">📊</div><h3>Dettagli container</h3></div><div class="pb" id="cdet" style="font-size:0.74rem;line-height:2;color:var(--muted);">Esegui un calcolo.</div></div>
       <div class="panel"><div class="ph"><div class="pi">⚖️</div><h3>Peso &amp; limiti</h3></div><div class="pb" id="cwgt" style="font-size:0.74rem;color:var(--muted);">Esegui un calcolo.</div></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><div class="pi">🗺️</div><h3>Vista dall'alto</h3></div>
+      <div class="pb">
+        <div class="plan-actions">
+          <button class="be bb" id="btnEditPlan" onclick="toggleContainerPlanEdit()">✏️ Modifica layout</button>
+          <button class="be bb" onclick="rotateSelectedPlanItem()">🔄 Ruota pallet</button>
+          <button class="be bb" onclick="resetContainerPlan()">↺ Reset layout</button>
+          <button class="be bb" onclick="addContainerPlan()">➕ Aggiungi container</button>
+          <button class="be bb" onclick="removeActiveContainerPlan()">➖ Rimuovi container</button>
+        </div>
+        <div class="multi-plan-bar">
+          <div class="multi-plan-tabs" id="containerPlanTabs"></div>
+          <div class="multi-plan-meta" id="containerPlanSummary">1 container</div>
+        </div>
+        <div class="plan-addbar">
+          <div class="fg wide"><label>Aggiungi pallet al container attivo</label><select id="planPalletPreset" onchange="applyPlanPalletPreset()"><option value="custom">Custom</option><option value="1200x800" selected>EUR 1200 × 800</option><option value="1200x1000">Industrial 1200 × 1000</option><option value="1140x1140">CP1 1140 × 1140</option><option value="1100x1100">1100 × 1100</option><option value="800x600">Half pallet 800 × 600</option></select></div>
+          <div class="fg"><label>Lung. pallet (mm)</label><input type="number" id="planNewPL" value="1200" min="100"></div>
+          <div class="fg"><label>Larg. pallet (mm)</label><input type="number" id="planNewPW" value="800" min="100"></div>
+          <button class="be bb" onclick="addCustomPlanPallet()">＋ Inserisci</button>
+          <button class="be bb" onclick="removeSelectedPlanItem()">🗑 Rimuovi</button>
+          <button class="be bb" onclick="duplicateSelectedPlanItem()">⧉ Duplica</button>
+        </div>
+        <div class="plan-wrap" id="cschemaWrap">
+          <div class="plan-head"><span id="cschemaTitle">Schema vista dall'alto</span><span id="cschemaMeta">—</span></div>
+          <div class="plan-dimrow top"><span id="cschemaLenLabel">Lunghezza interna: —</span><span id="cschemaModeLabel">Vista container attivo</span></div>
+          <div class="plan-box" id="cschema"></div>
+          <div class="plan-dimrow bottom"><span id="cschemaWidLabel">Larghezza interna: —</span><span id="cschemaHintLabel">Misure esterne al disegno</span></div>
+          <div class="plan-legend" id="cschemaLegend"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -384,15 +432,15 @@ button{pointer-events:auto!important}
       <div class="pb">
         <div class="sl t">Tipo veicolo</div>
         <div class="ct-grid">
-          <button type="button" class="ctb ttb on" onclick="selTruck('std',this)"><em>🚛</em><strong>Semirimorchio</strong><span>13600×2400×2700mm · 24t</span></button>
-          <button type="button" class="ctb ttb" onclick="selTruck('mega',this)"><em>📏</em><strong>Mega Trailer</strong><span>13600×2400×3000mm · 24t</span></button>
-          <button type="button" class="ctb ttb" onclick="selTruck('van',this)"><em>🚐</em><strong>Furgone (7.5t)</strong><span>6200×2200×2200mm · 4t</span></button>
-          <button type="button" class="ctb ttb" onclick="selTruck('ref',this)"><em>❄️</em><strong>Reefer Truck</strong><span>13310×2400×2600mm · 22t</span></button>
+          <button class="ctb ttb on" onclick="selTruck('std',this)"><em>🚛</em><strong>Semirimorchio</strong><span>13600×2400×2700mm · 24t</span></button>
+          <button class="ctb ttb" onclick="selTruck('mega',this)"><em>📏</em><strong>Mega Trailer</strong><span>13600×2400×3000mm · 24t</span></button>
+          <button class="ctb ttb" onclick="selTruck('van',this)"><em>🚐</em><strong>Furgone (7.5t)</strong><span>6200×2200×2200mm · 4t</span></button>
+          <button class="ctb ttb" onclick="selTruck('ref',this)"><em>❄️</em><strong>Reefer Truck</strong><span>13310×2400×2600mm · 22t</span></button>
         </div>
         <div class="sl t">Modalità carico</div>
         <div class="mt">
-          <button type="button" class="mb ton on" onclick="selTMode('boxes',this)">📦 Floor Loaded</button>
-          <button type="button" class="mb ton" onclick="selTMode('pallets',this)">🪵 Su Pallet</button>
+          <button class="mb ton on" onclick="selTMode('boxes',this)">📦 Floor Loaded</button>
+          <button class="mb ton" onclick="selTMode('pallets',this)">🪵 Su Pallet</button>
         </div>
         <div id="tm-boxes">
           <div class="sl t">Dimensioni scatola</div>
@@ -404,12 +452,12 @@ button{pointer-events:auto!important}
         <div id="tm-pallets" style="display:none;">
           <div class="sl t">Tipo pallet</div>
           <div class="pg">
-            <button type="button" class="pb2 on" onclick="setTPal(1200,800,144,this)">EUR<br>1200×800</button>
-            <button type="button" class="pb2" onclick="setTPal(1200,1000,144,this)">EUR2<br>1200×1000</button>
-            <button type="button" class="pb2" onclick="setTPal(1200,1200,144,this)">EUR3<br>1200×1200</button>
-            <button type="button" class="pb2" onclick="setTPal(1219,1016,152,this)">US<br>1219×1016</button>
-            <button type="button" class="pb2" onclick="setTPal(1100,1100,144,this)">AU<br>1100×1100</button>
-            <button type="button" class="pb2" onclick="setTPal(0,0,0,this)">Custom<br>—</button>
+            <button class="pb2 on" onclick="setTPal(1200,800,144,this)">EUR<br>1200×800</button>
+            <button class="pb2" onclick="setTPal(1200,1000,144,this)">EUR2<br>1200×1000</button>
+            <button class="pb2" onclick="setTPal(1200,1200,144,this)">EUR3<br>1200×1200</button>
+            <button class="pb2" onclick="setTPal(1219,1016,152,this)">US<br>1219×1016</button>
+            <button class="pb2" onclick="setTPal(1100,1100,144,this)">AU<br>1100×1100</button>
+            <button class="pb2" onclick="setTPal(0,0,0,this)">Custom<br>—</button>
           </div>
           <div class="fr"><div class="fg"><label>Lung. pallet (mm)</label><input type="number" id="tpL" value="1200" min="1"></div><div class="fg"><label>Larg. pallet (mm)</label><input type="number" id="tpW" value="800" min="1"></div></div>
           <div class="fr"><div class="fg"><label>Spessore pallet (mm)</label><input type="number" id="tpT" value="144" min="1"></div><div class="fg"><label>H carico (mm)</label><input type="number" id="tpCH" value="1200" min="1"></div></div>
@@ -429,7 +477,7 @@ button{pointer-events:auto!important}
           </div>
         </div>
 
-        <button type="button" class="bc bt" onclick="calcTruck()">▶ CALCOLA TRUCK 3D</button>
+        <button class="bc bt" onclick="calcTruck()">▶ CALCOLA TRUCK 3D</button>
         <div class="alert" id="al-t">✓ Calcolo truck completato!</div>
       </div>
     </div>
@@ -445,19 +493,19 @@ button{pointer-events:auto!important}
       <div class="ph" style="justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:8px;"><div class="pi">🎲</div><h3>Vista 3D Truck</h3><span class="it t" id="tlbl">Semirimorchio</span></div>
         <div style="display:flex;gap:6px;">
-          <button type="button" class="be bt" onclick="exportPDF('truck')">📄 PDF</button>
-          <button type="button" class="be bt" onclick="doScreenshot('tc')">📷</button>
+          <button class="be bt" onclick="exportPDF('truck')">📄 PDF</button>
+          <button class="be bt" onclick="doScreenshot('tc')">📷</button>
           
         </div>
       </div>
       <div class="cw" id="tc">
         <div class="vi">Trascina per ruotare · Scroll per zoom</div>
         <div class="vc">
-          <button type="button" class="cb" onclick="rCamT()">⌂</button>
-          <button type="button" class="cb" onclick="vT('front')">↔</button>
-          <button type="button" class="cb" onclick="vT('top')">↕</button>
-          <button type="button" class="cb" onclick="vT('side')">↗</button>
-          <button type="button" class="cb" onclick="togAnimT()" id="abT">▶</button>
+          <button class="cb" onclick="rCamT()">⌂</button>
+          <button class="cb" onclick="vT('front')">↔</button>
+          <button class="cb" onclick="vT('top')">↕</button>
+          <button class="cb" onclick="vT('side')">↗</button>
+          <button class="cb" onclick="togAnimT()" id="abT">▶</button>
         </div>
       </div>
     </div>
@@ -486,8 +534,8 @@ button{pointer-events:auto!important}
           <div class="fr"><div class="fg"><label>Paese destinazione</label><select id="rToCountry"></select></div><div class="fg"><label>Porto destinazione</label><select id="rToPort"></select></div></div>
           <div class="fr"><div class="fg"><label>Shipping line</label><select id="rLine"><option>MSC</option><option>Maersk</option><option>CMA CGM</option><option>ONE</option><option>Hapag-Lloyd</option><option>Evergreen</option></select></div><div class="fg"><label>Container type</label><select id="rType"><option value="20GP">20' GP</option><option value="40GP">40' GP</option><option value="40HC" selected>40' HC</option><option value="40RF">40' Reefer</option></select></div></div>
           <div class="routes-actions">
-            <button type="button" class="bc" onclick="calcRoutePlanner()">▶ CALCOLA ROTTA</button>
-            <button type="button" class="btn-xfer" onclick="presetRouteExample()">✨ ESEMPIO RAPIDO</button>
+            <button class="bc" onclick="calcRoutePlanner()">▶ CALCOLA ROTTA</button>
+            <button class="btn-xfer" onclick="presetRouteExample()">✨ ESEMPIO RAPIDO</button>
           </div>
           <div class="routes-note">Per evitare input manuali, i menu si popolano da una fonte remota pubblica dei porti. La parte D&amp;D in questa versione è una stima operativa automatica, non una tariffa live di compagnia.</div>
         </div>
@@ -694,6 +742,7 @@ function setupLightsP(){
 // ══════ CONTAINER CALC ══════
 let lastC=null;
 function calcContainer(){
+  syncContainerUnitsType();
   const spec=CONTS[selectedCont];
   const mS=+document.getElementById('cMSide').value,mT=+document.getElementById('cMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
@@ -749,8 +798,9 @@ function calcContainer(){
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
   document.getElementById('cwgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
   document.querySelectorAll('.csc').forEach(c=>c.classList.add('on'));
-  lastC={cL:spec.iL,cW:spec.iW,cH:spec.iH,items,name:spec.name};
+  lastC={cL:spec.iL,cW:spec.iW,cH:spec.iH,items:clonePlanItems(items),name:spec.name,mode:cMode};
   buildBoxScene(GRP_C,lastC,0x3b82f6);
+  renderContainerPlan(spec,items,cMode,{layout:'automatico'});
   CAM_C.tgt=new THREE.Vector3(spec.iL/2,spec.iH/2,spec.iW/2);
   CAM_C.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_C.upd();
   showAlert('al-c');
@@ -766,6 +816,304 @@ function calcHowManyContainers(unitsPerCont,kgPerUnit,spec){
   document.getElementById('cNResult').style.display='block';
   document.getElementById('cNVal').textContent=needed+' container';
   document.getElementById('cNDesc').innerHTML=`Per ${n.toLocaleString()} ${type==='pallets'?'pallet':'scatole'} · <b style="color:var(--text)">${perC}</b> per container · Totale spedibile: <b style="color:var(--text)">${tot.toLocaleString()}</b>`;
+}
+
+
+let containerPlanState={spec:null,mode:'boxes',items:[],originalItems:[],selectedIndex:-1,editing:false,scaleX:1,scaleY:1,boxW:900,boxH:220,containers:[],activeContainer:0};
+
+function clonePlanItems(items){return items.map(it=>({...it}));}
+function clonePlanContainer(c){return {items:clonePlanItems(c.items||[]),originalItems:clonePlanItems(c.originalItems||c.items||[]),layout:c.layout||'automatico'};}
+function getActiveContainerPlan(){return containerPlanState.containers[containerPlanState.activeContainer]||null;}
+function renderContainerPlanTabs(){
+  const tabs=document.getElementById('containerPlanTabs');
+  const summary=document.getElementById('containerPlanSummary');
+  if(!tabs||!summary) return;
+  if(!containerPlanState.containers.length){
+    tabs.innerHTML='';
+    summary.textContent='Nessun container';
+    return;
+  }
+  tabs.innerHTML=containerPlanState.containers.map((c,i)=>`<button class="plan-tab ${i===containerPlanState.activeContainer?'active':''}" onclick="setActiveContainerPlan(${i})">Container ${i+1}</button>`).join('');
+  const totalUnits=containerPlanState.containers.reduce((sum,c)=>sum+(c.items?.length||0),0);
+  const label=containerPlanState.mode==='pallets'?'pallet top view':'scatole top view';
+  summary.textContent=`${containerPlanState.containers.length} container · ${totalUnits} ${label}`;
+}
+function setActiveContainerPlan(idx){
+  if(idx<0||idx>=containerPlanState.containers.length) return;
+  const current=getActiveContainerPlan();
+  if(current){
+    current.items=clonePlanItems(containerPlanState.items);
+    current.originalItems=clonePlanItems(containerPlanState.originalItems);
+  }
+  containerPlanState.activeContainer=idx;
+  const next=getActiveContainerPlan();
+  if(!next) return;
+  renderContainerPlan(containerPlanState.spec,next.items,containerPlanState.mode,{layout:next.layout||'manuale',preserveContainers:true,preserveSelection:false});
+  syncPlanTo3D();
+  buildBoxScene(GRP_C,lastC,0x3b82f6);
+}
+function addContainerPlan(){
+  if(!containerPlanState.spec||!containerPlanState.items.length) return;
+  const base=getActiveContainerPlan()||{items:containerPlanState.items,originalItems:containerPlanState.originalItems,layout:'duplicato'};
+  containerPlanState.containers.push(clonePlanContainer(base));
+  renderContainerPlanTabs();
+  setActiveContainerPlan(containerPlanState.containers.length-1);
+}
+function removeActiveContainerPlan(){
+  if(containerPlanState.containers.length<=1) return;
+  containerPlanState.containers.splice(containerPlanState.activeContainer,1);
+  containerPlanState.activeContainer=Math.max(0,Math.min(containerPlanState.activeContainer,containerPlanState.containers.length-1));
+  renderContainerPlanTabs();
+  setActiveContainerPlan(containerPlanState.activeContainer);
+}
+function renderContainerPlan(spec,items,mode,meta={}){
+  const box=document.getElementById('cschema'), legend=document.getElementById('cschemaLegend');
+  if(!box||!legend||!spec) return;
+  const W=Math.max(680, box.clientWidth||900), H=Math.max(180,Math.round((spec.iW/spec.iL)*W));
+  containerPlanState.spec=spec;
+  containerPlanState.mode=mode;
+  containerPlanState.items=clonePlanItems(items.filter(it=>it.y===0));
+  containerPlanState.originalItems=clonePlanItems(meta.originalItems?meta.originalItems.filter(it=>it.y===0):containerPlanState.items);
+  containerPlanState.selectedIndex=meta.preserveSelection ? containerPlanState.selectedIndex : -1;
+  containerPlanState.scaleX=W/spec.iL;
+  containerPlanState.scaleY=H/spec.iW;
+  containerPlanState.boxW=W;
+  containerPlanState.boxH=H;
+  box.style.height=H+'px';
+  box.classList.toggle('editing',containerPlanState.editing);
+  if(!meta.preserveContainers){
+    containerPlanState.containers=[{items:clonePlanItems(containerPlanState.items),originalItems:clonePlanItems(containerPlanState.originalItems),layout:meta.layout||'automatico'}];
+    containerPlanState.activeContainer=0;
+  }else{
+    const current=getActiveContainerPlan();
+    if(current){
+      current.items=clonePlanItems(containerPlanState.items);
+      current.originalItems=clonePlanItems(containerPlanState.originalItems);
+      if(meta.layout) current.layout=meta.layout;
+    }
+  }
+  box.innerHTML=`<svg class="plan-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="${W}" height="${H}" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/></svg>`;
+  const lenLbl=document.getElementById('cschemaLenLabel');
+  const widLbl=document.getElementById('cschemaWidLabel');
+  const modeLbl=document.getElementById('cschemaModeLabel');
+  const hintLbl=document.getElementById('cschemaHintLabel');
+  if(lenLbl) lenLbl.textContent=`Lunghezza interna: ${(spec.iL/1000).toFixed(2)} m`;
+  if(widLbl) widLbl.textContent=`Larghezza interna: ${(spec.iW/1000).toFixed(3)} m`;
+  if(modeLbl) modeLbl.textContent=`${spec.name} · Container ${containerPlanState.activeContainer+1}/${Math.max(1,containerPlanState.containers.length||1)}`;
+  if(hintLbl) hintLbl.textContent='Misure esterne al disegno';
+  containerPlanState.items.forEach((item,idx)=>{
+    const el=document.createElement('div');
+    const isP=item.type==='pallet';
+    el.className=`plan-item ${isP?'pallet':'box'} ${idx%2===0?'':'alt'}`;
+    el.dataset.index=idx;
+    syncPlanItemElement(el,item);
+    el.addEventListener('click',e=>{e.stopPropagation();selectPlanItem(idx);});
+    el.addEventListener('dblclick',e=>{e.stopPropagation(); if(item.type==='pallet') rotatePlanItem(idx,true);});
+    attachPlanItemDrag(el,idx);
+    box.appendChild(el);
+  });
+  box.onclick=()=>selectPlanItem(-1);
+  document.getElementById('cschemaTitle').textContent=mode==='pallets'?"Schema pallet vista dall'alto":"Schema floor loaded vista dall'alto";
+  document.getElementById('cschemaMeta').textContent=meta.layout ? `Layout: ${meta.layout}` : 'Layout automatico';
+  const pills=mode==='pallets' ? [['#f59e0b','Pallet'],['#0f172a','Selezionato'],['#cbd5e1','Area container']] : [['#60a5fa','Scatole'],['#0f172a','Selezionato']];
+  legend.innerHTML=pills.map(([c,t])=>`<span class="plan-pill"><span class="plan-dot" style="background:${c}"></span>${t}</span>`).join('');
+  renderContainerPlanTabs();
+  updatePlanButtons();
+}
+function syncPlanItemElement(el,item){
+  const sx=containerPlanState.scaleX, sy=containerPlanState.scaleY;
+  const l=item.type==='pallet'?item.pw:item.w;
+  const w=item.type==='pallet'?item.pl:item.l;
+  el.style.left=(item.x*sx)+'px';
+  el.style.top=(item.z*sy)+'px';
+  el.style.width=Math.max(10,l*sx-2)+'px';
+  el.style.height=Math.max(10,w*sy-2)+'px';
+}
+function selectPlanItem(idx){
+  containerPlanState.selectedIndex=idx;
+  document.querySelectorAll('#cschema .plan-item').forEach((el,i)=>el.classList.toggle('selected',i===idx));
+  updatePlanButtons();
+}
+function updatePlanButtons(){
+  const b=document.getElementById('btnEditPlan');
+  if(b) b.textContent=containerPlanState.editing?'✅ Fine modifica':'✏️ Modifica layout';
+}
+function applyPlanPalletPreset(){
+  const v=document.getElementById('planPalletPreset')?.value||'custom';
+  if(v==='custom') return;
+  const parts=v.split('x').map(Number);
+  if(parts.length!==2||parts.some(n=>!n)) return;
+  document.getElementById('planNewPL').value=parts[0];
+  document.getElementById('planNewPW').value=parts[1];
+}
+function findFreePlanSpot(len,wid){
+  const spec=containerPlanState.spec;
+  if(!spec) return {x:0,z:0};
+  const gap=20;
+  for(let z=0; z<=spec.iW-wid; z+=20){
+    for(let x=0; x<=spec.iL-len; x+=20){
+      const overlaps=containerPlanState.items.some(it=>{
+        const il=it.type==='pallet'?it.pw:it.w;
+        const iw=it.type==='pallet'?it.pl:it.l;
+        return !(x+len+gap<=it.x || it.x+il+gap<=x || z+wid+gap<=it.z || it.z+iw+gap<=z);
+      });
+      if(!overlaps) return {x,z};
+    }
+  }
+  return {x:0,z:0};
+}
+function addCustomPlanPallet(){
+  if(!containerPlanState.spec){ alert('Esegui prima un calcolo container.'); return; }
+  const len=+document.getElementById('planNewPL').value;
+  const wid=+document.getElementById('planNewPW').value;
+  if(!len||!wid||len<100||wid<100){ alert('Inserisci misure pallet valide.'); return; }
+  if(len>containerPlanState.spec.iL || wid>containerPlanState.spec.iW){ alert('Questo pallet è più grande dello spazio interno del container.'); return; }
+  const pos=findFreePlanSpot(len,wid);
+  const item={x:pos.x,y:0,z:pos.z,pw:len,pt:+document.getElementById('cpT')?.value||144,pl:wid,ch:+document.getElementById('cpCH')?.value||1200,type:'pallet',kg:+document.getElementById('cpKg')?.value||0,manual:true};
+  containerPlanState.items.push(item);
+  const current=getActiveContainerPlan();
+  if(current){
+    current.items=clonePlanItems(containerPlanState.items);
+    current.originalItems=clonePlanItems(containerPlanState.originalItems);
+    current.layout='manuale';
+  }
+  renderContainerPlan(containerPlanState.spec,containerPlanState.items,containerPlanState.mode,{layout:'manuale',preserveContainers:true,preserveSelection:false,originalItems:containerPlanState.originalItems});
+  selectPlanItem(containerPlanState.items.length-1);
+  syncPlanTo3D();
+  buildBoxScene(GRP_C,lastC,0x3b82f6);
+}
+function duplicateSelectedPlanItem(){
+  const idx=containerPlanState.selectedIndex;
+  if(idx<0){ alert('Seleziona prima un pallet.'); return; }
+  const src=containerPlanState.items[idx];
+  if(!src||src.type!=='pallet'){ alert('Puoi duplicare solo un pallet.'); return; }
+  document.getElementById('planNewPL').value=src.pw;
+  document.getElementById('planNewPW').value=src.pl;
+  addCustomPlanPallet();
+}
+function removeSelectedPlanItem(){
+  const idx=containerPlanState.selectedIndex;
+  if(idx<0){ alert('Seleziona prima un pallet da rimuovere.'); return; }
+  const src=containerPlanState.items[idx];
+  if(!src||src.type!=='pallet'){ alert('Puoi rimuovere solo un pallet selezionato.'); return; }
+  containerPlanState.items.splice(idx,1);
+  containerPlanState.selectedIndex=-1;
+  const current=getActiveContainerPlan();
+  if(current){
+    current.items=clonePlanItems(containerPlanState.items);
+    current.originalItems=clonePlanItems(containerPlanState.originalItems);
+    current.layout='manuale';
+  }
+  renderContainerPlan(containerPlanState.spec,containerPlanState.items,containerPlanState.mode,{layout:'manuale',preserveContainers:true,preserveSelection:false,originalItems:containerPlanState.originalItems});
+  syncPlanTo3D();
+  buildBoxScene(GRP_C,lastC,0x3b82f6);
+}
+function toggleContainerPlanEdit(){
+  containerPlanState.editing=!containerPlanState.editing;
+  const box=document.getElementById('cschema');
+  if(box) box.classList.toggle('editing',containerPlanState.editing);
+  document.querySelectorAll('#cschema .plan-item').forEach(el=>el.classList.toggle('editing',containerPlanState.editing));
+  updatePlanButtons();
+}
+function rotatePlanItem(idx,refresh3d){
+  const item=containerPlanState.items[idx];
+  if(!item||item.type!=='pallet') return;
+  const tmp=item.pw; item.pw=item.pl; item.pl=tmp;
+  clampPlanItem(item);
+  const el=document.querySelector(`#cschema .plan-item[data-index="${idx}"]`);
+  if(el) syncPlanItemElement(el,item);
+  const current=getActiveContainerPlan(); if(current) current.items=clonePlanItems(containerPlanState.items);
+  syncPlanTo3D();
+  if(refresh3d) buildBoxScene(GRP_C,lastC,0x3b82f6);
+}
+function rotateSelectedPlanItem(){ if(containerPlanState.selectedIndex>=0) rotatePlanItem(containerPlanState.selectedIndex,true); }
+function resetContainerPlan(){
+  if(!containerPlanState.spec) return;
+  const current=getActiveContainerPlan();
+  if(current){
+    current.items=clonePlanItems(current.originalItems);
+    renderContainerPlan(containerPlanState.spec,current.items,containerPlanState.mode,{layout:'reset',preserveContainers:true,originalItems:current.originalItems});
+  }else{
+    containerPlanState.items=clonePlanItems(containerPlanState.originalItems);
+    renderContainerPlan(containerPlanState.spec,containerPlanState.items,containerPlanState.mode,{layout:'reset'});
+  }
+  syncPlanTo3D();
+  buildBoxScene(GRP_C,lastC,0x3b82f6);
+}
+function clampPlanItem(item){
+  const spec=containerPlanState.spec; if(!spec) return;
+  const len=item.type==='pallet'?item.pw:item.w;
+  const wid=item.type==='pallet'?item.pl:item.l;
+  item.x=Math.max(0,Math.min(spec.iL-len,item.x));
+  item.z=Math.max(0,Math.min(spec.iW-wid,item.z));
+}
+function attachPlanItemDrag(el,idx){
+  let active=false,startX=0,startY=0,origX=0,origY=0,pid=null;
+  el.addEventListener('pointerdown',e=>{
+    if(!containerPlanState.editing) return;
+    active=true; pid=e.pointerId; el.setPointerCapture(pid); el.classList.add('dragging');
+    selectPlanItem(idx);
+    startX=e.clientX; startY=e.clientY;
+    const item=containerPlanState.items[idx]; origX=item.x; origY=item.z;
+    e.preventDefault();
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!active) return;
+    const item=containerPlanState.items[idx];
+    item.x=origX+(e.clientX-startX)/containerPlanState.scaleX;
+    item.z=origY+(e.clientY-startY)/containerPlanState.scaleY;
+    clampPlanItem(item);
+    syncPlanItemElement(el,item);
+  });
+  const stop=(e)=>{
+    if(!active) return;
+    active=false;
+    el.classList.remove('dragging');
+    try{ if(pid!==null) el.releasePointerCapture(pid); }catch(err){}
+    const current=getActiveContainerPlan(); if(current) current.items=clonePlanItems(containerPlanState.items);
+    renderContainerPlanTabs();
+    syncPlanTo3D();
+    buildBoxScene(GRP_C,lastC,0x3b82f6);
+  };
+  el.addEventListener('pointerup',stop);
+  el.addEventListener('pointercancel',stop);
+  el.addEventListener('lostpointercapture',stop);
+}
+function syncPlanTo3D(){
+  if(!lastC||!containerPlanState.items.length) return;
+  const current=getActiveContainerPlan();
+  const topItems=clonePlanItems((current?.items||containerPlanState.items).filter(Boolean));
+  if(containerPlanState.mode==='pallets'){
+    lastC.items=topItems.map(src=>({
+      ...src,
+      x:src.x,
+      y:0,
+      z:src.z,
+      pw:src.pw,
+      pl:src.pl,
+      pt:src.pt ?? (+document.getElementById('cpT')?.value||144),
+      ch:src.ch ?? (+document.getElementById('cpCH')?.value||1200),
+      type:'pallet'
+    }));
+    document.getElementById('cs-tot').textContent=lastC.items.length;
+  } else {
+    let topIndex=0;
+    lastC.items=lastC.items.map(it=>{
+      if(it.y===0 && topIndex<topItems.length){
+        const src=topItems[topIndex++];
+        return {...it,x:src.x,z:src.z,w:src.w,l:src.l};
+      }
+      return it;
+    });
+  }
+  const meta=document.getElementById('cschemaMeta');
+  if(meta&&current){
+    meta.textContent=`Layout: ${current.layout||'manuale'} · Container ${containerPlanState.activeContainer+1}/${containerPlanState.containers.length}`;
+  }
+  const modeLbl=document.getElementById('cschemaModeLabel');
+  if(modeLbl&&containerPlanState.spec){
+    modeLbl.textContent=`${containerPlanState.spec.name} · Container ${containerPlanState.activeContainer+1}/${containerPlanState.containers.length}`;
+  }
 }
 
 // ══════ TRUCK CALC ══════
@@ -916,155 +1264,110 @@ function transferToTruck(){
 }
 
 // ══════ PDF EXPORT ══════
+function createContainerTopViewDataURL(){
+  const spec=containerPlanState.spec;
+  const current=getActiveContainerPlan();
+  if(!spec||!current) return '';
+  const items=(current.items||[]).filter(Boolean);
+  const W=1600;
+  const H=Math.max(420,Math.round((spec.iW/spec.iL)*W));
+  const scaleX=W/spec.iL, scaleY=H/spec.iW;
+  const rects=items.map((item,idx)=>{
+    const len=item.type==='pallet'?item.pw:item.w;
+    const wid=item.type==='pallet'?item.pl:item.l;
+    const x=item.x*scaleX;
+    const y=item.z*scaleY;
+    const w=Math.max(8,len*scaleX-3);
+    const h=Math.max(8,wid*scaleY-3);
+    const fill=item.type==='pallet'?(idx%2===0?'#f59e0b':'#fbbf24'):(idx%2===0?'#60a5fa':'#93c5fd');
+    const label=(item.type==='pallet'?`${Math.round(item.pw)}×${Math.round(item.pl)}`:`${Math.round(item.w)}×${Math.round(item.l)}`);
+    const showLabel=(w>120&&h>30);
+    return `<g>
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="10" fill="${fill}" stroke="#0f172a" stroke-opacity="0.28" stroke-width="2"/>
+      ${showLabel?`<text x="${(x+w/2).toFixed(1)}" y="${(y+h/2+5).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#0f172a">${label}</text>`:''}
+    </g>`;
+  }).join('');
+  const title = containerPlanState.mode==='pallets' ? 'Disposizione pallet vista dall'alto' : 'Disposizione scatole vista dall'alto';
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H+170}" viewBox="0 0 ${W} ${H+170}">
+    <rect width="100%" height="100%" fill="#ffffff"/>
+    <text x="0" y="34" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#0f172a">${title}</text>
+    <text x="0" y="68" font-family="Arial, sans-serif" font-size="18" fill="#475569">${containerPlanState.spec.name} · Container ${containerPlanState.activeContainer+1}/${containerPlanState.containers.length}</text>
+    <text x="0" y="100" font-family="Arial, sans-serif" font-size="16" fill="#475569">Lunghezza interna: ${(spec.iL/1000).toFixed(2)} m</text>
+    <text x="420" y="100" font-family="Arial, sans-serif" font-size="16" fill="#475569">Larghezza interna: ${(spec.iW/1000).toFixed(3)} m</text>
+    <g transform="translate(0,120)">
+      <rect x="0" y="0" width="${W}" height="${H}" rx="16" fill="#f8fafc" stroke="#94a3b8" stroke-width="3"/>
+      ${rects}
+    </g>
+  </svg>`;
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+function createHiResRendererDataURL(renderer,scene,cam,width=1800,height=1050){
+  const prevSize=renderer.getSize(new THREE.Vector2());
+  const prevPixelRatio=renderer.getPixelRatio();
+  renderer.setPixelRatio(Math.max(1.5,window.devicePixelRatio||1));
+  renderer.setSize(width,height,false);
+  renderer.render(scene,cam);
+  const data=renderer.domElement.toDataURL('image/png',1.0);
+  renderer.setPixelRatio(prevPixelRatio);
+  renderer.setSize(prevSize.x,prevSize.y,false);
+  renderer.render(scene,cam);
+  return data;
+}
 function exportPDF(page){
-  let renderer,scene,cam,title,details,stats;
+  let renderer,scene,cam,title,details,stats,extraInfo='';
   if(page==='pallet'){
     if(!lastP){alert('Esegui prima un calcolo.');return;}
     renderer=RP.r;scene=SP.sc;cam=CAM_P.cam;
     title='Chepallet — Report Pallettizzazione';
     details=document.getElementById('pdet').innerText;
-    stats=`Scatole: ${document.getElementById('sp-tot').textContent}  |  Per strato: ${document.getElementById('sp-lay').textContent}  |  Peso: ${document.getElementById('sp-wgt').textContent}kg  |  Efficienza: ${document.getElementById('sp-eff').textContent}`;
+    stats=`Scatole: ${document.getElementById('sp-tot').textContent} · Per strato: ${document.getElementById('sp-lay').textContent} · Peso: ${document.getElementById('sp-wgt').textContent} kg · Efficienza: ${document.getElementById('sp-eff').textContent}`;
   } else if(page==='container'){
     if(!lastC){alert('Esegui prima un calcolo.');return;}
     renderer=RC.r;scene=SC.sc;cam=CAM_C.cam;
     title='Chepallet — Report Container';
     details=document.getElementById('cdet').innerText;
-    stats=`Unità: ${document.getElementById('cs-tot').textContent}  |  Vol: ${document.getElementById('cs-vol').textContent}  |  Peso: ${document.getElementById('cs-wgt').textContent}kg`;
+    stats=`Unità: ${document.getElementById('cs-tot').textContent} · Vol: ${document.getElementById('cs-vol').textContent} · Peso: ${document.getElementById('cs-wgt').textContent} kg · Container: ${containerPlanState.containers.length}`;
+    extraInfo=document.getElementById('cwgt').innerText;
   } else {
     if(!lastT){alert('Esegui prima un calcolo.');return;}
     renderer=RT.r;scene=ST.sc;cam=CAM_T.cam;
     title='Chepallet — Report Truck';
     details=document.getElementById('tdet').innerText;
-    stats=`Unità: ${document.getElementById('ts-tot').textContent}  |  Vol: ${document.getElementById('ts-vol').textContent}  |  Peso: ${document.getElementById('ts-wgt').textContent}kg`;
+    stats=`Unità: ${document.getElementById('ts-tot').textContent} · Vol: ${document.getElementById('ts-vol').textContent} · Peso: ${document.getElementById('ts-wgt').textContent} kg`;
   }
-  renderer.render(scene,cam);
-  const img=renderer.domElement.toDataURL('image/png',0.95);
+  const img=createHiResRendererDataURL(renderer,scene,cam);
+  const topImg = page==='container' ? createContainerTopViewDataURL() : '';
   const now=new Date().toLocaleString('it-IT');
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>
-    body{font-family:'Courier New',monospace;background:#fff;color:#111;padding:32px;max-width:900px;margin:0 auto;}
-    h1{font-family:Arial,sans-serif;font-size:22px;font-weight:900;border-bottom:3px solid #f0a500;padding-bottom:8px;margin-bottom:6px;}
-    .sub{color:#666;font-size:11px;margin-bottom:24px;}
-    .render{width:100%;border-radius:10px;border:1px solid #e5e7eb;margin:16px 0;}
-    .stats{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;font-size:13px;margin-bottom:16px;}
-    .det{font-size:12px;line-height:1.9;color:#444;white-space:pre-wrap;}
-    .footer{margin-top:32px;font-size:10px;color:#999;border-top:1px solid #e5e7eb;padding-top:10px;}
-  
-/* ROUTES */
-.nav-btn.nr{background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.24)}
-.route-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;}
-.route-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
-.route-kpi{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
-.route-kpi .k{font-size:1.2rem;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;}
-.route-kpi .l{font-size:0.68rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
-.routes-note{font-size:.7rem;color:var(--muted);line-height:1.6;margin-top:10px;}
-.routes-box{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
-.routes-line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.06);font-size:.78rem;color:var(--muted)}
-.routes-line:last-child{border-bottom:none;}
-.routes-line b{color:var(--text)}
-.badge-soft{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.22);font-size:.68rem;color:var(--text)}
-.routes-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;}
-.routes-warn{font-size:.72rem;color:#fbbf24;margin-top:8px;}
-@media (max-width:960px){.route-grid{grid-template-columns:1fr;}.route-kpis{grid-template-columns:repeat(2,1fr);}}
-
-
-/* click hardening fix */
-header,.main-nav,.main-nav *{pointer-events:auto!important}
-header,.main-nav,.nav-btn{position:relative;z-index:9999}
-button{pointer-events:auto!important}
-.page{position:relative;z-index:1}
-.cw,.vc,.cb,.plan-wrap,.plan-box{position:relative}
-
-</style></head><body>
-    <h1>${title}</h1>
-    <div class="sub">Generato il ${now} · chepallet.app</div>
-    <img src="${img}" class="render">
-    <div class="stats">${stats}</div>
-    <div class="det">${details}</div>
-    <div class="footer">Chepallet v3.0 — Calcolatore professionale di pallettizzazione, container e truck</div>
+    @page{size:A4 portrait;margin:12mm;}
+    body{font-family:Arial,sans-serif;background:#fff;color:#0f172a;margin:0;}
+    .sheet{max-width:190mm;margin:0 auto;padding:0;}
+    h1{font-size:22px;font-weight:800;margin:0 0 6px;}
+    .sub{font-size:11px;color:#64748b;margin-bottom:14px;}
+    .img-block{margin:0 0 12px;page-break-inside:avoid;}
+    .img-title{font-size:14px;font-weight:700;margin:0 0 6px;}
+    img{width:100%;display:block;border:1px solid #cbd5e1;border-radius:12px;background:#fff;}
+    .info{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px;}
+    .box{border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;background:#f8fafc;font-size:12px;line-height:1.6;white-space:pre-wrap;}
+    .footer{margin-top:10px;font-size:10px;color:#94a3b8;text-align:right;}
+  </style></head><body>
+    <div class="sheet">
+      <h1>${title}</h1>
+      <div class="sub">Generato il ${now}</div>
+      <div class="img-block">
+        <div class="img-title">Render 3D</div>
+        <img src="${img}" alt="Render 3D">
+      </div>
+      ${page==='container'&&topImg?`<div class="img-block"><div class="img-title">Vista dall'alto</div><img src="${topImg}" alt="Vista dall'alto"></div>`:''}
+      <div class="info">
+        <div class="box"><b>Riepilogo</b><br>${stats}</div>
+        <div class="box"><b>Dettagli</b><br>${details}</div>
+        ${extraInfo?`<div class="box"><b>Peso e limiti</b><br>${extraInfo}</div>`:''}
+      </div>
+      <div class="footer">Chepallet</div>
+    </div>
     <script>window.onload=()=>window.print();<\/script>
-  
-<script>
-(function(){
-  function q(sel,root){ return (root||document).querySelector(sel); }
-  function qa(sel,root){ return Array.from((root||document).querySelectorAll(sel)); }
-
-  function safeShowPage(name, btn){
-    try{
-      if(typeof showPage === 'function'){
-        showPage(name, btn);
-        return;
-      }
-    }catch(e){}
-    qa('.page').forEach(p => p.classList.remove('active'));
-    const page = document.getElementById('page-' + name);
-    if(page) page.classList.add('active');
-    qa('.nav-btn').forEach(b => b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    try{ if(typeof resizeAll === 'function') resizeAll(); }catch(e){}
-  }
-
-  function bindNavFallback(){
-    const btns = qa('.main-nav .nav-btn');
-    btns.forEach((btn, idx) => {
-      let page = 'pallet';
-      const t = (btn.textContent || '').toLowerCase();
-      if(t.includes('container')) page = 'container';
-      else if(t.includes('truck')) page = 'truck';
-      else if(t.includes('routes')) page = 'routes';
-      else if(idx === 0) page = 'pallet';
-      else if(idx === 1) page = 'container';
-      else if(idx === 2) page = 'truck';
-      else if(idx === 3) page = 'routes';
-
-      // kill accidental form submit behavior
-      btn.setAttribute('type','button');
-
-      // fallback listeners in capture phase too
-      const handler = function(ev){
-        ev.preventDefault();
-        ev.stopPropagation();
-        safeShowPage(page, btn);
-        if(page === 'routes'){
-          try{ if(typeof initRoutes === 'function') initRoutes(); }catch(e){}
-        }
-      };
-      btn.addEventListener('click', handler, true);
-      btn.addEventListener('pointerup', handler, true);
-    });
-  }
-
-  function hardenButtons(){
-    qa('button').forEach(btn => btn.setAttribute('type','button'));
-  }
-
-  function bringHeaderToFront(){
-    const header = q('header');
-    if(header){
-      header.style.zIndex = '9999';
-      header.style.pointerEvents = 'auto';
-    }
-    const nav = q('.main-nav');
-    if(nav){
-      nav.style.zIndex = '9999';
-      nav.style.pointerEvents = 'auto';
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    hardenButtons();
-    bindNavFallback();
-    bringHeaderToFront();
-  });
-
-  window.addEventListener('load', function(){
-    hardenButtons();
-    bindNavFallback();
-    bringHeaderToFront();
-  });
-})();
-</script>
-
-</body></html>`;
+  </body></html>`;
   const w=window.open('','_blank');w.document.write(html);w.document.close();
 }
 
@@ -1228,89 +1531,8 @@ function calcRoutePlanner(){
 
 // Init
 calcPallet();
+syncContainerUnitsType();
 routeDefaultDates();
 </script>
-
-<script>
-(function(){
-  function q(sel,root){ return (root||document).querySelector(sel); }
-  function qa(sel,root){ return Array.from((root||document).querySelectorAll(sel)); }
-
-  function safeShowPage(name, btn){
-    try{
-      if(typeof showPage === 'function'){
-        showPage(name, btn);
-        return;
-      }
-    }catch(e){}
-    qa('.page').forEach(p => p.classList.remove('active'));
-    const page = document.getElementById('page-' + name);
-    if(page) page.classList.add('active');
-    qa('.nav-btn').forEach(b => b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    try{ if(typeof resizeAll === 'function') resizeAll(); }catch(e){}
-  }
-
-  function bindNavFallback(){
-    const btns = qa('.main-nav .nav-btn');
-    btns.forEach((btn, idx) => {
-      let page = 'pallet';
-      const t = (btn.textContent || '').toLowerCase();
-      if(t.includes('container')) page = 'container';
-      else if(t.includes('truck')) page = 'truck';
-      else if(t.includes('routes')) page = 'routes';
-      else if(idx === 0) page = 'pallet';
-      else if(idx === 1) page = 'container';
-      else if(idx === 2) page = 'truck';
-      else if(idx === 3) page = 'routes';
-
-      // kill accidental form submit behavior
-      btn.setAttribute('type','button');
-
-      // fallback listeners in capture phase too
-      const handler = function(ev){
-        ev.preventDefault();
-        ev.stopPropagation();
-        safeShowPage(page, btn);
-        if(page === 'routes'){
-          try{ if(typeof initRoutes === 'function') initRoutes(); }catch(e){}
-        }
-      };
-      btn.addEventListener('click', handler, true);
-      btn.addEventListener('pointerup', handler, true);
-    });
-  }
-
-  function hardenButtons(){
-    qa('button').forEach(btn => btn.setAttribute('type','button'));
-  }
-
-  function bringHeaderToFront(){
-    const header = q('header');
-    if(header){
-      header.style.zIndex = '9999';
-      header.style.pointerEvents = 'auto';
-    }
-    const nav = q('.main-nav');
-    if(nav){
-      nav.style.zIndex = '9999';
-      nav.style.pointerEvents = 'auto';
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    hardenButtons();
-    bindNavFallback();
-    bringHeaderToFront();
-  });
-
-  window.addEventListener('load', function(){
-    hardenButtons();
-    bindNavFallback();
-    bringHeaderToFront();
-  });
-})();
-</script>
-
 </body>
 </html>
