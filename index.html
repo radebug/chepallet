@@ -537,7 +537,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
             <button class="bc" onclick="calcRoutePlanner()">▶ CALCOLA ROTTA</button>
             <button class="btn-xfer" onclick="presetRouteExample()">✨ ESEMPIO RAPIDO</button>
           </div>
-          <div class="routes-note">Per evitare input manuali, i menu si popolano da una fonte remota pubblica dei porti. La parte D&amp;D in questa versione è una stima operativa automatica, non una tariffa live di compagnia.</div>
+          
         </div>
       </div>
       <div class="panel">
@@ -545,7 +545,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <div class="pb">
           <div class="fr"><div class="fg"><label>Discharge</label><input type="date" id="rDischarge"></div><div class="fg"><label>Date out full</label><input type="date" id="rOutFull"></div></div>
           <div class="fr"><div class="fg"><label>Date in empty</label><input type="date" id="rInEmpty"></div><div class="fg"><label>Profilo</label><select id="rProfile"><option value="import" selected>Import</option><option value="export">Export</option></select></div></div>
-          <div class="routes-note">Le date hanno valori precompilati: puoi anche cliccare direttamente “Calcola rotta” senza scrivere nulla.</div>
+          
         </div>
       </div>
     </div>
@@ -1287,7 +1287,7 @@ function createContainerTopViewDataURL(){
       ${showLabel?`<text x="${(x+w/2).toFixed(1)}" y="${(y+h/2+5).toFixed(1)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#0f172a">${label}</text>`:''}
     </g>`;
   }).join('');
-  const title = containerPlanState.mode==='pallets' ? 'Disposizione pallet vista dall'alto' : 'Disposizione scatole vista dall'alto';
+  const title = containerPlanState.mode==='pallets' ? "Disposizione pallet vista dall'alto" : "Disposizione scatole vista dall'alto";
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H+170}" viewBox="0 0 ${W} ${H+170}">
     <rect width="100%" height="100%" fill="#ffffff"/>
     <text x="0" y="34" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#0f172a">${title}</text>
@@ -1525,7 +1525,7 @@ function calcRoutePlanner(){
     <div class="routes-line"><span>Free detention</span><b>${freeOut} gg</b></div>
     <div class="routes-line"><span>Used detention window</span><b>${usedOut} gg</b></div>
     <div class="routes-line"><span>Chargeable detention</span><b>${detDays} gg</b></div>`;
-  document.getElementById('rWarn').textContent = 'Stima operativa pronta senza API key: i giorni addebitabili sono utili per planning, ma il costo monetario reale dipende dal tariffario ufficiale di linea/porto/data.';
+  document.getElementById('rWarn').textContent = '';
   setRouteStatus('Calcolo completato');
 }
 
