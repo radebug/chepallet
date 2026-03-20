@@ -1760,19 +1760,51 @@ function renderFuelCards(){
     '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);">Nessuna regione trovata.</div>';
 }
 
-async function tryFetch(url, force){
-  const cache = force ? 'no-cache' : 'force-cache';
-  const ctrl  = new AbortController();
-  const tid   = setTimeout(()=>ctrl.abort(), 8000); // 8s timeout per proxy
-  try {
-    const res = await fetch(url, {cache, signal:ctrl.signal});
-    clearTimeout(tid);
-    if(!res.ok) return null;
-    return await res.text();
-  } catch(e) {
-    clearTimeout(tid);
-    return null;
-  }
+async function fetchViaClaudeAPI(force=false){
+  // Claude fetches the MIMIT page server-side (no CORS issues) and returns
+  // structured JSON with all regions and fuel prices.
+  const SYSTEM = `Sei un estrattore di dati. Ti verrà fornito l'HTML della pagina MIMIT dei prezzi carburanti.
+Estrai TUTTI i dati di prezzi per TUTTE le regioni/province e restituisci SOLO un array JSON valido, niente altro.
+Formato esatto (usa sempre le virgolette doppie, niente commenti):
+[
+  {"name":"Abruzzo","fuels":{"Benzina":{"price":1.768,"er":"SELF"},"Gasolio":{"price":1.942,"er":"SELF"},"GPL":{"price":0.706,"er":"SERVITO"},"Metano":{"price":1.429,"er":"SERVITO"}}},
+  ...
+]
+Regole:
+- Benzina e Gasolio: usa sempre il prezzo SELF SERVICE
+- GPL e Metano: usa sempre il prezzo SERVITO
+- Se un carburante non è disponibile per una regione, ometti quella chiave
+- Non aggiungere testo prima o dopo il JSON
+- Includi tutte le 21 regioni/province: Abruzzo, Basilicata, Calabria, Campania, Emilia Romagna, Friuli Venezia Giulia, Lazio, Liguria, Lombardia, Marche, Molise, Piemonte, Puglia, Sardegna, Sicilia, Toscana, Umbria, Valle d'Aosta, Veneto, Bolzano, Trento`;
+
+  const USER = `Vai su https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni usando il web_search tool o web fetch, poi estrai tutti i prezzi medi carburanti per regione e restituisci il JSON come da istruzioni.`;
+
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4000,
+    system: SYSTEM,
+    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+    messages: [{ role: 'user', content: USER }]
+  };
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if(!res.ok) throw new Error('API error ' + res.status);
+  const data = await res.json();
+
+  // Extract text from response
+  const textBlock = data.content?.find(b => b.type === 'text');
+  if(!textBlock?.text) throw new Error('No text in response');
+
+  // Parse JSON — strip any markdown fences just in case
+  const clean = textBlock.text.replace(/```json|```/gi,'').trim();
+  const parsed = JSON.parse(clean);
+  if(!Array.isArray(parsed) || parsed.length < 10) throw new Error('Dati incompleti');
+  return parsed;
 }
 
 async function loadFuelData(force=false){
@@ -1782,20 +1814,40 @@ async function loadFuelData(force=false){
   const lbl = document.getElementById('fuelUpdateLabel');
   if(btn) btn.disabled = true;
   dot.style.background='#f0a500'; dot.style.animation='blink 2s infinite';
-  lbl.textContent = 'Caricamento in corso…';
+  lbl.textContent = '⏳ Sto leggendo il sito MIMIT…';
   document.getElementById('fuelGrid').innerHTML =
-    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Recupero dati MIMIT…</div>';
+    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Sto recuperando i prezzi in tempo reale dal sito MIMIT…<br><span style="font-size:.72rem;margin-top:8px;display:block;">Questo può richiedere 10–20 secondi</span></div>';
 
   let parsed = null;
-  // Try every proxy
-  for(const url of FUEL_PROXIES){
-    lbl.textContent = 'Connessione a ' + new URL(url).hostname + '…';
-    const text = await tryFetch(url, force);
-    if(text){ parsed = parseFuelCSV(text); }
-    if(parsed){ FUEL_SOURCE='live'; break; }
+
+  // 1️⃣ Try via API (reads the live MIMIT page server-side)
+  try {
+    lbl.textContent = '⏳ Sto leggendo il sito MIMIT…';
+    parsed = await fetchViaClaudeAPI(force);
+    FUEL_SOURCE = 'claude';
+  } catch(e) {
+    console.warn('API fetch failed:', e.message);
   }
 
-  // Fallback to static data
+  // 2️⃣ Try direct CSV proxies as secondary fallback
+  if(!parsed){
+    for(const url of FUEL_PROXIES){
+      lbl.textContent = '⏳ Sto recuperando i dati…';
+      try{
+        const ctrl = new AbortController();
+        const tid = setTimeout(()=>ctrl.abort(), 8000);
+        const res = await fetch(url, {cache: force?'no-cache':'force-cache', signal:ctrl.signal});
+        clearTimeout(tid);
+        if(res.ok){
+          const text = await res.text();
+          const candidate = parseFuelCSV(text);
+          if(candidate){ parsed = candidate; FUEL_SOURCE='proxy'; break; }
+        }
+      }catch(e){ /* try next */ }
+    }
+  }
+
+  // 3️⃣ Static fallback
   if(!parsed){
     parsed = FUEL_FALLBACK;
     FUEL_SOURCE = 'fallback';
@@ -1803,19 +1855,25 @@ async function loadFuelData(force=false){
 
   FUEL_DATA   = parsed;
   FUEL_LOADED = true;
-  dot.style.background   = FUEL_SOURCE==='live' ? '#22c55e' : '#f0a500';
-  dot.style.animation    = 'blink 2s infinite';
   const now = new Date();
-  if(FUEL_SOURCE==='live'){
-    lbl.textContent = `Live · aggiornato ${now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})} · MIMIT`;
+  const timeStr = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+
+  if(FUEL_SOURCE === 'claude'){
+    dot.style.background = '#22c55e'; dot.style.animation = 'blink 2s infinite';
+    lbl.textContent = `✓ Live · ${timeStr} · MIMIT`;
     document.getElementById('fuelNote').textContent =
-      'Dati ufficiali MIMIT aggiornati ogni mattina (disponibili dalle 08:30). Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.';
+      'Dati estratti in tempo reale dal sito ufficiale MIMIT. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale. Aggiornamento quotidiano dalle 08:30.';
+  } else if(FUEL_SOURCE === 'proxy'){
+    dot.style.background = '#22c55e'; dot.style.animation = 'blink 2s infinite';
+    lbl.textContent = `✓ Live via CSV · ${timeStr} · MIMIT`;
+    document.getElementById('fuelNote').textContent =
+      'Dati ufficiali MIMIT (CSV MediaRegionaleStradale). Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.';
   } else {
-    lbl.textContent = `⚠ Dati statici di riserva (${FUEL_FALLBACK_DATE}) — tutti i proxy non raggiungibili`;
+    dot.style.background = '#f0a500'; dot.style.animation = 'blink 2s infinite';
+    lbl.textContent = `⚠ Dati di riserva (${FUEL_FALLBACK_DATE})`;
     document.getElementById('fuelNote').innerHTML =
-      `Tutti i proxy CORS hanno fallito. Visualizzati dati di riserva del <b>${FUEL_FALLBACK_DATE}</b>. 
-       Riprova cliccando 🔄 Aggiorna, oppure 
-       <a href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni" target="_blank" style="color:#e11d48;">consulta il sito MIMIT →</a>`;
+      `Impossibile raggiungere MIMIT. Dati di riserva del <b>${FUEL_FALLBACK_DATE}</b>. 
+       Riprova con 🔄 Aggiorna oppure <a href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni" target="_blank" style="color:#e11d48;">vai al sito MIMIT →</a>`;
   }
 
   renderFuelCards();
