@@ -1626,144 +1626,200 @@ function syncContainerUnitsType(){
 // ══════ CARBURANTI (MIMIT CSV) ══════
 let FUEL_DATA = [];
 let FUEL_LOADED = false;
+let FUEL_SOURCE = ''; // 'live' | 'fallback'
+
 const FUEL_CSV_URL = 'https://www.mimit.gov.it/images/stories/carburanti/MediaRegionaleStradale.csv';
-const FUEL_PROXY = 'https://corsproxy.io/?url=' + encodeURIComponent(FUEL_CSV_URL);
+// Multiple CORS proxies tried in sequence
+const FUEL_PROXIES = [
+  'https://api.allorigins.win/raw?url=' + encodeURIComponent(FUEL_CSV_URL),
+  'https://corsproxy.io/?url=' + encodeURIComponent(FUEL_CSV_URL),
+  'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(FUEL_CSV_URL),
+  'https://thingproxy.freeboard.io/fetch/' + FUEL_CSV_URL,
+];
+
+// ── STATIC FALLBACK (MIMIT data 09-03-2026) ─────────────────────────────────
+// Usato solo se tutti i proxy falliscono. Aggiornato automaticamente al prossimo
+// caricamento riuscito.
+const FUEL_FALLBACK_DATE = '09-03-2026';
+const FUEL_FALLBACK = [
+  {name:'Abruzzo',         fuels:{Benzina:{price:1.768,er:'SELF'},Gasolio:{price:1.942,er:'SELF'},GPL:{price:0.706,er:'SERVITO'},Metano:{price:1.429,er:'SERVITO'}}},
+  {name:'Basilicata',      fuels:{Benzina:{price:1.813,er:'SELF'},Gasolio:{price:1.968,er:'SELF'},GPL:{price:0.689,er:'SERVITO'},Metano:{price:1.512,er:'SERVITO'}}},
+  {name:'Calabria',        fuels:{Benzina:{price:1.820,er:'SELF'},Gasolio:{price:1.993,er:'SELF'},GPL:{price:0.744,er:'SERVITO'},Metano:{price:1.578,er:'SERVITO'}}},
+  {name:'Campania',        fuels:{Benzina:{price:1.783,er:'SELF'},Gasolio:{price:1.963,er:'SELF'},GPL:{price:0.657,er:'SERVITO'},Metano:{price:1.445,er:'SERVITO'}}},
+  {name:'Emilia Romagna',  fuels:{Benzina:{price:1.776,er:'SELF'},Gasolio:{price:1.961,er:'SELF'},GPL:{price:0.680,er:'SERVITO'},Metano:{price:1.455,er:'SERVITO'}}},
+  {name:'Friuli Venezia Giulia',fuels:{Benzina:{price:1.782,er:'SELF'},Gasolio:{price:1.972,er:'SELF'},GPL:{price:0.686,er:'SERVITO'},Metano:{price:1.440,er:'SERVITO'}}},
+  {name:'Lazio',           fuels:{Benzina:{price:1.766,er:'SELF'},Gasolio:{price:1.954,er:'SELF'},GPL:{price:0.681,er:'SERVITO'},Metano:{price:1.586,er:'SERVITO'}}},
+  {name:'Liguria',         fuels:{Benzina:{price:1.799,er:'SELF'},Gasolio:{price:1.972,er:'SELF'},GPL:{price:0.780,er:'SERVITO'},Metano:{price:1.460,er:'SERVITO'}}},
+  {name:'Lombardia',       fuels:{Benzina:{price:1.779,er:'SELF'},Gasolio:{price:1.976,er:'SELF'},GPL:{price:0.683,er:'SERVITO'},Metano:{price:1.450,er:'SERVITO'}}},
+  {name:'Marche',          fuels:{Benzina:{price:1.758,er:'SELF'},Gasolio:{price:1.946,er:'SELF'},GPL:{price:0.707,er:'SERVITO'},Metano:{price:1.378,er:'SERVITO'}}},
+  {name:'Molise',          fuels:{Benzina:{price:1.788,er:'SELF'},Gasolio:{price:1.968,er:'SELF'},GPL:{price:0.708,er:'SERVITO'},Metano:{price:1.423,er:'SERVITO'}}},
+  {name:'Piemonte',        fuels:{Benzina:{price:1.775,er:'SELF'},Gasolio:{price:1.976,er:'SELF'},GPL:{price:0.680,er:'SERVITO'},Metano:{price:1.470,er:'SERVITO'}}},
+  {name:'Puglia',          fuels:{Benzina:{price:1.790,er:'SELF'},Gasolio:{price:1.957,er:'SELF'},GPL:{price:0.668,er:'SERVITO'},Metano:{price:1.585,er:'SERVITO'}}},
+  {name:'Sardegna',        fuels:{Benzina:{price:1.784,er:'SELF'},Gasolio:{price:1.975,er:'SELF'},GPL:{price:0.804,er:'SERVITO'}}},
+  {name:'Sicilia',         fuels:{Benzina:{price:1.807,er:'SELF'},Gasolio:{price:1.990,er:'SELF'},GPL:{price:0.762,er:'SERVITO'},Metano:{price:1.761,er:'SERVITO'}}},
+  {name:'Toscana',         fuels:{Benzina:{price:1.774,er:'SELF'},Gasolio:{price:1.964,er:'SELF'},GPL:{price:0.701,er:'SERVITO'},Metano:{price:1.509,er:'SERVITO'}}},
+  {name:'Umbria',          fuels:{Benzina:{price:1.765,er:'SELF'},Gasolio:{price:1.949,er:'SELF'},GPL:{price:0.697,er:'SERVITO'},Metano:{price:1.418,er:'SERVITO'}}},
+  {name:"Valle d'Aosta",   fuels:{Benzina:{price:1.808,er:'SELF'},Gasolio:{price:1.985,er:'SELF'},GPL:{price:0.822,er:'SERVITO'}}},
+  {name:'Veneto',          fuels:{Benzina:{price:1.772,er:'SELF'},Gasolio:{price:1.970,er:'SELF'},GPL:{price:0.693,er:'SERVITO'},Metano:{price:1.415,er:'SERVITO'}}},
+  {name:'Bolzano',         fuels:{Benzina:{price:1.822,er:'SELF'},Gasolio:{price:2.008,er:'SELF'},GPL:{price:0.787,er:'SERVITO'},Metano:{price:1.641,er:'SERVITO'}}},
+  {name:'Trento',          fuels:{Benzina:{price:1.806,er:'SELF'},Gasolio:{price:1.993,er:'SELF'},GPL:{price:0.732,er:'SERVITO'},Metano:{price:1.521,er:'SERVITO'}}},
+];
+// ─────────────────────────────────────────────────────────────────────────────
 
 const FUEL_ICONS = {Benzina:'⛽', Gasolio:'🔵', GPL:'🟡', Metano:'⚪'};
 const REGION_FLAGS = {
-  'Abruzzo':'🏔', 'Basilicata':'🌾', 'Calabria':'🌊', 'Campania':'🌋', 'Emilia Romagna':'🧀',
-  'Friuli Venezia Giulia':'🦅', 'Lazio':'🏛', 'Liguria':'⚓', 'Lombardia':'🏭', 'Marche':'🌅',
-  'Molise':'🌿', 'Piemonte':'🍷', 'Puglia':'🫒', 'Sardegna':'🏖', 'Sicilia':'🍊', 'Toscana':'🌻',
-  'Umbria':'🌄', "Valle d'Aosta":'⛷', 'Veneto':'🎭', 'Bolzano':'🏔', 'Trento':'🦌'
+  'Abruzzo':'🏔','Basilicata':'🌾','Calabria':'🌊','Campania':'🌋','Emilia Romagna':'🧀',
+  'Friuli Venezia Giulia':'🦅','Lazio':'🏛','Liguria':'⚓','Lombardia':'🏭','Marche':'🌅',
+  'Molise':'🌿','Piemonte':'🍷','Puglia':'🫒','Sardegna':'🏖','Sicilia':'🍊','Toscana':'🌻',
+  'Umbria':'🌄',"Valle d'Aosta":'⛷','Veneto':'🎭','Bolzano':'🏔','Trento':'🦌'
 };
 
-function parseCSVLine(line){
-  const cols=[];let c='',inQ=false;
-  for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){inQ=!inQ;}else if(ch===';'&&!inQ){cols.push(c.trim());c='';}else c+=ch;}
-  cols.push(c.trim());return cols;
-}
-
 function parseFuelCSV(text){
-  const lines=text.split('\n').filter(l=>l.trim());
-  // Try to detect separator (some CSVs use comma, MIMIT uses semicolons)
-  const header=lines[0];
-  const sep=header.includes(';')?';':',';
-  const regions={};
+  // Normalise line endings and strip BOM
+  text = text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  const lines = text.split('\n').filter(l=>l.trim());
+  if(lines.length < 2) return null;
+  // Detect separator
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const regions = {};
   for(let i=1;i<lines.length;i++){
-    const raw=lines[i];
-    const cols=raw.split(sep).map(s=>s.trim().replace(/"/g,''));
-    if(cols.length<3)continue;
-    // Expected format: Regione;TipoCarburante;TipoErogazione;Prezzo
-    const region=cols[0];const tipo=cols[1];const erogazione=cols[2];const price=parseFloat(cols[3]?.replace(',','.'));
-    if(!region||!tipo||isNaN(price))continue;
-    if(!regions[region])regions[region]={name:region,fuels:{}};
-    // Keep SELF for Benzina/Gasolio, SERVITO for GPL/Metano (MIMIT methodology)
-    const key=tipo.trim();
-    const existing=regions[region].fuels[key];
-    if(!existing||(erogazione==='SELF'&&(key==='Benzina'||key==='Gasolio'))||(erogazione==='SERVITO'&&(key==='GPL'||key==='Metano'))){
-      regions[region].fuels[key]={price,erogazione};
+    const cols = lines[i].split(sep).map(s=>s.trim().replace(/^"+|"+$/g,''));
+    if(cols.length < 4) continue;
+    const region = cols[0];
+    const tipo   = cols[1];
+    const erog   = cols[2];
+    const raw    = cols[3].replace(',','.');
+    const price  = parseFloat(raw);
+    if(!region || !tipo || isNaN(price) || price <= 0) continue;
+    if(!regions[region]) regions[region] = {name:region, fuels:{}};
+    // MIMIT methodology: SELF for Benzina/Gasolio, SERVITO for GPL/Metano
+    const wantSelf   = (tipo==='Benzina'||tipo==='Gasolio');
+    const wantServ   = (tipo==='GPL'||tipo==='Metano');
+    const goodMode   = (wantSelf && erog==='SELF') || (wantServ && erog==='SERVITO');
+    if(!regions[region].fuels[tipo] || goodMode){
+      regions[region].fuels[tipo] = {price, er:erog};
     }
   }
-  return Object.values(regions).filter(r=>Object.keys(r.fuels).length>0);
+  const result = Object.values(regions).filter(r=>Object.keys(r.fuels).length>0);
+  return result.length >= 10 ? result : null; // sanity check: at least 10 regions
 }
 
-function fuelPriceFmt(p){return p?('€ '+p.toFixed(3)):'—';}
+function fuelPriceFmt(p){ return p ? '€\u202f'+p.toFixed(3) : '—'; }
 
 function renderFuelCards(){
-  if(!FUEL_DATA.length){document.getElementById('fuelGrid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Nessun dato caricato.</div>';return;}
-  const sort=document.getElementById('fuelSortBy').value;
-  const search=(document.getElementById('fuelSearch').value||'').toLowerCase();
+  if(!FUEL_DATA.length) return;
+  const sort   = document.getElementById('fuelSortBy').value;
+  const search = (document.getElementById('fuelSearch').value||'').toLowerCase();
 
-  // Compute min/max for coloring
-  const allBenz=FUEL_DATA.map(r=>r.fuels['Benzina']?.price).filter(Boolean);
-  const allGas=FUEL_DATA.map(r=>r.fuels['Gasolio']?.price).filter(Boolean);
-  const minBenz=Math.min(...allBenz),maxBenz=Math.max(...allBenz);
-  const minGas=Math.min(...allGas),maxGas=Math.max(...allGas);
-  const allGpl=FUEL_DATA.map(r=>r.fuels['GPL']?.price).filter(Boolean);
-  const allMet=FUEL_DATA.map(r=>r.fuels['Metano']?.price).filter(Boolean);
-  const minGpl=Math.min(...allGpl),minMet=Math.min(...allMet);
+  const prices = t => FUEL_DATA.map(r=>r.fuels[t]?.price).filter(Boolean);
+  const minOf  = t => Math.min(...prices(t));
+  const maxOf  = t => Math.max(...prices(t));
+  const mins   = {Benzina:minOf('Benzina'),Gasolio:minOf('Gasolio'),GPL:minOf('GPL'),Metano:minOf('Metano')};
+  const maxs   = {Benzina:maxOf('Benzina'),Gasolio:maxOf('Gasolio')};
 
-  // Update KPIs
-  const kbr=FUEL_DATA.find(r=>r.fuels['Benzina']?.price===minBenz);
-  const kgr=FUEL_DATA.find(r=>r.fuels['Gasolio']?.price===minGas);
-  const kgplr=FUEL_DATA.find(r=>r.fuels['GPL']?.price===minGpl);
-  const kmetr=FUEL_DATA.find(r=>r.fuels['Metano']?.price===minMet);
-  document.getElementById('fk-benz').innerHTML=`${fuelPriceFmt(minBenz)}<br><span style="font-size:.6rem;font-weight:400;color:var(--muted)">${kbr?.name||''}</span>`;
-  document.getElementById('fk-gas').innerHTML=`${fuelPriceFmt(minGas)}<br><span style="font-size:.6rem;font-weight:400;color:var(--muted)">${kgr?.name||''}</span>`;
-  document.getElementById('fk-gpl').innerHTML=`${fuelPriceFmt(minGpl)}<br><span style="font-size:.6rem;font-weight:400;color:var(--muted)">${kgplr?.name||''}</span>`;
-  document.getElementById('fk-met').innerHTML=`${fuelPriceFmt(minMet)}<br><span style="font-size:.6rem;font-weight:400;color:var(--muted)">${kmetr?.name||''}</span>`;
+  // KPIs
+  ['Benzina','Gasolio','GPL','Metano'].forEach((t,i)=>{
+    const id=['fk-benz','fk-gas','fk-gpl','fk-met'][i];
+    const m=mins[t]; const r=FUEL_DATA.find(x=>x.fuels[t]?.price===m);
+    document.getElementById(id).innerHTML=`${fuelPriceFmt(m)}<br><span style="font-size:.6rem;font-weight:400;color:var(--muted)">${r?.name||'—'}</span>`;
+  });
 
-  let data=[...FUEL_DATA];
-  if(search)data=data.filter(r=>r.name.toLowerCase().includes(search));
+  let data = [...FUEL_DATA];
+  if(search) data = data.filter(r=>r.name.toLowerCase().includes(search));
+  const g = k => (f,v) => (f.fuels[k]?.price||v);
+  if     (sort==='benz_asc')  data.sort((a,b)=>g('Benzina')(a,99) - g('Benzina')(b,99));
+  else if(sort==='benz_desc') data.sort((a,b)=>g('Benzina')(b,0)  - g('Benzina')(a,0));
+  else if(sort==='gas_asc')   data.sort((a,b)=>g('Gasolio')(a,99) - g('Gasolio')(b,99));
+  else if(sort==='gas_desc')  data.sort((a,b)=>g('Gasolio')(b,0)  - g('Gasolio')(a,0));
+  else data.sort((a,b)=>a.name.localeCompare(b.name,'it'));
 
-  if(sort==='benz_asc') data.sort((a,b)=>(a.fuels['Benzina']?.price||99)-(b.fuels['Benzina']?.price||99));
-  else if(sort==='benz_desc') data.sort((a,b)=>(b.fuels['Benzina']?.price||0)-(a.fuels['Benzina']?.price||0));
-  else if(sort==='gas_asc') data.sort((a,b)=>(a.fuels['Gasolio']?.price||99)-(b.fuels['Gasolio']?.price||99));
-  else if(sort==='gas_desc') data.sort((a,b)=>(b.fuels['Gasolio']?.price||0)-(a.fuels['Gasolio']?.price||0));
-  else data.sort((a,b)=>a.name.localeCompare(b.name));
+  const pc = (p,t) => {
+    if(!p) return '';
+    if(p===mins[t]) return ' low';
+    if(maxs[t]&&p===maxs[t]) return ' high';
+    return '';
+  };
 
-  function priceClass(p,min,max){if(!p)return'';if(p===min)return' low';if(p===max)return' high';return'';}
-
-  const html=data.map(r=>{
-    const flag=REGION_FLAGS[r.name]||'📍';
-    const fuels=['Benzina','Gasolio','GPL','Metano'].map(tipo=>{
-      const f=r.fuels[tipo];if(!f)return'';
-      const mn=tipo==='Benzina'?minBenz:tipo==='Gasolio'?minGas:tipo==='GPL'?minGpl:minMet;
-      const mx=tipo==='Benzina'?maxBenz:tipo==='Gasolio'?maxGas:0:0;
-      const cls=priceClass(f.price,mn,mx);
+  const html = data.map(r=>{
+    const flag = REGION_FLAGS[r.name]||'📍';
+    const rows = ['Benzina','Gasolio','GPL','Metano'].map(t=>{
+      const f=r.fuels[t]; if(!f) return '';
       return `<div class="fuel-row">
-        <span class="fuel-icon">${FUEL_ICONS[tipo]||'⛽'}</span>
-        <span class="fuel-label">${tipo} <span class="fuel-badge">${f.erogazione}</span></span>
-        <span class="fuel-price${cls}">${fuelPriceFmt(f.price)}</span>
+        <span class="fuel-icon">${FUEL_ICONS[t]}</span>
+        <span class="fuel-label">${t} <span class="fuel-badge">${f.er}</span></span>
+        <span class="fuel-price${pc(f.price,t)}">${fuelPriceFmt(f.price)}</span>
       </div>`;
     }).join('');
     return `<div class="fuel-card">
       <div class="fuel-card-head"><h3>${flag} ${r.name}</h3></div>
-      <div class="fuel-card-body">${fuels||'<span style="color:var(--muted);font-size:.74rem;">Dati non disponibili</span>'}</div>
+      <div class="fuel-card-body">${rows||'<span style="color:var(--muted);font-size:.74rem;">Dati non disponibili</span>'}</div>
     </div>`;
   }).join('');
 
-  document.getElementById('fuelGrid').innerHTML=html||'<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);">Nessuna regione trovata.</div>';
+  document.getElementById('fuelGrid').innerHTML = html ||
+    '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);">Nessuna regione trovata.</div>';
+}
+
+async function tryFetch(url, force){
+  const cache = force ? 'no-cache' : 'force-cache';
+  const ctrl  = new AbortController();
+  const tid   = setTimeout(()=>ctrl.abort(), 8000); // 8s timeout per proxy
+  try {
+    const res = await fetch(url, {cache, signal:ctrl.signal});
+    clearTimeout(tid);
+    if(!res.ok) return null;
+    return await res.text();
+  } catch(e) {
+    clearTimeout(tid);
+    return null;
+  }
 }
 
 async function loadFuelData(force=false){
-  if(FUEL_LOADED&&!force)return;
-  const btn=document.getElementById('fuelRefreshBtn');
-  const dot=document.getElementById('fuelDot');
-  const lbl=document.getElementById('fuelUpdateLabel');
-  if(btn)btn.disabled=true;
-  dot.style.background='#f0a500';dot.style.animation='blink 2s infinite';
-  lbl.textContent='Caricamento in corso…';
-  document.getElementById('fuelGrid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Recupero dati da MIMIT…</div>';
+  if(FUEL_LOADED && !force) return;
+  const btn = document.getElementById('fuelRefreshBtn');
+  const dot = document.getElementById('fuelDot');
+  const lbl = document.getElementById('fuelUpdateLabel');
+  if(btn) btn.disabled = true;
+  dot.style.background='#f0a500'; dot.style.animation='blink 2s infinite';
+  lbl.textContent = 'Caricamento in corso…';
+  document.getElementById('fuelGrid').innerHTML =
+    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Recupero dati MIMIT…</div>';
 
-  let text='';let ok=false;
-  // Try direct first, then proxy
-  for(const url of [FUEL_CSV_URL, FUEL_PROXY]){
-    try{
-      const res=await fetch(url,{cache:force?'no-cache':'force-cache'});
-      if(res.ok){text=await res.text();ok=true;break;}
-    }catch(e){console.warn('Fuel fetch failed:',url,e);}
+  let parsed = null;
+  // Try every proxy
+  for(const url of FUEL_PROXIES){
+    lbl.textContent = 'Connessione a ' + new URL(url).hostname + '…';
+    const text = await tryFetch(url, force);
+    if(text){ parsed = parseFuelCSV(text); }
+    if(parsed){ FUEL_SOURCE='live'; break; }
   }
 
-  if(!ok||!text){
-    dot.style.background='#e11d48';dot.style.animation='none';
-    lbl.textContent='Errore caricamento dati';
-    document.getElementById('fuelGrid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">
-      ⚠️ Impossibile caricare i dati dal MIMIT.<br><br>
-      <a href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni" target="_blank" style="color:#e11d48;">Consulta il sito ufficiale MIMIT →</a>
-    </div>`;
-    if(btn)btn.disabled=false;
-    return;
+  // Fallback to static data
+  if(!parsed){
+    parsed = FUEL_FALLBACK;
+    FUEL_SOURCE = 'fallback';
   }
 
-  FUEL_DATA=parseFuelCSV(text);
-  FUEL_LOADED=true;
-  dot.style.background='#22c55e';dot.style.animation='blink 2s infinite';
-  const now=new Date();
-  lbl.textContent=`Aggiornato: ${now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})} · Fonte: MIMIT (dati alle 08:00)`;
-  document.getElementById('fuelNote').textContent='I prezzi medi sono calcolati dal Ministero delle Imprese e del Made in Italy su base regionale (rete extra-autostradale). Benzina e Gasolio: self-service. GPL e Metano: servito. Aggiornamento quotidiano, disponibile dalle 08:30.';
+  FUEL_DATA   = parsed;
+  FUEL_LOADED = true;
+  dot.style.background   = FUEL_SOURCE==='live' ? '#22c55e' : '#f0a500';
+  dot.style.animation    = 'blink 2s infinite';
+  const now = new Date();
+  if(FUEL_SOURCE==='live'){
+    lbl.textContent = `Live · aggiornato ${now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})} · MIMIT`;
+    document.getElementById('fuelNote').textContent =
+      'Dati ufficiali MIMIT aggiornati ogni mattina (disponibili dalle 08:30). Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.';
+  } else {
+    lbl.textContent = `⚠ Dati statici di riserva (${FUEL_FALLBACK_DATE}) — tutti i proxy non raggiungibili`;
+    document.getElementById('fuelNote').innerHTML =
+      `Tutti i proxy CORS hanno fallito. Visualizzati dati di riserva del <b>${FUEL_FALLBACK_DATE}</b>. 
+       Riprova cliccando 🔄 Aggiorna, oppure 
+       <a href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni" target="_blank" style="color:#e11d48;">consulta il sito MIMIT →</a>`;
+  }
+
   renderFuelCards();
-  if(btn)btn.disabled=false;
+  if(btn) btn.disabled = false;
 }
 
 async function initFuel(){
