@@ -693,7 +693,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 </div>
 
 <div class="fuel-grid" id="fuelGrid">
-  <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">Clicca la scheda ⛽ Carburanti per caricare i dati.</div>
+  <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Caricamento prezzi carburanti in corso…</div>
 </div>
 <div class="fuel-note" id="fuelNote"></div>
 </div>
@@ -2361,10 +2361,11 @@ let FUEL_SOURCE = ''; // 'direct' | 'proxy' | 'fallback'
 const FUEL_CSV_URL = 'https://www.mimit.gov.it/images/stories/carburanti/MediaRegionaleStradale.csv';
 // Prima prova diretta; se il browser blocca per CORS, usa proxy pubblici in fallback.
 const FUEL_PROXIES = [
-  'https://corsproxy.io/?' + encodeURIComponent(FUEL_CSV_URL),
+  'https://corsproxy.io/?url=' + encodeURIComponent(FUEL_CSV_URL),
   'https://api.allorigins.win/raw?url=' + encodeURIComponent(FUEL_CSV_URL),
   'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(FUEL_CSV_URL),
   'https://thingproxy.freeboard.io/fetch/' + FUEL_CSV_URL,
+  'https://cors.sh/' + FUEL_CSV_URL,
 ];
 
 // ── STATIC FALLBACK (MIMIT data 09-03-2026) ─────────────────────────────────
@@ -2405,33 +2406,39 @@ const REGION_FLAGS = {
 };
 
 function parseFuelCSV(text){
-  // Normalise line endings and strip BOM
   text = text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-  const lines = text.split('\n').filter(l=>l.trim());
-  if(lines.length < 2) return null;
-  // Detect separator
-  const sep = lines[0].includes(';') ? ';' : ',';
+  const allLines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(allLines.length < 3) return null;
+  // MIMIT format: line 0 = "Aggiornamento DD-MM-YYYY", line 1 = header, line 2+ = data
+  const sep = allLines[0].includes(';') || allLines[1].includes(';') ? ';' : ',';
+  const updateLine = allLines.find(l => /aggiornamento/i.test(l));
+  const updateDate = updateLine ? updateLine.replace(/aggiornamento\s*/i,'').trim() : null;
+  // Find start of data: skip date line + header line
+  let dataStart = 0;
+  for(let i=0;i<Math.min(3,allLines.length);i++){
+    if(/aggiornamento/i.test(allLines[i])) dataStart = Math.max(dataStart, i+1);
+    if(/REGIONE|TIPOLOGIA/i.test(allLines[i])) dataStart = Math.max(dataStart, i+1);
+  }
   const regions = {};
-  for(let i=1;i<lines.length;i++){
-    const cols = lines[i].split(sep).map(s=>s.trim().replace(/^"+|"+$/g,''));
+  for(let i=dataStart; i<allLines.length; i++){
+    const cols = allLines[i].split(sep).map(s=>s.replace(/^["']+|["']+$/g,'').trim());
     if(cols.length < 4) continue;
     const region = cols[0];
     const tipo   = cols[1];
-    const erog   = cols[2];
-    const raw    = cols[3].replace(',','.');
-    const price  = parseFloat(raw);
-    if(!region || !tipo || isNaN(price) || price <= 0) continue;
+    const erog   = cols[2].toUpperCase();
+    const price  = parseFloat(cols[3].replace(',','.'));
+    if(!region || !tipo || isNaN(price) || price <= 0 || price > 10) continue;
     if(!regions[region]) regions[region] = {name:region, fuels:{}};
-    // MIMIT methodology: SELF for Benzina/Gasolio, SERVITO for GPL/Metano
-    const wantSelf   = (tipo==='Benzina'||tipo==='Gasolio');
-    const wantServ   = (tipo==='GPL'||tipo==='Metano');
-    const goodMode   = (wantSelf && erog==='SELF') || (wantServ && erog==='SERVITO');
+    const wantSelf = (tipo==='Benzina' || tipo==='Gasolio');
+    const wantServ = (tipo==='GPL' || tipo==='Metano');
+    const goodMode = (wantSelf && erog==='SELF') || (wantServ && erog==='SERVITO');
     if(!regions[region].fuels[tipo] || goodMode){
       regions[region].fuels[tipo] = {price, er:erog};
     }
   }
   const result = Object.values(regions).filter(r=>Object.keys(r.fuels).length>0);
-  return result.length >= 10 ? result : null; // sanity check: at least 10 regions
+  if(result.length < 10) return null;
+  return {data: result, date: updateDate};
 }
 
 function fuelPriceFmt(p){ return p ? '€\u202f'+p.toFixed(3) : '—'; }
@@ -2490,79 +2497,92 @@ function renderFuelCards(){
     '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);">Nessuna regione trovata.</div>';
 }
 
+async function fetchWithTimeout(url, timeoutMs, force){
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      cache: force ? 'no-cache' : 'default',
+      signal: ctrl.signal
+    });
+    clearTimeout(tid);
+    if(!res.ok) return null;
+    return await res.text();
+  } catch(e) {
+    clearTimeout(tid);
+    return null;
+  }
+}
+
+async function tryFetchCSV(url, force){
+  const text = await fetchWithTimeout(url, 7000, force);
+  if(!text) return null;
+  return parseFuelCSV(text);
+}
+
 async function loadFuelData(force=false){
   if(FUEL_LOADED && !force) return;
+  FUEL_LOADED = false;
   const btn = document.getElementById('fuelRefreshBtn');
   const dot = document.getElementById('fuelDot');
   const lbl = document.getElementById('fuelUpdateLabel');
+  const noteEl = document.getElementById('fuelNote');
+  const gridEl = document.getElementById('fuelGrid');
   if(btn) btn.disabled = true;
-  dot.style.background='#f0a500'; dot.style.animation='blink 2s infinite';
-  lbl.textContent = '⏳ Sto leggendo il CSV MIMIT…';
-  document.getElementById('fuelGrid').innerHTML =
-    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Sto recuperando i prezzi dal CSV ufficiale MIMIT…</div>';
+  dot.style.background = '#f0a500'; dot.style.animation = 'blink 2s infinite';
+  lbl.textContent = '⏳ Connessione a MIMIT…';
+  gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Recupero prezzi dal CSV ufficiale MIMIT…</div>';
 
   let parsed = null;
+  let source = '';
 
-  // 1) prova diretta del CSV ufficiale
-  try {
-    const ctrl = new AbortController();
-    const tid = setTimeout(()=>ctrl.abort(), 8000);
-    const res = await fetch(FUEL_CSV_URL, {cache: force?'no-cache':'force-cache', signal:ctrl.signal});
-    clearTimeout(tid);
-    if(res.ok){
-      const text = await res.text();
-      const candidate = parseFuelCSV(text);
-      if(candidate){ parsed = candidate; FUEL_SOURCE = 'direct'; }
-    }
-  } catch(e) {
-    console.warn('Direct MIMIT CSV fetch failed:', e?.message || e);
-  }
+  // 1) Fetch diretta (funziona se il browser/estensione rimuove CORS o se MIMIT aggiunge headers)
+  lbl.textContent = '⏳ Tentativo diretto MIMIT…';
+  parsed = await tryFetchCSV(FUEL_CSV_URL, force);
+  if(parsed) source = 'direct';
 
-  // 2) proxy di fallback
+  // 2) Fetch parallela su tutti i proxy — vince il primo che risponde con dati validi
   if(!parsed){
-    for(const url of FUEL_PROXIES){
-      lbl.textContent = '⏳ Sto recuperando i dati…';
-      try{
-        const ctrl = new AbortController();
-        const tid = setTimeout(()=>ctrl.abort(), 8000);
-        const res = await fetch(url, {cache: force?'no-cache':'force-cache', signal:ctrl.signal});
-        clearTimeout(tid);
-        if(res.ok){
-          const text = await res.text();
-          const candidate = parseFuelCSV(text);
-          if(candidate){ parsed = candidate; FUEL_SOURCE='proxy'; break; }
-        }
-      }catch(e){ /* prova il successivo */ }
-    }
+    lbl.textContent = '⏳ Connessione via proxy CORS…';
+    parsed = await new Promise(resolve => {
+      let settled = false;
+      let pending = FUEL_PROXIES.length;
+      if(pending === 0){ resolve(null); return; }
+      FUEL_PROXIES.forEach(async url => {
+        const result = await tryFetchCSV(url, force);
+        pending--;
+        if(!settled && result){ settled = true; resolve(result); }
+        else if(!settled && pending === 0){ resolve(null); }
+      });
+    });
+    if(parsed) source = 'proxy';
   }
 
-  // 3) fallback statico se tutto fallisce
+  // 3) Fallback statico
   if(!parsed){
-    parsed = FUEL_FALLBACK;
-    FUEL_SOURCE = 'fallback';
+    parsed = { data: FUEL_FALLBACK, date: FUEL_FALLBACK_DATE };
+    source = 'fallback';
   }
 
-  FUEL_DATA   = parsed;
+  FUEL_DATA   = parsed.data;
   FUEL_LOADED = true;
+  FUEL_SOURCE = source;
   const now = new Date();
   const timeStr = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const csvDate = parsed.date || '—';
 
-  if(FUEL_SOURCE === 'direct'){
+  if(source === 'direct'){
     dot.style.background = '#22c55e'; dot.style.animation = 'blink 2s infinite';
-    lbl.textContent = `✓ Live diretto · ${timeStr} · MIMIT`;
-    document.getElementById('fuelNote').textContent =
-      'Dati letti direttamente dal CSV ufficiale MediaRegionaleStradale.csv del MIMIT. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.';
-  } else if(FUEL_SOURCE === 'proxy'){
+    lbl.textContent = `✓ Live MIMIT · aggiornato al ${csvDate} · ${timeStr}`;
+    noteEl.textContent = `Dati letti direttamente da MediaRegionaleStradale.csv (MIMIT). Aggiornamento MIMIT: ${csvDate}. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.`;
+  } else if(source === 'proxy'){
     dot.style.background = '#22c55e'; dot.style.animation = 'blink 2s infinite';
-    lbl.textContent = `✓ Live via proxy · ${timeStr} · MIMIT`;
-    document.getElementById('fuelNote').innerHTML =
-      'Dati ufficiali MIMIT letti dal CSV MediaRegionaleStradale.csv tramite proxy CORS. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.';
+    lbl.textContent = `✓ Live via proxy · aggiornato al ${csvDate} · ${timeStr}`;
+    noteEl.innerHTML = `Dati MIMIT via proxy CORS. Aggiornamento MIMIT: <b>${csvDate}</b>. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.`;
   } else {
     dot.style.background = '#f0a500'; dot.style.animation = 'blink 2s infinite';
-    lbl.textContent = `⚠ Dati di riserva (${FUEL_FALLBACK_DATE})`;
-    document.getElementById('fuelNote').innerHTML =
-      `Impossibile raggiungere il CSV MIMIT dal browser. Dati di riserva del <b>${FUEL_FALLBACK_DATE}</b>. 
-       Riprova con 🔄 Aggiorna oppure <a href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni" target="_blank" style="color:#e11d48;">vai al sito MIMIT →</a>`;
+    lbl.textContent = `⚠ Offline — dati di riserva del ${FUEL_FALLBACK_DATE}`;
+    noteEl.innerHTML = `Impossibile raggiungere il CSV MIMIT. Dati di riserva del <b>${FUEL_FALLBACK_DATE}</b>. Riprova con 🔄 o <a href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni" target="_blank" style="color:#e11d48;">vai al sito MIMIT →</a>`;
   }
 
   renderFuelCards();
@@ -2570,7 +2590,7 @@ async function loadFuelData(force=false){
 }
 
 async function initFuel(){
-  if(!FUEL_LOADED) await loadFuelData(false);
+  await loadFuelData(false);
 }
 
 // Init
@@ -2578,6 +2598,8 @@ toggleOvhField();
 calcPallet();
 syncContainerUnitsType();
 routeDefaultDates();
+// Auto-load fuel data in background on page open (silent, non-blocking)
+loadFuelData(false);
 </script>
 </body>
 </html>
