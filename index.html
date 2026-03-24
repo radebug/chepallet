@@ -760,11 +760,11 @@ function makeCam(wrap,dist=4000){
   el.addEventListener('mousedown',e=>{drag=true;prev={x:e.clientX,y:e.clientY};});
   window.addEventListener('mouseup',()=>drag=false);
   window.addEventListener('mousemove',e=>{if(!drag)return;th+=(e.clientX-prev.x)*0.008;phi=Math.max(0.08,Math.min(Math.PI/2-0.04,phi+(e.clientY-prev.y)*0.008));prev={x:e.clientX,y:e.clientY};upd();});
-  el.addEventListener('wheel',e=>{r=Math.max(500,Math.min(80000,r+e.deltaY*2));upd();});
+  el.addEventListener('wheel',e=>{e.preventDefault();r=Math.max(500,Math.min(80000,r+e.deltaY*2));upd();},{passive:false});
   let lt=null;
-  el.addEventListener('touchstart',e=>{lt=e.touches;drag=true;});
+  el.addEventListener('touchstart',e=>{lt=e.touches;drag=true;},{passive:false});
   el.addEventListener('touchend',()=>{drag=false;lt=null;});
-  el.addEventListener('touchmove',e=>{if(!lt)return;if(e.touches.length===1){th+=(e.touches[0].clientX-lt[0].clientX)*0.01;phi=Math.max(0.08,Math.min(Math.PI/2-0.04,phi+(e.touches[0].clientY-lt[0].clientY)*0.01));}else if(e.touches.length===2){const d0=Math.hypot(lt[0].clientX-lt[1].clientX,lt[0].clientY-lt[1].clientY),d1=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);r=Math.max(500,Math.min(80000,r-(d1-d0)*5));}lt=e.touches;upd();});
+  el.addEventListener('touchmove',e=>{if(!lt)return;e.preventDefault();if(e.touches.length===1){th+=(e.touches[0].clientX-lt[0].clientX)*0.01;phi=Math.max(0.08,Math.min(Math.PI/2-0.04,phi+(e.touches[0].clientY-lt[0].clientY)*0.01));}else if(e.touches.length===2){const d0=Math.hypot(lt[0].clientX-lt[1].clientX,lt[0].clientY-lt[1].clientY),d1=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);r=Math.max(500,Math.min(80000,r-(d1-d0)*5));}lt=e.touches;upd();},{passive:false});
   return{cam,upd,get th(){return th;},set th(v){th=v;},get phi(){return phi;},set phi(v){phi=v;},get r(){return r;},set r(v){r=v;},get tgt(){return tgt;},set tgt(v){tgt=v;},get anim(){return anim;},set anim(v){anim=v;},reset(d=4000){th=Math.PI/4;phi=Math.PI/3.5;r=d;tgt=new THREE.Vector3(0,500,0);upd();},setView(v,d=4000){if(v==='front'){th=Math.PI;phi=Math.PI/4;}else if(v==='top'){th=0;phi=0.07;}else if(v==='side'){th=Math.PI/2;phi=Math.PI/4;}upd();}};
 }
 const CAM_P=makeCam(RP.wrap,3500),CAM_C=makeCam(RC.wrap,20000),CAM_T=makeCam(RT.wrap,20000);
