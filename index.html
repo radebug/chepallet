@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-:root{--bg:#0a0c10;--surface:#111318;--surface2:#181b22;--border:#252932;--accent:#f0a500;--accent2:#e05c2a;--blue:#3b82f6;--teal:#14b8a6;--text:#eef0f4;--muted:#6b7280;--green:#22c55e;--radius:12px;}
+:root{--bg:#0a0c10;--surface:#111318;--surface2:#181b22;--border:#252932;--accent:#f0a500;--accent2:#e05c2a;--blue:#3b82f6;--teal:#14b8a6;--fuel:#e11d48;--text:#eef0f4;--muted:#6b7280;--green:#22c55e;--radius:12px;}
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;}
 header{display:flex;align-items:center;justify-content:space-between;padding:13px 32px;border-bottom:1px solid var(--border);background:rgba(10,12,16,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;gap:10px;flex-wrap:wrap;}
@@ -125,17 +125,17 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .li{display:flex;align-items:center;gap:5px;font-size:0.66rem;color:var(--muted);}
 .ld{width:8px;height:8px;border-radius:2px;}
 
-.plan-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;}
-.plan-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.7rem;color:var(--muted);margin-bottom:8px;flex-wrap:wrap;}
-.plan-box{position:relative;background:#f3f4f6;border-radius:8px;border:1px solid #d1d5db;min-height:210px;overflow:hidden;touch-action:none;user-select:none;}
-.plan-svg{display:block;width:100%;height:auto;pointer-events:none;}
+.plan-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 12px 12px 16px;}
+.plan-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.7rem;color:var(--muted);margin-bottom:6px;flex-wrap:wrap;}
+.plan-box{position:relative;background:var(--surface2);border-radius:10px;border:1px solid var(--border);min-height:210px;overflow:visible;touch-action:none;user-select:none;}
+.plan-svg{display:block;width:100%;height:auto;pointer-events:none;overflow:visible;}
 .plan-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
 .plan-pill{display:flex;align-items:center;gap:6px;font-size:.64rem;color:var(--muted);}
 .plan-dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
 .plan-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
-.plan-item{position:absolute;border:1.5px solid #475569;border-radius:4px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);}
-.plan-item.box{background:#60a5fa;}
-.plan-item.box.alt{background:#93c5fd;}
+.plan-item{position:absolute;border:1.5px solid #475569;border-radius:4px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);transform-origin:top left;}
+.plan-item.box{background:#3b82f6;border-color:#1d4ed8;}
+.plan-item.box.alt{background:#2563eb;border-color:#1e40af;}
 .plan-addbar{display:grid;grid-template-columns:1.15fr 0.9fr 0.9fr auto auto;gap:8px;align-items:end;margin:10px 0 12px;}
 .plan-addbar .fg{margin-bottom:0;}
 .plan-addbar .be{height:36px;}
@@ -143,6 +143,8 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .plan-item.pallet{background:#f59e0b;}
 .plan-item.pallet.alt{background:#fb923c;}
 .plan-item.selected{outline:3px solid #0f172a;z-index:5;}
+.plan-item.overhang-real{border-color:#dc2626!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),0 0 0 2px rgba(220,38,38,.22);}
+.plan-item.overhang-soft{border-color:#f59e0b!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),0 0 0 2px rgba(245,158,11,.16);}
 .plan-item.editing{cursor:grab;}
 .plan-item.dragging{cursor:grabbing;z-index:10;}
 .plan-box.editing .plan-item{pointer-events:auto;}
@@ -193,7 +195,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .plan-dimrow.bottom{margin-top:2px;}
 
 /* FUEL PAGE */
---fuel:#e11d48;
 .nav-btn.nf{background:rgba(225,29,72,0.08);}
 .nav-btn.nf.active{background:var(--fuel,#e11d48);color:#fff;}
 .hero.fh::before{background:radial-gradient(ellipse,rgba(225,29,72,0.1) 0%,transparent 70%);}
@@ -288,7 +289,10 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           </div>
           <div class="fr"><div class="fg"><label>Lung. pallet (mm)</label><input type="number" id="pL" value="1200" min="1"></div><div class="fg"><label>Larg. pallet (mm)</label><input type="number" id="pW" value="800" min="1"></div></div>
           <div class="fr"><div class="fg"><label>Altezza max (mm)</label><input type="number" id="maxH" value="1800" min="1"></div><div class="fg"><label>Peso max (kg)</label><input type="number" id="maxKg" value="1000" min="1"></div></div>
-          <div class="fr"><div class="fg"><label>Overhang (mm)</label><input type="number" id="ovh" value="0" min="0"></div><div class="fg"><label>Spessore pallet (mm)</label><input type="number" id="pT" value="144" min="1"></div></div>
+          <div class="fr"><div class="fg"><label>Spessore pallet (mm)</label><input type="number" id="pT" value="144" min="1"></div></div>
+          <div class="tr"><span style="display:flex;flex-direction:column;gap:2px;"><b style="font-size:.72rem;color:var(--text);">Abilita overhang</b><span style="font-size:.64rem;color:var(--muted);">Le scatole possono sporgere oltre il bordo pallet</span></span><label class="tg"><input type="checkbox" id="ovhFlag" onchange="toggleOvhField()"><span class="ts"></span></label></div>
+          <div id="ovhRow" style="display:none;margin-top:6px;" class="fr"><div class="fg"><label>Overhang per lato (mm)</label><div class="iu"><input type="number" id="ovh" value="50" min="1" max="300"><span>mm</span></div></div></div>
+          <input type="hidden" id="ovhHidden" value="0">
         </div>
         <!-- VISUAL -->
         <div id="tab-visual" style="display:none;">
@@ -334,7 +338,35 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-      <div class="panel"><div class="ph"><div class="pi">🔲</div><h3>Schema strato</h3></div><div class="pb"><div id="pgrid"></div><div class="leg" id="pleg"></div></div></div>
+      <div class="panel">
+        <div class="ph"><div class="pi">🔲</div><h3>Schema strato personalizzabile</h3></div>
+        <div class="pb">
+          <div class="plan-actions">
+            <button class="be" id="btnEditPalletPlan" onclick="togglePalletPlanEdit()">✏️ Modifica layout</button>
+            <button class="be" onclick="rotateSelectedPalletPlanBox()">🔄 Ruota scatola</button>
+            <button class="be" id="btnCenterPalletPlan" onclick="centerPalletPlanItems()">🎯 Centra sul pallet</button>
+            <button class="be" id="btnQuickOverhang" onclick="togglePalletOverhangQuick()">📐 Overhang OFF</button>
+            <button class="be" id="btnTogglePalletGuide" onclick="togglePalletGuideVisibility()">🧱 Pallet ON</button>
+            <button class="be" onclick="resetPalletPlan()">↺ Reset layout</button>
+          </div>
+          <div class="plan-addbar">
+            <div class="fg wide"><label>Aggiungi scatola allo strato</label><select id="palletPlanPreset" onchange="applyPalletPlanPreset()"><option value="current" selected>Scatola corrente</option><option value="half">Mezza scatola</option><option value="quarter">1/4 scatola</option><option value="custom">Custom</option></select></div>
+            <div class="fg"><label>Lung. scatola (mm)</label><input type="number" id="planBoxL" value="400" min="50"></div>
+            <div class="fg"><label>Larg. scatola (mm)</label><input type="number" id="planBoxW" value="300" min="50"></div>
+            <button class="be" onclick="addCustomPalletPlanBox()">＋ Inserisci</button>
+            <button class="be" onclick="removeSelectedPalletPlanItem()">🗑 Rimuovi</button>
+            <button class="be" onclick="duplicateSelectedPalletPlanItem()">⧉ Duplica</button>
+          </div>
+          <div class="plan-wrap" id="pschemaWrap">
+            <div class="plan-head"><span id="pschemaTitle">Schema strato</span><span id="pschemaMeta" style="font-size:.63rem;">—</span></div>
+            <div class="plan-dimrow top"><span id="pschemaLenLabel" style="font-size:.63rem;color:var(--muted);">—</span><span id="pschemaModeLabel" style="font-size:.62rem;color:var(--muted);">—</span></div>
+            <div class="plan-box" id="pschema"></div>
+            <div class="plan-dimrow bottom"><span id="pschemaWidLabel" style="font-size:.63rem;color:var(--muted);">—</span><span id="pschemaHintLabel" style="font-size:.62rem;color:var(--muted);">—</span></div>
+            <div class="plan-legend" id="palletSchemaLegend"></div>
+          </div>
+          <div class="leg" id="pleg"></div>
+        </div>
+      </div>
       <div class="panel"><div class="ph"><div class="pi">📊</div><h3>Dettagli</h3></div><div class="pb" id="pdet" style="font-size:0.74rem;line-height:2;color:var(--muted);">Esegui un calcolo.</div></div>
     </div>
   </div>
@@ -383,7 +415,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           </div>
           <div class="fr"><div class="fg"><label>Lung. pallet (mm)</label><input type="number" id="cpL" value="1200" min="1"></div><div class="fg"><label>Larg. pallet (mm)</label><input type="number" id="cpW" value="800" min="1"></div></div>
           <div class="fr"><div class="fg"><label>Spessore pallet (mm)</label><input type="number" id="cpT" value="144" min="1"></div><div class="fg"><label>H carico (mm)</label><input type="number" id="cpCH" value="1200" min="1"></div></div>
-          <div class="fr"><div class="fg"><label>Peso per pallet (kg)</label><input type="number" id="cpKg" value="500" min="0"></div><div class="fg"><label>File pallet</label><input type="number" id="cpRows" value="1" min="1" max="3"></div></div>
+          <div class="fr"><div class="fg"><label>Peso per pallet (kg)</label><input type="number" id="cpKg" value="500" min="0"></div><div class="fg"><label>Layout ottimizzazione</label><input type="text" id="cpRows" value="AUTO MIX" readonly></div></div>
           <div class="tr"><span>Doppio strato (impilabili)</span><label class="tg"><input type="checkbox" id="cpStack"><span class="ts"></span></label></div>
         </div>
         <div class="sl b">Margini sicurezza</div>
@@ -407,9 +439,9 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
   <div class="rc">
     <div class="csg">
       <div class="csc"><div class="sv b" id="cs-tot">—</div><div class="slb">Unità totali</div></div>
-      <div class="csc"><div class="sv b" id="cs-vol">—</div><div class="slb">Utilizzo vol %</div></div>
+      <div class="csc"><div class="sv b" id="cs-vol">—</div><div class="slb">Volume usato / %</div></div>
       <div class="csc"><div class="sv b" id="cs-wgt">—</div><div class="slb">Peso tot (kg)</div></div>
-      <div class="csc"><div class="sv b" id="cs-lay">—</div><div class="slb">Strati / file</div></div>
+      <div class="csc"><div class="sv b" id="cs-lay">—</div><div class="slb">Per layer / stack</div></div>
     </div>
     <div class="panel">
       <div class="ph" style="justify-content:space-between;">
@@ -483,10 +515,10 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
       <div class="pb">
         <div class="sl t">Tipo veicolo</div>
         <div class="ct-grid">
-          <button class="ctb ttb on" onclick="selTruck('std',this)"><em>🚛</em><strong>Semirimorchio</strong><span>13600×2400×2700mm · 24t</span></button>
-          <button class="ctb ttb" onclick="selTruck('mega',this)"><em>📏</em><strong>Mega Trailer</strong><span>13600×2400×3000mm · 24t</span></button>
-          <button class="ctb ttb" onclick="selTruck('van',this)"><em>🚐</em><strong>Furgone (7.5t)</strong><span>6200×2200×2200mm · 4t</span></button>
-          <button class="ctb ttb" onclick="selTruck('ref',this)"><em>❄️</em><strong>Reefer Truck</strong><span>13310×2400×2600mm · 22t</span></button>
+          <button class="ctb ttb on" onclick="selTruck('std',this)"><em>🚛</em><strong>Semirimorchio</strong><span>13620×2480×2700mm · 24t</span></button>
+          <button class="ctb ttb" onclick="selTruck('mega',this)"><em>📏</em><strong>Mega Trailer</strong><span>13620×2480×3000mm · 24t</span></button>
+          <button class="ctb ttb" onclick="selTruck('van',this)"><em>🚐</em><strong>Furgone (7.5t)</strong><span>6200×2200×2300mm · 4t</span></button>
+          <button class="ctb ttb" onclick="selTruck('ref',this)"><em>❄️</em><strong>Reefer Truck</strong><span>13360×2460×2500mm · 22t</span></button>
         </div>
         <div class="sl t">Modalità carico</div>
         <div class="mt">
@@ -536,9 +568,9 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
   <div class="rc">
     <div class="csg">
       <div class="csc tc"><div class="sv t" id="ts-tot">—</div><div class="slb">Unità totali</div></div>
-      <div class="csc tc"><div class="sv t" id="ts-vol">—</div><div class="slb">Utilizzo vol %</div></div>
+      <div class="csc tc"><div class="sv t" id="ts-vol">—</div><div class="slb">Volume usato / %</div></div>
       <div class="csc tc"><div class="sv t" id="ts-wgt">—</div><div class="slb">Peso tot (kg)</div></div>
-      <div class="csc tc"><div class="sv t" id="ts-lay">—</div><div class="slb">Strati / file</div></div>
+      <div class="csc tc"><div class="sv t" id="ts-lay">—</div><div class="slb">Per layer / stack</div></div>
     </div>
     <div class="panel">
       <div class="ph" style="justify-content:space-between;">
@@ -677,8 +709,18 @@ function showPage(n,btn){
 }
 
 // ══════ SPECS ══════
-const CONTS={'20dry':{name:"20' Dry",iL:5898,iW:2352,iH:2393,maxP:28200,tare:2300},'40dry':{name:"40' Dry",iL:12032,iW:2352,iH:2393,maxP:26680,tare:3800},'40hc':{name:"40' HC",iL:12032,iW:2352,iH:2698,maxP:26460,tare:4020},'40ref':{name:"40' Reefer",iL:11580,iW:2286,iH:2400,maxP:27700,tare:4400}};
-const TRUCKS={'std':{name:"Semirimorchio",iL:13600,iW:2400,iH:2700,maxP:24000,tare:7500},'mega':{name:"Mega Trailer",iL:13600,iW:2400,iH:3000,maxP:24000,tare:7500},'van':{name:"Furgone 7.5t",iL:6200,iW:2200,iH:2200,maxP:4000,tare:3500},'ref':{name:"Reefer Truck",iL:13310,iW:2400,iH:2600,maxP:22000,tare:8000}};
+const CONTS={
+  '20dry':{name:"20' Dry",iL:5898,iW:2352,iH:2393,maxP:28200,tare:2300,structLossL:0,structLossW:0,practicalSide:35,practicalTop:40},
+  '40dry':{name:"40' Dry",iL:12032,iW:2352,iH:2393,maxP:26680,tare:3800,structLossL:350,structLossW:0,practicalSide:35,practicalTop:40},
+  '40hc':{name:"40' HC",iL:12032,iW:2352,iH:2698,maxP:26460,tare:4020,structLossL:350,structLossW:0,practicalSide:35,practicalTop:50},
+  '40ref':{name:"40' Reefer",iL:11580,iW:2286,iH:2400,maxP:27700,tare:4400,structLossL:1000,structLossW:20,practicalSide:40,practicalTop:50}
+};
+const TRUCKS={
+  'std':{name:"Semirimorchio",iL:13620,iW:2480,iH:2700,maxP:24000,tare:6800,structLossL:0,structLossW:0,practicalSide:30,practicalTop:40},
+  'mega':{name:"Mega Trailer",iL:13620,iW:2480,iH:3000,maxP:24000,tare:7200,structLossL:0,structLossW:0,practicalSide:30,practicalTop:50},
+  'van':{name:"Furgone 7.5t",iL:6200,iW:2200,iH:2300,maxP:4000,tare:3500,structLossL:80,structLossW:40,practicalSide:35,practicalTop:40},
+  'ref':{name:"Reefer Truck",iL:13360,iW:2460,iH:2500,maxP:22000,tare:8000,structLossL:0,structLossW:40,practicalSide:35,practicalTop:45}
+};
 let selectedCont='20dry',selectedTruck='std',cMode='boxes',tMode='boxes';
 
 // ══════ THREE.JS RENDERERS ══════
@@ -765,57 +807,546 @@ function addEdges(grp,geo,pos){const l=new THREE.LineSegments(new THREE.EdgesGeo
 
 // ══════ PALLET CALC ══════
 let lastP=null,customTex=null;
+let palletPlanState={spec:null,items:[],originalItems:[],selectedIndex:-1,editing:false,manual:false,showGuide:true,scaleX:1,scaleY:1,boxW:1,boxH:1,layoutLabel:'automatico'};
+
+function clampPalletPlanItemToSpec(item,spec){
+  if(!item||!spec) return item;
+  item.w=Math.max(1,Math.min(+item.w||0,spec.areaL));
+  item.l=Math.max(1,Math.min(+item.l||0,spec.areaW));
+  item.x=Math.max(0,Math.min(spec.areaL-item.w,+item.x||0));
+  item.z=Math.max(0,Math.min(spec.areaW-item.l,+item.z||0));
+  item.x=Math.round(item.x*10)/10;
+  item.z=Math.round(item.z*10)/10;
+  item.w=Math.round(item.w*10)/10;
+  item.l=Math.round(item.l*10)/10;
+  return item;
+}
+
+function buildPalletAutoItems(positions,bL,bW,overhang){
+  return positions.map((pos,idx)=>({
+    x:pos.x,
+    z:pos.z,
+    w:pos.rot?bW:bL,
+    l:pos.rot?bL:bW,
+    rot:!!pos.rot,
+    manual:false,
+    id:`auto-${idx}`
+  }));
+}
+
+function summarizePalletPlanMix(items){
+  const uniq=[...new Set(items.map(it=>`${Math.round(it.w)}×${Math.round(it.l)}`))];
+  if(!uniq.length) return '—';
+  return uniq.slice(0,4).join(', ')+(uniq.length>4?'…':'');
+}
+
+function toggleOvhField(){
+  const flag=document.getElementById('ovhFlag');
+  const row=document.getElementById('ovhRow');
+  if(!flag || !row) return;
+  row.style.display=flag.checked?'':'none';
+  updatePalletQuickButtons();
+}
+
+function updatePalletQuickButtons(){
+  const flag=document.getElementById('ovhFlag');
+  const btn=document.getElementById('btnQuickOverhang');
+  if(btn && flag){
+    btn.textContent=flag.checked?'📐 Overhang ON':'📐 Overhang OFF';
+  }
+  const guideBtn=document.getElementById('btnTogglePalletGuide');
+  if(guideBtn){
+    guideBtn.textContent=palletPlanState.showGuide?'🧱 Pallet ON':'🧱 Pallet OFF';
+  }
+}
+
+function togglePalletGuideVisibility(){
+  palletPlanState.showGuide=!palletPlanState.showGuide;
+  updatePalletQuickButtons();
+  if(palletPlanState.spec){
+    renderPalletPlan(palletPlanState.spec,palletPlanState.items,{layout:palletPlanState.layoutLabel,originalItems:palletPlanState.originalItems,manual:palletPlanState.manual});
+    updatePalletPlanResults();
+  }
+}
+
+function togglePalletOverhangQuick(){
+  const flag=document.getElementById('ovhFlag');
+  if(!flag) return;
+  flag.checked=!flag.checked;
+  toggleOvhField();
+  calcPallet();
+}
+
 function calcPallet(){
   const bL=+document.getElementById('bL').value,bW=+document.getElementById('bW').value,bH=+document.getElementById('bH').value,bKg=+document.getElementById('bKg').value;
   const pL=+document.getElementById('pL').value,pW=+document.getElementById('pW').value,pT=+document.getElementById('pT').value;
   const maxH=+document.getElementById('maxH').value,maxKg=+document.getElementById('maxKg').value;
-  const oh=+document.getElementById('ovh').value,nL=+document.getElementById('layers').value;
-  const doRot=+document.getElementById('lrot').value===1,wf=document.getElementById('wf').checked,showBase=document.getElementById('showP').checked;
-  function fit(rot){const bx=rot?bW:bL,bz=rot?bL:bW,nx=Math.floor((pL+oh*2)/bx),nz=Math.floor((pW+oh*2)/bz);const p=[];for(let i=0;i<nx;i++)for(let j=0;j<nz;j++)p.push({x:i*bx,z:j*bz,rot});return{p,nx,nz};}
-  const fA=fit(false),fB=fit(true),best=fA.p.length>=fB.p.length?fA:fB;
-  const actL=Math.min(nL,Math.floor((maxH-pT)/bH));
-  let all=[];
-  for(let l=0;l<actL;l++){const cur=doRot&&l%2===1?fit(!best.p[0]?.rot).p:best.p;all=all.concat(cur.map(p=>({...p,layer:l})));}
-  const tot=all.length,totKg=tot*bKg,eff=Math.min(100,Math.round(best.p.length*bL*bW/(pL*pW)*100)),totH=pT+actL*bH;
+  const ovhEnabled=document.getElementById('ovhFlag')?.checked||false;
+  const oh=ovhEnabled?(+document.getElementById('ovh').value||0):0;
+  const nL=+document.getElementById('layers').value;
+  const doRot=+document.getElementById('lrot').value===1;
+
+  const areaL=pL+oh*2, areaW=pW+oh*2;
+  const layA=buildBestBoxLayer(areaL,areaW,bL,bW,false,oh);
+  const layB=buildBestBoxLayer(areaL,areaW,bL,bW,true,oh);
+  const best=layA.count>=layB.count?layA:layB;
+  const autoLayerItems=buildPalletAutoItems(best.positions,bL,bW,oh);
+  const spec={baseL:pL,baseW:pW,areaL,areaW,overhang:oh,pT,maxH,maxKg,bH,bKg,requestedLayers:nL,alternate:doRot};
+  const sameSpec=palletPlanState.spec && palletPlanState.spec.baseL===pL && palletPlanState.spec.baseW===pW && palletPlanState.spec.overhang===oh;
+  const keepManual=!!(palletPlanState.manual && sameSpec && palletPlanState.items.length);
+  const items=keepManual?clonePlanItems(palletPlanState.items):clonePlanItems(autoLayerItems);
+  const layoutLabel=keepManual?'manuale personalizzato':best.layout;
+
+  renderPalletPlan(spec,items,{layout:layoutLabel,originalItems:autoLayerItems,manual:keepManual});
+  updatePalletPlanResults();
+  applyPalletPlanPreset();
+  showAlert('al-p');
+}
+
+function updatePalletPlanResults(){
+  if(!palletPlanState.spec) return;
+  const spec=palletPlanState.spec;
+  const bH=+document.getElementById('bH').value;
+  const bKg=+document.getElementById('bKg').value;
+  const pT=+document.getElementById('pT').value;
+  const maxH=+document.getElementById('maxH').value;
+  const maxKg=+document.getElementById('maxKg').value;
+  const nL=+document.getElementById('layers').value;
+  const wf=document.getElementById('wf').checked,showBase=document.getElementById('showP').checked;
+  const maxLayersByHeight=Math.max(0,Math.floor((maxH-pT)/Math.max(1,bH)));
+  const actL=Math.min(nL,maxLayersByHeight);
+  const layerItems=clonePlanItems(palletPlanState.items).map(it=>clampPalletPlanItemToSpec(it,spec));
+  palletPlanState.items=clonePlanItems(layerItems);
+  const perLayer=layerItems.length;
+  const tot=perLayer*actL;
+  const usedArea=layerItems.reduce((sum,it)=>sum+(it.w*it.l),0);
+  const eff=Math.round((usedArea/Math.max(1,(spec.areaL*spec.areaW)))*100);
+  const totKg=tot*bKg;
+  const totH=pT+actL*bH;
+  const all=[];
+  for(let l=0;l<actL;l++){
+    layerItems.forEach(it=>all.push({x:it.x,z:it.z,w:it.w,l:it.l,layer:l,rot:!!it.rot}));
+  }
+
   document.getElementById('sp-tot').textContent=tot;
-  document.getElementById('sp-lay').textContent=best.p.length;
+  document.getElementById('sp-lay').textContent=perLayer;
   document.getElementById('sp-wgt').textContent=Math.round(totKg*10)/10;
   document.getElementById('sp-eff').textContent=eff+'%';
   document.querySelectorAll('.sc').forEach(c=>c.classList.add('on'));
-  document.getElementById('pdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🏗 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>📐 Colonne: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${actL}</b></div><div>📏 H tot: <b style="color:${totH>maxH?'var(--accent2)':'var(--text)'}">${Math.round(totH)}mm${totH>maxH?' ⚠':''}</b></div><div>⚖️ Peso: <b style="color:${totKg>maxKg?'var(--accent2)':'var(--text)'}">${Math.round(totKg*10)/10}kg${totKg>maxKg?' ⚠':''}</b></div><div>🎯 Eff: <b style="color:var(--green)">${eff}%</b></div>`;
-  // Pattern
-  const pg=document.getElementById('pgrid');pg.innerHTML='';
-  const mx=20,dnx=Math.min(best.nx,mx),dnz=Math.min(best.nz,mx);
-  for(let j=0;j<dnz;j++){const row=document.createElement('div');row.className='pr';for(let i=0;i<dnx;i++){const c=document.createElement('div');c.className='pc f';row.appendChild(c);}pg.appendChild(row);}
-  document.getElementById('pleg').innerHTML=`<div class="li"><div class="ld" style="background:var(--accent)"></div>Scatola (${best.nx}×${best.nz})</div>`;
-  lastP={bL,bW,bH,pL,pW,pT,layers:actL,positions:all,wf,showBase};
+
+  const layoutLbl=palletPlanState.layoutLabel||'automatico';
+  const mix=summarizePalletPlanMix(layerItems);
+  const metaEl=document.getElementById('pschemaMeta');
+  if(metaEl) metaEl.textContent=`Layout: ${layoutLbl}`;
+  document.getElementById('pdet').innerHTML=`<div>📦 Box base: <b style="color:var(--text)">${document.getElementById('bL').value}×${document.getElementById('bW').value}×${document.getElementById('bH').value}mm</b></div><div>🏗 Pallet: <b style="color:var(--text)">${spec.baseL}×${spec.baseW}mm</b></div><div>🧠 Layout attivo: <b style="color:var(--text)">${layoutLbl}</b></div><div>🧩 Mix formati nello schema: <b style="color:var(--text)">${mix}</b></div><div>📦 Per strato: <b style="color:var(--text)">${perLayer}</b> scatole</div><div>📏 Area utile totale: <b style="color:var(--text)">${spec.areaL}×${spec.areaW}mm</b></div><div>📏 Overhang disponibile: <b style="color:var(--text)">${spec.overhang}mm</b></div><div>🔢 Strati utili: <b style="color:var(--text)">${actL}</b></div><div>📏 H tot: <b style="color:${totH>maxH?'var(--accent2)':'var(--text)'}">${Math.round(totH)}mm${totH>maxH?' ⚠':''}</b></div><div>⚖️ Peso: <b style="color:${totKg>maxKg?'var(--accent2)':'var(--text)'}">${Math.round(totKg*10)/10}kg${totKg>maxKg?' ⚠':''}</b></div><div>🎯 Fill area utile: <b style="color:${eff>100?'var(--accent2)':'var(--green)'}">${eff}%</b></div>`;
+
+  const realOverhangCount=layerItems.filter(it=>getPalletPlanItemOverhang(it).max>0).length;
+  document.getElementById('pleg').innerHTML=`${palletPlanState.showGuide?'<div class="li"><div class="ld" style="background:transparent;border:1px dashed rgba(148,163,184,.8)"></div>Impronta pallet</div>':''}${spec.overhang>0?'<div class="li"><div class="ld" style="background:transparent;border:1px solid rgba(148,163,184,.35)"></div>Area utile / overhang</div>':''}<div class="li"><div class="ld" style="background:#60a5fa"></div>Scatole (trascina · doppio clic = ruota)</div>${spec.overhang>0?`<div class="li"><div class="ld" style="background:#dc2626"></div>Overhang reale: ${realOverhangCount}</div>`:''}`;
+
+  lastP={pL:spec.baseL,pW:spec.baseW,areaL:spec.areaL,areaW:spec.areaW,pT,layers:actL,positions:all,wf,showBase,overhang:spec.overhang,schemaItems:clonePlanItems(layerItems)};
   buildPScene(lastP);
   setupLightsP();
-  showAlert('al-p');
+}
+
+function renderPalletPlan(spec,items,meta={}){
+  const box=document.getElementById('pschema'), legend=document.getElementById('palletSchemaLegend');
+  if(!box||!legend||!spec) return;
+
+  const hostW=Math.max(480, box.clientWidth||720);
+  const hasOvh = spec.overhang > 0;
+
+  // Reserve fixed space for visual dimension labels, but include it in the fit calculation
+  const dimSpaceLeft = 52;
+  const dimSpaceTop = 34;
+  const dimSpaceRight = hasOvh ? 52 : 8;
+  const dimSpaceBottom = hasOvh ? 34 : 8;
+  const reserve={left:8,right:8,top:8,bottom:8};
+
+  const usableW=Math.max(180,hostW-reserve.left-reserve.right-dimSpaceLeft-dimSpaceRight);
+  const maxTotalH=Math.max(260,Math.round(hostW*0.68));
+  const usableH=Math.max(160,maxTotalH-reserve.top-reserve.bottom-dimSpaceTop-dimSpaceBottom);
+
+  const scale=Math.min(usableW/spec.areaL, usableH/spec.areaW);
+  const outerW=spec.areaL*scale;
+  const outerH=spec.areaW*scale;
+  const totalW=outerW+reserve.left+reserve.right+dimSpaceLeft+dimSpaceRight;
+  const totalH=outerH+reserve.top+reserve.bottom+dimSpaceTop+dimSpaceBottom;
+  const outerX=Math.round((totalW-dimSpaceLeft-dimSpaceRight-outerW)/2 + dimSpaceLeft);
+  const outerY=Math.round((totalH-dimSpaceTop-dimSpaceBottom-outerH)/2 + dimSpaceTop);
+  const ox=outerX+spec.overhang*scale;
+  const oz=outerY+spec.overhang*scale;
+  const pw=spec.baseL*scale;
+  const ph=spec.baseW*scale;
+
+  palletPlanState.spec=spec;
+  palletPlanState.scaleX=scale;
+  palletPlanState.scaleY=scale;
+  palletPlanState.boxW=totalW;
+  palletPlanState.boxH=totalH;
+  palletPlanState.offsetX=outerX;
+  palletPlanState.offsetY=outerY;
+  palletPlanState.drawLeft=outerX;
+  palletPlanState.drawTop=outerY;
+  palletPlanState.drawRight=outerX+outerW;
+  palletPlanState.drawBottom=outerY+outerH;
+
+  const normalizedItems=clonePlanItems(items).map(it=>clampPalletPlanItemToSpec(it,spec));
+  const normalizedOriginal=clonePlanItems(meta.originalItems||items).map(it=>clampPalletPlanItemToSpec(it,spec));
+  palletPlanState.items=normalizedItems;
+  palletPlanState.originalItems=normalizedOriginal;
+  palletPlanState.selectedIndex=-1;
+  palletPlanState.manual=!!meta.manual;
+  palletPlanState.layoutLabel=meta.layout||'automatico';
+
+  box.classList.toggle('editing',palletPlanState.editing);
+  box.innerHTML='';
+
+  const arrowM = `<marker id="dA" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#64748b"/></marker>
+  <marker id="dA2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto-start-reverse"><path d="M0,0 L7,3.5 L0,7 z" fill="#64748b"/></marker>`;
+  const gridPat = `<pattern id="pgrid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(100,116,139,.12)" stroke-width="1"/></pattern>`;
+
+  const ovhZone = hasOvh ? `<rect x="${outerX.toFixed(1)}" y="${outerY.toFixed(1)}" width="${outerW.toFixed(1)}" height="${outerH.toFixed(1)}" rx="10" fill="none" stroke="rgba(148,163,184,.35)" stroke-width="1.1"/>` : '';
+  // When no overhang: palletFill IS the pallet border (solid). When overhang on: it's dashed to distinguish from the area zone.
+  const palletFill = palletPlanState.showGuide
+    ? `<rect x="${ox.toFixed(1)}" y="${oz.toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" rx="8" fill="none" stroke="rgba(148,163,184,.7)" stroke-width="1.4" ${hasOvh?'stroke-dasharray="5 4"':''}/>` 
+    : (!hasOvh ? `<rect x="${outerX.toFixed(1)}" y="${outerY.toFixed(1)}" width="${outerW.toFixed(1)}" height="${outerH.toFixed(1)}" rx="10" fill="none" stroke="rgba(148,163,184,.45)" stroke-width="1.2"/>` : '');
+  const gridRect = `<rect x="${outerX.toFixed(1)}" y="${outerY.toFixed(1)}" width="${outerW.toFixed(1)}" height="${outerH.toFixed(1)}" rx="10" fill="url(#pgrid)"/>`;
+  const outerBorder = '';
+
+  const topLine = `<line x1="${outerX}" y1="${outerY-14}" x2="${outerX+outerW}" y2="${outerY-14}" stroke="#64748b" stroke-width="1.2" marker-start="url(#dA2)" marker-end="url(#dA)"/><text x="${outerX+outerW/2}" y="${outerY-18}" text-anchor="middle" fill="#94a3b8" font-size="12">${(spec.areaL/1000).toFixed(3)} m</text>`;
+  const leftLine = `<line x1="${outerX-14}" y1="${outerY}" x2="${outerX-14}" y2="${outerY+outerH}" stroke="#64748b" stroke-width="1.2" marker-start="url(#dA2)" marker-end="url(#dA)"/><text x="${outerX-20}" y="${outerY+outerH/2}" text-anchor="middle" transform="rotate(-90 ${outerX-20} ${outerY+outerH/2})" fill="#94a3b8" font-size="12">${(spec.areaW/1000).toFixed(3)} m</text>`;
+  const botLine = (hasOvh && palletPlanState.showGuide) ? `<line x1="${ox}" y1="${oz+ph+14}" x2="${ox+pw}" y2="${oz+ph+14}" stroke="#64748b" stroke-width="1.1" marker-start="url(#dA2)" marker-end="url(#dA)"/><text x="${ox+pw/2}" y="${oz+ph+28}" text-anchor="middle" fill="#94a3b8" font-size="11">Pallet ${(spec.baseL/1000).toFixed(3)} m</text>` : '';
+  const rightLine = (hasOvh && palletPlanState.showGuide) ? `<line x1="${ox+pw+14}" y1="${oz}" x2="${ox+pw+14}" y2="${oz+ph}" stroke="#64748b" stroke-width="1.1" marker-start="url(#dA2)" marker-end="url(#dA)"/><text x="${ox+pw+28}" y="${oz+ph/2}" text-anchor="middle" transform="rotate(-90 ${ox+pw+28} ${oz+ph/2})" fill="#94a3b8" font-size="11">Pallet ${(spec.baseW/1000).toFixed(3)} m</text>` : '';
+
+  box.innerHTML=`<svg class="plan-svg" viewBox="0 0 ${totalW} ${totalH}" xmlns="http://www.w3.org/2000/svg">
+  <defs>${arrowM}${gridPat}</defs>
+  ${ovhZone}
+  ${palletFill}
+  ${gridRect}
+  ${outerBorder}
+  ${topLine}
+  ${leftLine}
+  ${botLine}
+  ${rightLine}
+  </svg>`;
+
+  box.style.height = totalH + 'px';
+
+  const lenLbl=document.getElementById('pschemaLenLabel');
+  const widLbl=document.getElementById('pschemaWidLabel');
+  const modeLbl=document.getElementById('pschemaModeLabel');
+  const hintLbl=document.getElementById('pschemaHintLabel');
+  if(lenLbl) lenLbl.textContent=spec.overhang>0?`Pallet: ${(spec.baseL/1000).toFixed(3)} m · Area utile: ${(spec.areaL/1000).toFixed(3)} m (+${spec.overhang} mm/lato)`:`Pallet: ${(spec.baseL/1000).toFixed(3)} m`;
+  if(widLbl) widLbl.textContent=spec.overhang>0?`Pallet: ${(spec.baseW/1000).toFixed(3)} m · Area utile: ${(spec.areaW/1000).toFixed(3)} m`:`Pallet: ${(spec.baseW/1000).toFixed(3)} m`;
+  if(modeLbl) modeLbl.textContent=spec.overhang>0?`Overhang attivo · Area utile ${((spec.areaL*spec.areaW)/1000000).toFixed(3)} m² · Pallet ${((spec.baseL*spec.baseW)/1000000).toFixed(3)} m²`:`Area pallet ${((spec.baseL*spec.baseW)/1000000).toFixed(3)} m²`;
+  if(hintLbl) hintLbl.textContent=`Tutte le scatole sono scalate nello stesso sistema del render 3D${palletPlanState.showGuide?' · Impronta pallet visibile':' · Impronta pallet nascosta'}`;
+
+  palletPlanState.items.forEach((item,idx)=>{
+    const el=document.createElement('div');
+    el.className=`plan-item box ${idx%2===0?'':'alt'}`;
+    el.dataset.index=idx;
+    syncPalletPlanItemElement(el,item);
+    el.addEventListener('click',e=>{e.stopPropagation();selectPalletPlanItem(idx);});
+    el.addEventListener('dblclick',e=>{e.stopPropagation();rotatePalletPlanItem(idx,true);});
+    attachPalletPlanItemDrag(el,idx);
+    box.appendChild(el);
+  });
+
+  box.onclick=()=>selectPalletPlanItem(-1);
+  document.getElementById('pschemaTitle').textContent='Schema strato modificabile';
+  document.getElementById('pschemaMeta').textContent=`Layout: ${palletPlanState.layoutLabel}`;
+  const legendItems=[];
+  if(palletPlanState.showGuide) legendItems.push(['rgba(148,163,184,.8)','Impronta pallet']);
+  if(hasOvh) legendItems.push(['rgba(148,163,184,.35)','Area utile / overhang']);
+  legendItems.push(['#60a5fa','Scatole']);
+  legendItems.push(['#dc2626','Overhang reale']);
+  legendItems.push(['#0f172a','Selezionata']);
+  legend.innerHTML=legendItems.map(([c,t])=>`<span class="plan-pill"><span class="plan-dot" style="background:${c}"></span>${t}</span>`).join('');
+  updatePalletPlanButtons();
+
+  // Resync div positions when box is resized (SVG scales, divs need updating)
+  if(box._palletResizeObserver) box._palletResizeObserver.disconnect();
+  const ro=new ResizeObserver(()=>{
+    document.querySelectorAll('#pschema .plan-item').forEach((el,i)=>{
+      const item=palletPlanState.items[i];
+      if(item) syncPalletPlanItemElement(el,item);
+    });
+  });
+  ro.observe(box);
+  box._palletResizeObserver=ro;
+}
+function getPalletPlanItemOverhang(item){
+  const spec=palletPlanState.spec;
+  if(!spec) return {left:0,right:0,top:0,bottom:0,max:0};
+  const left=Math.max(0,spec.overhang-item.x);
+  const top=Math.max(0,spec.overhang-item.z);
+  const right=Math.max(0,(item.x+item.w)-(spec.overhang+spec.baseL));
+  const bottom=Math.max(0,(item.z+item.l)-(spec.overhang+spec.baseW));
+  return {left,right,top,bottom,max:Math.max(left,right,top,bottom)};
+}
+
+function syncPalletPlanItemElement(el,item){
+  const sx=palletPlanState.scaleX, sy=palletPlanState.scaleY;
+  const ox=palletPlanState.offsetX||0, oy=palletPlanState.offsetY||0;
+
+  // The SVG uses viewBox totalW×totalH but is rendered at box.clientWidth CSS px.
+  // All positions stored in state are in SVG-space. Convert to CSS px for the div overlay.
+  const box=document.getElementById('pschema');
+  const svgW=palletPlanState.boxW||1, svgH=palletPlanState.boxH||1;
+  const cssW=box ? box.clientWidth : svgW;
+  const cssH=box ? box.clientHeight : svgH;
+  const rx=cssW/svgW, ry=cssH/svgH;
+
+  // Item position in SVG space → CSS space
+  const widthPx=Math.max(8, item.w*sx*rx - 2);
+  const heightPx=Math.max(8, item.l*sy*ry - 2);
+  const drawLeft=(palletPlanState.drawLeft ?? ox)*rx;
+  const drawTop=(palletPlanState.drawTop ?? oy)*ry;
+  const drawRight=(palletPlanState.drawRight ?? (ox+(palletPlanState.spec?.areaL||0)*sx))*rx;
+  const drawBottom=(palletPlanState.drawBottom ?? (oy+(palletPlanState.spec?.areaW||0)*sy))*ry;
+
+  const leftPx=Math.min(drawRight-widthPx, Math.max(drawLeft, ox*rx + item.x*sx*rx));
+  const topPx=Math.min(drawBottom-heightPx, Math.max(drawTop, oy*ry + item.z*sy*ry));
+
+  el.style.left=leftPx+'px';
+  el.style.top=topPx+'px';
+  el.style.width=widthPx+'px';
+  el.style.height=heightPx+'px';
+
+  const ov=getPalletPlanItemOverhang(item);
+  const spec=palletPlanState.spec;
+  // Mark overhang: item exits pallet footprint (but stays within allowed area)
+  const hasRealOverhang = spec && spec.overhang > 0 && ov.max > 0;
+  // Mark out-of-bounds: item exits the allowed area entirely (should not happen after clamp, but guard)
+  const outOfBounds = item.x < 0 || item.z < 0 ||
+    (spec && (item.x + item.w > spec.areaL || item.z + item.l > spec.areaW));
+  el.classList.toggle('overhang-real', hasRealOverhang && !outOfBounds);
+  el.classList.toggle('overhang-soft', false);
+  const ovParts=[];
+  if(ov.left) ovParts.push(`SX ${Math.round(ov.left)} mm`);
+  if(ov.right) ovParts.push(`DX ${Math.round(ov.right)} mm`);
+  if(ov.top) ovParts.push(`TOP ${Math.round(ov.top)} mm`);
+  if(ov.bottom) ovParts.push(`BOT ${Math.round(ov.bottom)} mm`);
+  el.title=`${Math.round(item.w)}×${Math.round(item.l)} mm${ovParts.length?` · overhang reale ${ovParts.join(' / ')}`:''}`;
+}
+
+function selectPalletPlanItem(idx){
+  palletPlanState.selectedIndex=idx;
+  document.querySelectorAll('#pschema .plan-item').forEach((el,i)=>el.classList.toggle('selected',i===idx));
+  updatePalletPlanButtons();
+}
+
+function updatePalletPlanButtons(){
+  const b=document.getElementById('btnEditPalletPlan');
+  if(b) b.textContent=palletPlanState.editing?'✅ Fine modifica':'✏️ Modifica layout';
+  updatePalletQuickButtons();
+}
+
+function centerPalletPlanItems(){
+  if(!palletPlanState.spec || !palletPlanState.items.length){
+    alert('Non ci sono scatole da centrare.');
+    return;
+  }
+  const spec=palletPlanState.spec;
+  const minX=Math.min(...palletPlanState.items.map(it=>it.x));
+  const minZ=Math.min(...palletPlanState.items.map(it=>it.z));
+  const maxX=Math.max(...palletPlanState.items.map(it=>it.x+it.w));
+  const maxZ=Math.max(...palletPlanState.items.map(it=>it.z+it.l));
+  const currentCX=(minX+maxX)/2;
+  const currentCZ=(minZ+maxZ)/2;
+
+  const targetMinX=spec.overhang;
+  const targetMinZ=spec.overhang;
+  const targetMaxX=spec.overhang+spec.baseL;
+  const targetMaxZ=spec.overhang+spec.baseW;
+  let dx=((targetMinX+targetMaxX)/2)-currentCX;
+  let dz=((targetMinZ+targetMaxZ)/2)-currentCZ;
+
+  const moved=clonePlanItems(palletPlanState.items).map(it=>({...it,x:it.x+dx,z:it.z+dz}));
+  let gMinX=Math.min(...moved.map(it=>it.x));
+  let gMinZ=Math.min(...moved.map(it=>it.z));
+  let gMaxX=Math.max(...moved.map(it=>it.x+it.w));
+  let gMaxZ=Math.max(...moved.map(it=>it.z+it.l));
+
+  if(gMinX<0) dx+=-gMinX;
+  if(gMaxX>spec.areaL) dx+=spec.areaL-gMaxX;
+  if(gMinZ<0) dz+=-gMinZ;
+  if(gMaxZ>spec.areaW) dz+=spec.areaW-gMaxZ;
+
+  palletPlanState.items=palletPlanState.items.map(it=>({
+    ...it,
+    x:it.x+dx,
+    z:it.z+dz
+  }));
+  palletPlanState.items.forEach(it=>clampPalletPlanItemToSpec(it,spec));
+  palletPlanState.manual=true;
+  palletPlanState.layoutLabel='manuale centrato';
+  renderPalletPlan(spec,palletPlanState.items,{layout:palletPlanState.layoutLabel,originalItems:palletPlanState.originalItems,manual:true});
+  updatePalletPlanResults();
+}
+
+function applyPalletPlanPreset(){
+  const preset=document.getElementById('palletPlanPreset')?.value||'current';
+  let l=+document.getElementById('bL').value, w=+document.getElementById('bW').value;
+  if(preset==='half'){ l=Math.max(50,Math.round(l/2)); }
+  else if(preset==='quarter'){ l=Math.max(50,Math.round(l/2)); w=Math.max(50,Math.round(w/2)); }
+  else if(preset==='custom'){ return; }
+  document.getElementById('planBoxL').value=l;
+  document.getElementById('planBoxW').value=w;
+}
+
+function findFreePalletPlanSpot(len,wid){
+  const spec=palletPlanState.spec;
+  if(!spec) return {x:0,z:0};
+  const gap=10;
+  for(let z=0; z<=spec.areaW-wid; z+=10){
+    for(let x=0; x<=spec.areaL-len; x+=10){
+      const overlaps=palletPlanState.items.some(it=>!(x+len+gap<=it.x || it.x+it.w+gap<=x || z+wid+gap<=it.z || it.z+it.l+gap<=z));
+      if(!overlaps) return {x,z};
+    }
+  }
+  return {x:Math.max(0,spec.overhang),z:Math.max(0,spec.overhang)};
+}
+
+function addCustomPalletPlanBox(){
+  if(!palletPlanState.spec){ alert('Esegui prima un calcolo pallet.'); return; }
+  const len=+document.getElementById('planBoxL').value;
+  const wid=+document.getElementById('planBoxW').value;
+  if(!len||!wid||len<50||wid<50){ alert('Inserisci misure scatola valide.'); return; }
+  if(len>palletPlanState.spec.areaL || wid>palletPlanState.spec.areaW){ alert("Questa scatola è più grande dell'area pallet disponibile, anche considerando l'overhang."); return; }
+  const pos=findFreePalletPlanSpot(len,wid);
+  palletPlanState.items.push({x:pos.x,z:pos.z,w:len,l:wid,rot:false,manual:true,id:`manual-${Date.now()}-${Math.random()}`});
+  palletPlanState.manual=true;
+  palletPlanState.layoutLabel='manuale personalizzato';
+  renderPalletPlan(palletPlanState.spec,palletPlanState.items,{layout:palletPlanState.layoutLabel,originalItems:palletPlanState.originalItems,manual:true});
+  selectPalletPlanItem(palletPlanState.items.length-1);
+  updatePalletPlanResults();
+}
+
+function duplicateSelectedPalletPlanItem(){
+  const idx=palletPlanState.selectedIndex;
+  if(idx<0){ alert('Seleziona prima una scatola.'); return; }
+  const src=palletPlanState.items[idx];
+  document.getElementById('planBoxL').value=src.w;
+  document.getElementById('planBoxW').value=src.l;
+  addCustomPalletPlanBox();
+}
+
+function removeSelectedPalletPlanItem(){
+  const idx=palletPlanState.selectedIndex;
+  if(idx<0){ alert('Seleziona prima una scatola da rimuovere.'); return; }
+  palletPlanState.items.splice(idx,1);
+  palletPlanState.selectedIndex=-1;
+  palletPlanState.manual=true;
+  palletPlanState.layoutLabel='manuale personalizzato';
+  renderPalletPlan(palletPlanState.spec,palletPlanState.items,{layout:palletPlanState.layoutLabel,originalItems:palletPlanState.originalItems,manual:true});
+  updatePalletPlanResults();
+}
+
+function togglePalletPlanEdit(){
+  palletPlanState.editing=!palletPlanState.editing;
+  const box=document.getElementById('pschema');
+  if(box) box.classList.toggle('editing',palletPlanState.editing);
+  document.querySelectorAll('#pschema .plan-item').forEach(el=>el.classList.toggle('editing',palletPlanState.editing));
+  updatePalletPlanButtons();
+}
+
+function rotatePalletPlanItem(idx,refresh){
+  const item=palletPlanState.items[idx];
+  if(!item) return;
+  const tmp=item.w; item.w=item.l; item.l=tmp; item.rot=!item.rot;
+  clampPalletPlanItem(item);
+  palletPlanState.manual=true;
+  palletPlanState.layoutLabel='manuale personalizzato';
+  const el=document.querySelector(`#pschema .plan-item[data-index="${idx}"]`);
+  if(el) syncPalletPlanItemElement(el,item);
+  if(refresh) updatePalletPlanResults();
+}
+function rotateSelectedPalletPlanBox(){ if(palletPlanState.selectedIndex>=0) rotatePalletPlanItem(palletPlanState.selectedIndex,true); }
+
+function resetPalletPlan(){
+  if(!palletPlanState.spec) return;
+  palletPlanState.items=clonePlanItems(palletPlanState.originalItems);
+  palletPlanState.manual=false;
+  palletPlanState.layoutLabel='automatico';
+  renderPalletPlan(palletPlanState.spec,palletPlanState.items,{layout:'automatico',originalItems:palletPlanState.originalItems,manual:false});
+  updatePalletPlanResults();
+}
+
+function clampPalletPlanItem(item){
+  clampPalletPlanItemToSpec(item,palletPlanState.spec);
+}
+
+function attachPalletPlanItemDrag(el,idx){
+  let active=false,startX=0,startY=0,origX=0,origY=0,pid=null;
+  el.addEventListener('pointerdown',e=>{
+    if(!palletPlanState.editing) return;
+    active=true; pid=e.pointerId; el.setPointerCapture(pid); el.classList.add('dragging');
+    selectPalletPlanItem(idx);
+    startX=e.clientX; startY=e.clientY;
+    const item=palletPlanState.items[idx]; origX=item.x; origY=item.z;
+    e.preventDefault();
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!active) return;
+    const box=document.getElementById('pschema');
+    const svgW=palletPlanState.boxW||1;
+    const cssW=box ? box.clientWidth : svgW;
+    // Convert CSS px delta → mm: divide by (scaleX * cssToSvgRatio)
+    const effectiveScale = palletPlanState.scaleX * (cssW / svgW);
+    const item=palletPlanState.items[idx];
+    item.x=origX+(e.clientX-startX)/effectiveScale;
+    item.z=origY+(e.clientY-startY)/effectiveScale;
+    clampPalletPlanItem(item);
+    syncPalletPlanItemElement(el,item);
+  });
+  const stop=()=>{
+    if(!active) return;
+    active=false;
+    el.classList.remove('dragging');
+    try{ if(pid!==null) el.releasePointerCapture(pid); }catch(err){}
+    palletPlanState.manual=true;
+    palletPlanState.layoutLabel='manuale personalizzato';
+    updatePalletPlanResults();
+  };
+  el.addEventListener('pointerup',stop);
+  el.addEventListener('pointercancel',stop);
+  el.addEventListener('lostpointercapture',stop);
 }
 
 function buildPScene(res){
   clr(GRP_P);
-  const{bL,bW,bH,pL,pW,pT,positions,wf,showBase}=res;
+  const{pL,pW,areaL=pL,areaW=pW,pT,positions,wf,showBase,overhang=0}=res;
   const cp=document.getElementById('cPal').value,cb=document.getElementById('cBg').value;
   RP.r.setClearColor(h2t(cb),1);SP.g.visible=document.getElementById('showG').checked;
   if(showBase){
     const pm=new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.8});
-    const pb=new THREE.Mesh(new THREE.BoxGeometry(pL,pT,pW),pm);pb.position.set(0,pT/2,0);pb.receiveShadow=true;GRP_P.add(pb);
-    for(let i=0;i<3;i++){const bg=new THREE.BoxGeometry(pL,pT*0.38,pW*0.17);const bm=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.9}));bm.position.set(0,pT*0.69,(i-1)*pW*0.34);GRP_P.add(bm);}
+    const baseMesh=new THREE.Mesh(new THREE.BoxGeometry(areaL,pT,areaW),pm);
+    baseMesh.position.set(0,pT/2,0);baseMesh.receiveShadow=true;GRP_P.add(baseMesh);
+
+    if(overhang>0){
+      const footprintGeo=new THREE.BoxGeometry(pL,6,pW);
+      const footprintEdge=new THREE.LineSegments(new THREE.EdgesGeometry(footprintGeo),new THREE.LineBasicMaterial({color:0x475569,transparent:true,opacity:0.9}));
+      footprintEdge.position.set(0,pT+4,0); GRP_P.add(footprintEdge);
+    }else{
+      for(let i=0;i<3;i++){const bg=new THREE.BoxGeometry(areaL,pT*0.38,areaW*0.17);const bm=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.9}));bm.position.set(0,pT*0.69,(i-1)*areaW*0.34);GRP_P.add(bm);}
+    }
   }
   const tf=document.getElementById('texFace').value;
   function mat(color,f){const o={color:h2t(color),roughness:0.55,metalness:0.1};if(customTex&&(tf==='all'||tf===f||(tf==='sides'&&(f==='side'||f==='front'))))o.map=customTex;const m=new THREE.MeshStandardMaterial(o);if(wf)m.wireframe=true;return m;}
   const mats=[mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cTop').value,'top'),mat(document.getElementById('cSide').value,'side'),mat(document.getElementById('cFront').value,'front'),mat(document.getElementById('cSide').value,'side')];
-  positions.forEach(({x,z,layer,rot})=>{
-    const geo=rot?new THREE.BoxGeometry(bW,bH,bL):new THREE.BoxGeometry(bL,bH,bW);
+  positions.forEach(({x,z,layer,rot,w,l})=>{
+    const bw=w||(rot?+document.getElementById('bW').value:+document.getElementById('bL').value);
+    const bl=l||(rot?+document.getElementById('bL').value:+document.getElementById('bW').value);
+    const bh=+document.getElementById('bH').value;
+    const geo=new THREE.BoxGeometry(bw,bh,bl);
     const mesh=new THREE.Mesh(geo,mats);
-    const px=x+(rot?bW:bL)/2-pL/2,py=pT+layer*bH+bH/2,pz=z+(rot?bL:bW)/2-pW/2;
+    const px=x+bw/2-areaL/2,py=pT+layer*bh+bh/2,pz=z+bl/2-areaW/2;
     mesh.position.set(px,py,pz);mesh.castShadow=true;GRP_P.add(mesh);addEdges(GRP_P,geo,mesh.position);
   });
-  const midY=pT+(res.layers||1)*bH/2;
+  const midY=pT+(res.layers||1)*(+document.getElementById('bH').value)/2;
   CAM_P.tgt=new THREE.Vector3(0,midY,0);
-  CAM_P.r=Math.max(2000,(pL+pW+res.layers*bH)*1.6);CAM_P.upd();
+  CAM_P.r=Math.max(2000,(areaL+areaW+(res.layers||1)*(+document.getElementById('bH').value))*1.6);CAM_P.upd();
 }
 
 function setupLightsP(){
@@ -825,12 +1356,192 @@ function setupLightsP(){
 
 // ══════ CONTAINER CALC ══════
 let lastC=null;
+
+function formatM3(mm3){
+  return (Math.round((mm3/1e9)*100)/100).toFixed(2).replace(/\.00$/,'')+'m³';
+}
+
+function buildBestBoxLayer(areaL,areaW,bL,bW,seedRot=false,overhang=0){
+  const packed=packRectanglesMaxRects(areaL,areaW,seedRot?bW:bL,seedRot?bL:bW,true,2000)
+    .sort((a,b)=>a.y-b.y||a.x-b.x);
+  const positions=packed.map(r=>({x:r.x,z:r.y,rot:seedRot?!r.rot:r.rot}));
+  const layoutCounts={base:0,rot:0};
+  positions.forEach(p=>layoutCounts[p.rot?'rot':'base']++);
+  const layoutParts=[];
+  if(layoutCounts.base) layoutParts.push(`${layoutCounts.base} base`);
+  if(layoutCounts.rot) layoutParts.push(`${layoutCounts.rot} ruotate`);
+  return{count:positions.length,positions,layout:layoutParts.length?layoutParts.join(' + '):'Nessun layout'};
+}
+
+function buildStripedLayout(binL,binW,pL,pW,startX=0,startZ=0){
+  const A={len:pL,rowW:pW,rot:false,label:`${pL}×${pW}`};
+  const B={len:pW,rowW:pL,rot:true,label:`${pW}×${pL}`};
+  let best={count:0,fill:0,usedW:0,rowsA:0,rowsB:0,perA:0,perB:0,positions:[],layout:'nessuno',binL,binW};
+  const maxA=Math.floor(binW/A.rowW);
+  const maxB=Math.floor(binW/B.rowW);
+  const perA=Math.floor(binL/A.len);
+  const perB=Math.floor(binL/B.len);
+
+  for(let a=0;a<=maxA;a++){
+    for(let b=0;b<=maxB;b++){
+      const usedW=a*A.rowW+b*B.rowW;
+      if(usedW>binW) continue;
+      const count=a*perA+b*perB;
+      if(count<=0) continue;
+      const usedArea=count*pL*pW;
+      const fill=binL*binW>0?usedArea/(binL*binW):0;
+      const better=count>best.count || (count===best.count && (fill>best.fill || (Math.abs(fill-best.fill)<1e-9 && usedW>best.usedW)));
+      if(!better) continue;
+      let z=startZ;
+      const positions=[];
+      const seq=[...Array(b).fill(B),...Array(a).fill(A)];
+      seq.forEach(row=>{
+        const per=Math.floor(binL/row.len);
+        for(let i=0;i<per;i++) positions.push({x:startX+i*row.len,z,pw:row.len,pl:row.rowW,rot:row.rot});
+        z+=row.rowW;
+      });
+      const layoutParts=[];
+      if(a) layoutParts.push(`${a} file ${A.label}`);
+      if(b) layoutParts.push(`${b} file ruotate ${B.label}`);
+      best={count,fill,usedW,rowsA:a,rowsB:b,perA,perB,positions,layout:layoutParts.join(' + '),binL,binW};
+    }
+  }
+  return best;
+}
+
+function buildVehiclePalletLayout(spec,pL,pW,marginSide=0){
+  const binL=Math.max(0,spec.iL-(spec.structLossL||0)-marginSide*2);
+  const binW=Math.max(0,spec.iW-(spec.structLossW||0)-marginSide*2);
+  const startX=Math.max(0,Math.round((spec.iL-binL)/2));
+  const startZ=Math.max(0,Math.round((spec.iW-binW)/2));
+
+  const stripe=buildStripedLayout(binL,binW,pL,pW,startX,startZ);
+  const packed=packRectanglesMaxRects(binL,binW,pL,pW,true,600).map(r=>({
+    x:startX+r.x,
+    z:startZ+r.y,
+    pw:r.w,
+    pl:r.h,
+    rot:r.rot
+  }));
+  const packArea=packed.length*pL*pW;
+  const stripeArea=stripe.count*pL*pW;
+  const maxRect={
+    count:packed.length,
+    fill:binL*binW>0?packArea/(binL*binW):0,
+    positions:packed,
+    layout:'automatico misto'
+  };
+  const chosen=(maxRect.count>stripe.count || (maxRect.count===stripe.count && maxRect.fill>stripe.fill))?maxRect:stripe;
+  return{...chosen,binL,binW,startX,startZ};
+}
+
+function buildVolumeBarHTML(usedVol,totalVol,ve,prefixColor){
+  return `<div style="font-size:0.66rem;color:var(--muted);margin-top:10px;margin-bottom:4px;">${formatM3(usedVol)} / ${formatM3(totalVol)} · ${ve}% volume usato</div><div class="wbt"><div class="wbf" style="width:${Math.min(100,ve)}%;background:${prefixColor};"></div></div>`;
+}
+
+function splitFreeRect(freeRect, usedRect){
+  const out=[];
+  const fx=freeRect.x, fy=freeRect.y, fw=freeRect.w, fh=freeRect.h;
+  const ux=usedRect.x, uy=usedRect.y, uw=usedRect.w, uh=usedRect.h;
+  if(ux>=fx+fw || ux+uw<=fx || uy>=fy+fh || uy+uh<=fy) return [freeRect];
+  if(uy>fy) out.push({x:fx,y:fy,w:fw,h:uy-fy});
+  if(uy+uh<fy+fh) out.push({x:fx,y:uy+uh,w:fw,h:(fy+fh)-(uy+uh)});
+  const y1=Math.max(fy,uy), y2=Math.min(fy+fh,uy+uh);
+  if(ux>fx && y2>y1) out.push({x:fx,y:y1,w:ux-fx,h:y2-y1});
+  if(ux+uw<fx+fw && y2>y1) out.push({x:ux+uw,y:y1,w:(fx+fw)-(ux+uw),h:y2-y1});
+  return out.filter(r=>r.w>0&&r.h>0);
+}
+
+function pruneFreeRects(rects){
+  return rects.filter((a,i)=>!rects.some((b,j)=>i!==j && a.x>=b.x && a.y>=b.y && a.x+a.w<=b.x+b.w && a.y+a.h<=b.y+b.h));
+}
+
+function packRectanglesMaxRects(binW,binH,rectL,rectW,allowRotate=true,maxItems=500){
+  let free=[{x:0,y:0,w:binW,h:binH}];
+  const placed=[];
+  for(let step=0;step<maxItems;step++){
+    let best=null;
+    free.forEach((fr,idx)=>{
+      [{w:rectL,h:rectW,rot:false},{w:rectW,h:rectL,rot:true}].forEach(opt=>{
+        if((opt.rot && !allowRotate) || opt.w>fr.w || opt.h>fr.h) return;
+        const shortSide=Math.min(fr.w-opt.w, fr.h-opt.h);
+        const longSide=Math.max(fr.w-opt.w, fr.h-opt.h);
+        const score=[shortSide,longSide,fr.y,fr.x];
+        if(!best || score.join('|')<best.score.join('|')) best={score,idx,x:fr.x,y:fr.y,w:opt.w,h:opt.h,rot:opt.rot};
+      });
+    });
+    if(!best) break;
+    const used={x:best.x,y:best.y,w:best.w,h:best.h};
+    placed.push({...used,rot:best.rot});
+    const next=[];
+    free.forEach(fr=>{
+      const intersects=!(used.x+used.w<=fr.x || fr.x+fr.w<=used.x || used.y+used.h<=fr.y || fr.y+fr.h<=used.y);
+      if(!intersects) next.push(fr);
+      else next.push(...splitFreeRect(fr,used));
+    });
+    free=pruneFreeRects(next);
+  }
+  return placed;
+}
+
+function buildPalletLayout(spec,pL,pW,mS){
+  const binL=Math.max(0,spec.iL-mS*2), binW=Math.max(0,spec.iW-mS*2);
+  const packed=packRectanglesMaxRects(binL,binW,pL,pW,true,500);
+  return packed.map(r=>({x:mS+r.x,z:mS+r.y,pw:r.w,pl:r.h,rot:r.rot}));
+}
+
+function getPracticalMargins(spec,userSide,userTop){
+  return {
+    side: Math.max(+userSide||0, spec.practicalSide||0),
+    top: Math.max(+userTop||0, spec.practicalTop||0)
+  };
+}
+
+function calcPalletCapacityModes(spec,pL,pW,pT,pCH,stack,userSide,userTop){
+  const theoreticalLayout=buildVehiclePalletLayout({...spec,structLossL:0,structLossW:0},pL,pW,0);
+  const theoreticalHeight=Math.max(0,spec.iH);
+  const palletH=Math.max(1,pT+pCH);
+  const theoreticalStacks=stack?Math.max(1,Math.floor(theoreticalHeight/palletH)):1;
+  const theoretical={
+    perLayer: theoreticalLayout.count,
+    stacks: theoreticalStacks,
+    total: theoreticalLayout.count*theoreticalStacks,
+    layout: theoreticalLayout.layout||'automatico misto',
+    binL: theoreticalLayout.binL,
+    binW: theoreticalLayout.binW,
+    h: theoreticalHeight,
+    side: 0,
+    top: 0
+  };
+  const practicalMargins=getPracticalMargins(spec,userSide,userTop);
+  const practicalSpec={...spec};
+  const practicalLayout=buildVehiclePalletLayout(practicalSpec,pL,pW,practicalMargins.side);
+  const practicalHeight=Math.max(0,spec.iH-practicalMargins.top);
+  const practicalStacks=stack?Math.max(1,Math.floor(practicalHeight/palletH)):1;
+  const practical={
+    perLayer: practicalLayout.count,
+    stacks: practicalStacks,
+    total: practicalLayout.count*practicalStacks,
+    layout: practicalLayout.layout||'automatico misto',
+    binL: practicalLayout.binL,
+    binW: practicalLayout.binW,
+    h: practicalHeight,
+    side: practicalMargins.side,
+    top: practicalMargins.top
+  };
+  return {theoretical, practical};
+}
+
+function buildCapacityModeHTML(kind,modes){
+  return `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:0.72rem;line-height:1.9;color:var(--muted);"><div><b style="color:var(--text)">Capacità teorica</b>: ${modes.theoretical.total} ${kind} · ${modes.theoretical.perLayer}/layer · ${modes.theoretical.stacks} layer · ${(modes.theoretical.binL/1000).toFixed(2)}×${(modes.theoretical.binW/1000).toFixed(3)}m</div><div><b style="color:var(--text)">Capacità pratica reale</b>: ${modes.practical.total} ${kind} · ${modes.practical.perLayer}/layer · ${modes.practical.stacks} layer · ${(modes.practical.binL/1000).toFixed(2)}×${(modes.practical.binW/1000).toFixed(3)}m · margini ${modes.practical.side}mm lato / ${modes.practical.top}mm top</div></div>`;
+}
+
 function calcContainer(){
   syncContainerUnitsType();
   const spec=CONTS[selectedCont];
   const mS=+document.getElementById('cMSide').value,mT=+document.getElementById('cMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
-  let items=[],totKg=0,usedVol=0,layers=0;
+  let items=[],totKg=0,usedVol=0,layers=0,totalVol=spec.iL*spec.iW*spec.iH,layoutLabel='automatico';
 
   if(cMode==='boxes'){
     const bL=+document.getElementById('cbL').value,bW=+document.getElementById('cbW').value,bH=+document.getElementById('cbH').value,bKg=+document.getElementById('cbKg').value;
@@ -839,52 +1550,58 @@ function calcContainer(){
     const fA=ft(false),fB=ft(true);
     const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
     layers=Math.floor(uH/bH);
-    for(let ly=0;ly<layers;ly++){const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});}
+    for(let ly=0;ly<layers;ly++){
+      const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;
+      for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});
+    }
     totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;
-    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
-    document.getElementById('cs-tot').textContent=items.length;document.getElementById('cs-vol').textContent=ve+'%';document.getElementById('cs-wgt').textContent=Math.round(totKg);document.getElementById('cs-lay').textContent=layers;
-    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div><div>📦 Vol tot: <b style="color:var(--text)">${Math.round(spec.iL*spec.iW*spec.iH/1e9*100)/100}m³</b></div>`;
-    // How many containers
-    const perCont=items.length/layers*layers;
+    const ve=Math.round(usedVol/totalVol*100);
+    document.getElementById('cs-tot').textContent=items.length;
+    document.getElementById('cs-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
+    document.getElementById('cs-wgt').textContent=Math.round(totKg);
+    document.getElementById('cs-lay').textContent=layers;
+    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 H utile interna: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
+    const perCont=items.length;
     calcHowManyContainers(perCont,bKg,spec);
   } else {
     const pL=+document.getElementById('cpL').value,pW=+document.getElementById('cpW').value,pT=+document.getElementById('cpT').value,pCH=+document.getElementById('cpCH').value,pKg=+document.getElementById('cpKg').value;
     const stack=document.getElementById('cpStack').checked;
     const requestedUnits=Math.max(0,+document.getElementById('cNUnits').value||0);
     const requestedType=document.getElementById('cNType').value;
-    const tPH=pT+pCH,stk=stack?Math.floor(uH/tPH):1;
-    function ftp(rot){const pl=rot?pW:pL,pw=rot?pL:pW;return{nx:Math.floor(uL/pl),nz:Math.floor(uW/pw),pl,pw,rot};}
-    const fA=ftp(false),fB=ftp(true),best=fA.nx*fA.nz>=fB.nx*fB.nz?fA:fB;
-    const maxPerLayer=best.nx*best.nz;
-    const maxPallets=maxPerLayer*stk;
+    const tPH=pT+pCH;
+    const caps=calcPalletCapacityModes(spec,pL,pW,pT,pCH,stack,mS,mT);
+    const floorLayout=buildVehiclePalletLayout(spec,pL,pW,getPracticalMargins(spec,mS,mT).side);
+    const maxPerLayer=caps.practical.perLayer;
+    const stk=caps.practical.stacks;
+    const maxPallets=caps.practical.total;
     const palletsToRender=requestedType==='pallets'&&requestedUnits>0?Math.min(requestedUnits,maxPallets):maxPallets;
-    const layersToRender=Math.max(1,Math.ceil(palletsToRender/Math.max(1,maxPerLayer)));
-    layers=layersToRender;
+    layers=Math.max(1,Math.ceil(palletsToRender/Math.max(1,maxPerLayer)));
     let placed=0;
     for(let sl=0;sl<stk && placed<palletsToRender;sl++){
-      for(let ix=0;ix<best.nx && placed<palletsToRender;ix++){
-        for(let iz=0;iz<best.nz && placed<palletsToRender;iz++){
-          items.push({x:mS+ix*best.pl,y:sl*tPH,z:mS+iz*best.pw,pw:best.pl,pt:pT,pl:best.pw,ch:pCH,type:'pallet'});
-          placed++;
-        }
+      for(const pos of floorLayout.positions){
+        if(placed>=palletsToRender) break;
+        items.push({x:pos.x,y:sl*tPH,z:pos.z,pw:pos.pw,pt:pT,pl:pos.pl,ch:pCH,type:'pallet',rot:pos.rot});
+        placed++;
       }
     }
-    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;
-    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
-    const cappedNote=requestedType==='pallets'&&requestedUnits>maxPallets?`<div>⚠ Limite container: <b style="color:var(--accent2)">${maxPallets}</b> pallet renderizzati su ${requestedUnits}</div>`:'';
+    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;layoutLabel=caps.practical.layout||'automatico';
+    const ve=Math.round(usedVol/totalVol*100);
+    const cappedNote=requestedType==='pallets'&&requestedUnits>maxPallets?`<div>⚠ Limite pratico reale: <b style="color:var(--accent2)">${maxPallets}</b> pallet renderizzati su ${requestedUnits}</div>`:'';
     document.getElementById('cs-tot').textContent=items.length;
-    document.getElementById('cs-vol').textContent=ve+'%';
+    document.getElementById('cs-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('cs-wgt').textContent=Math.round(totKg);
-    document.getElementById('cs-lay').textContent=layersToRender+' strati';
-    document.getElementById('cdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati renderizzati: <b style="color:var(--text)">${layersToRender}</b> / max ${stk}</div><div>📏 H carico: <b style="color:var(--text)">${tPH}mm</b></div><div>📦 Pallet renderizzati: <b style="color:var(--text)">${items.length}</b> / max ${maxPallets}</div>${cappedNote}`;
+    document.getElementById('cs-lay').textContent=`${maxPerLayer}/lay`;
+    document.getElementById('cdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout pratico usato: <b style="color:var(--text)">${layoutLabel}</b></div><div>📐 Per layer pratico: <b style="color:var(--text)">${maxPerLayer}</b> pallet</div><div>🔢 Stack pratico max: <b style="color:var(--text)">${stk}</b> layer</div><div>📏 H pallet + carico: <b style="color:${tPH>caps.practical.h?'var(--accent2)':'var(--text)'}">${tPH}mm</b></div><div>📏 H utile pratica: <b style="color:var(--text)">${caps.practical.h}mm</b></div><div>📦 Pallet renderizzati: <b style="color:var(--text)">${items.length}</b> / max pratico ${maxPallets}</div><div>📏 Layout utile pratico: <b style="color:var(--text)">${(caps.practical.binL/1000).toFixed(2)}×${(caps.practical.binW/1000).toFixed(3)}m</b></div>${buildCapacityModeHTML('pallet',caps)}${cappedNote}`;
     calcHowManyContainers(maxPallets,pKg,spec);
   }
+
+  const ve=Math.round(usedVol/totalVol*100);
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
-  document.getElementById('cwgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
+  document.getElementById('cwgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div><div>Volume usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>Volume totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div><div style="margin-top:6px;color:var(--muted)">Vista calcolata: <b style="color:var(--text)">pratica reale</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${buildVolumeBarHTML(usedVol,totalVol,ve,'var(--blue)')}${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
   document.querySelectorAll('.csc').forEach(c=>c.classList.add('on'));
   lastC={cL:spec.iL,cW:spec.iW,cH:spec.iH,items:clonePlanItems(items),name:spec.name,mode:cMode};
   buildBoxScene(GRP_C,lastC,0x3b82f6);
-  renderContainerPlan(spec,items,cMode,{layout:'automatico'});
+  renderContainerPlan(spec,items,cMode,{layout:layoutLabel});
   CAM_C.tgt=new THREE.Vector3(spec.iL/2,spec.iH/2,spec.iW/2);
   CAM_C.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_C.upd();
   showAlert('al-c');
@@ -1206,7 +1923,7 @@ function calcTruck(){
   const spec=TRUCKS[selectedTruck];
   const mS=+document.getElementById('tMSide').value,mT=+document.getElementById('tMTop').value;
   const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
-  let items=[],totKg=0,usedVol=0,layers=0;
+  let items=[],totKg=0,usedVol=0,layers=0,totalVol=spec.iL*spec.iW*spec.iH,layoutLabel='automatico';
 
   if(tMode==='boxes'){
     const bL=+document.getElementById('tbL').value,bW=+document.getElementById('tbW').value,bH=+document.getElementById('tbH').value,bKg=+document.getElementById('tbKg').value;
@@ -1215,28 +1932,40 @@ function calcTruck(){
     const fA=ft(false),fB=ft(true);
     const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
     layers=Math.floor(uH/bH);
-    for(let ly=0;ly<layers;ly++){const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});}
+    for(let ly=0;ly<layers;ly++){
+      const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;
+      for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});
+    }
     totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;
-    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
-    document.getElementById('ts-tot').textContent=items.length;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent=layers;
-    document.getElementById('tdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 Vol usato: <b style="color:var(--text)">${Math.round(usedVol/1e9*100)/100}m³</b></div>`;
+    const ve=Math.round(usedVol/totalVol*100);
+    document.getElementById('ts-tot').textContent=items.length;
+    document.getElementById('ts-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
+    document.getElementById('ts-wgt').textContent=Math.round(totKg);
+    document.getElementById('ts-lay').textContent=layers;
+    document.getElementById('tdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 H utile interna: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
     calcHowManyTrucks(items.length,bKg,spec);
   } else {
     const pL=+document.getElementById('tpL').value,pW=+document.getElementById('tpW').value,pT=+document.getElementById('tpT').value,pCH=+document.getElementById('tpCH').value,pKg=+document.getElementById('tpKg').value;
     const stack=document.getElementById('tpStack').checked;
-    const tPH=pT+pCH,stk=stack?Math.floor(uH/tPH):1;
-    function ftp(rot){const pl=rot?pW:pL,pw=rot?pL:pW;return{nx:Math.floor(uL/pl),nz:Math.floor(uW/pw),pl,pw,rot};}
-    const fA=ftp(false),fB=ftp(true),best=fA.nx*fA.nz>=fB.nx*fB.nz?fA:fB;
+    const tPH=pT+pCH;
+    const caps=calcPalletCapacityModes(spec,pL,pW,pT,pCH,stack,mS,mT);
+    const floorLayout=buildVehiclePalletLayout(spec,pL,pW,getPracticalMargins(spec,mS,mT).side);
+    const maxPerLayer=caps.practical.perLayer;
+    const stk=caps.practical.stacks;
+    for(let sl=0;sl<stk;sl++) floorLayout.positions.forEach(pos=>items.push({x:pos.x,y:sl*tPH,z:pos.z,pw:pos.pw,pt:pT,pl:pos.pl,ch:pCH,type:'pallet',rot:pos.rot}));
     layers=stk;
-    for(let sl=0;sl<stk;sl++)for(let ix=0;ix<best.nx;ix++)for(let iz=0;iz<best.nz;iz++)items.push({x:mS+ix*best.pl,y:sl*tPH,z:mS+iz*best.pw,pw:best.pl,pt:pT,pl:best.pw,ch:pCH,type:'pallet'});
-    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;
-    const ve=Math.round(usedVol/(spec.iL*spec.iW*spec.iH)*100);
-    document.getElementById('ts-tot').textContent=items.length;document.getElementById('ts-vol').textContent=ve+'%';document.getElementById('ts-wgt').textContent=Math.round(totKg);document.getElementById('ts-lay').textContent=stk+' strati';
-    document.getElementById('tdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${stk}</b></div>`;
+    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;layoutLabel=caps.practical.layout||'automatico';
+    const ve=Math.round(usedVol/totalVol*100);
+    document.getElementById('ts-tot').textContent=items.length;
+    document.getElementById('ts-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
+    document.getElementById('ts-wgt').textContent=Math.round(totKg);
+    document.getElementById('ts-lay').textContent=`${maxPerLayer}/lay`;
+    document.getElementById('tdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout pratico usato: <b style="color:var(--text)">${layoutLabel}</b></div><div>📐 Per layer pratico: <b style="color:var(--text)">${maxPerLayer}</b> pallet</div><div>🔢 Stack pratico max: <b style="color:var(--text)">${stk}</b> layer</div><div>📏 H pallet + carico: <b style="color:${tPH>caps.practical.h?'var(--accent2)':'var(--text)'}">${tPH}mm</b></div><div>📏 H utile pratica: <b style="color:var(--text)">${caps.practical.h}mm</b></div><div>📏 Layout utile pratico: <b style="color:var(--text)">${(caps.practical.binL/1000).toFixed(2)}×${(caps.practical.binW/1000).toFixed(3)}m</b></div>${buildCapacityModeHTML('pallet',caps)}`;
     calcHowManyTrucks(items.length,pKg,spec);
   }
+  const ve=Math.round(usedVol/totalVol*100);
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
-  document.getElementById('twgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
+  document.getElementById('twgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div><div>Volume usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>Volume totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div><div style="margin-top:6px;color:var(--muted)">Vista calcolata: <b style="color:var(--text)">pratica reale</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${buildVolumeBarHTML(usedVol,totalVol,ve,'var(--teal)')}${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
   document.querySelectorAll('.csc.tc').forEach(c=>c.classList.add('on'));
   lastT={cL:spec.iL,cW:spec.iW,cH:spec.iH,items,name:spec.name};
   buildBoxScene(GRP_T,lastT,0x14b8a6);
@@ -1486,6 +2215,7 @@ function loadTex(input){const f=input.files[0];if(!f)return;document.getElementB
 
 // Reactive visual updates
 ['cTop','cSide','cFront','cPal','cBg','texFace','light','wf','showP','showG'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',()=>{if(lastP){setupLightsP();buildPScene(lastP);}});});
+['bL','bW'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',()=>applyPalletPlanPreset());});
 
 
 
@@ -1626,13 +2356,13 @@ function syncContainerUnitsType(){
 // ══════ CARBURANTI (MIMIT CSV) ══════
 let FUEL_DATA = [];
 let FUEL_LOADED = false;
-let FUEL_SOURCE = ''; // 'live' | 'fallback'
+let FUEL_SOURCE = ''; // 'direct' | 'proxy' | 'fallback'
 
 const FUEL_CSV_URL = 'https://www.mimit.gov.it/images/stories/carburanti/MediaRegionaleStradale.csv';
-// Multiple CORS proxies tried in sequence
+// Prima prova diretta; se il browser blocca per CORS, usa proxy pubblici in fallback.
 const FUEL_PROXIES = [
+  'https://corsproxy.io/?' + encodeURIComponent(FUEL_CSV_URL),
   'https://api.allorigins.win/raw?url=' + encodeURIComponent(FUEL_CSV_URL),
-  'https://corsproxy.io/?url=' + encodeURIComponent(FUEL_CSV_URL),
   'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(FUEL_CSV_URL),
   'https://thingproxy.freeboard.io/fetch/' + FUEL_CSV_URL,
 ];
@@ -1760,53 +2490,6 @@ function renderFuelCards(){
     '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);">Nessuna regione trovata.</div>';
 }
 
-async function fetchViaClaudeAPI(force=false){
-  // Claude fetches the MIMIT page server-side (no CORS issues) and returns
-  // structured JSON with all regions and fuel prices.
-  const SYSTEM = `Sei un estrattore di dati. Ti verrà fornito l'HTML della pagina MIMIT dei prezzi carburanti.
-Estrai TUTTI i dati di prezzi per TUTTE le regioni/province e restituisci SOLO un array JSON valido, niente altro.
-Formato esatto (usa sempre le virgolette doppie, niente commenti):
-[
-  {"name":"Abruzzo","fuels":{"Benzina":{"price":1.768,"er":"SELF"},"Gasolio":{"price":1.942,"er":"SELF"},"GPL":{"price":0.706,"er":"SERVITO"},"Metano":{"price":1.429,"er":"SERVITO"}}},
-  ...
-]
-Regole:
-- Benzina e Gasolio: usa sempre il prezzo SELF SERVICE
-- GPL e Metano: usa sempre il prezzo SERVITO
-- Se un carburante non è disponibile per una regione, ometti quella chiave
-- Non aggiungere testo prima o dopo il JSON
-- Includi tutte le 21 regioni/province: Abruzzo, Basilicata, Calabria, Campania, Emilia Romagna, Friuli Venezia Giulia, Lazio, Liguria, Lombardia, Marche, Molise, Piemonte, Puglia, Sardegna, Sicilia, Toscana, Umbria, Valle d'Aosta, Veneto, Bolzano, Trento`;
-
-  const USER = `Vai su https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni usando il web_search tool o web fetch, poi estrai tutti i prezzi medi carburanti per regione e restituisci il JSON come da istruzioni.`;
-
-  const body = {
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4000,
-    system: SYSTEM,
-    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-    messages: [{ role: 'user', content: USER }]
-  };
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-
-  if(!res.ok) throw new Error('API error ' + res.status);
-  const data = await res.json();
-
-  // Extract text from response
-  const textBlock = data.content?.find(b => b.type === 'text');
-  if(!textBlock?.text) throw new Error('No text in response');
-
-  // Parse JSON — strip any markdown fences just in case
-  const clean = textBlock.text.replace(/```json|```/gi,'').trim();
-  const parsed = JSON.parse(clean);
-  if(!Array.isArray(parsed) || parsed.length < 10) throw new Error('Dati incompleti');
-  return parsed;
-}
-
 async function loadFuelData(force=false){
   if(FUEL_LOADED && !force) return;
   const btn = document.getElementById('fuelRefreshBtn');
@@ -1814,22 +2497,28 @@ async function loadFuelData(force=false){
   const lbl = document.getElementById('fuelUpdateLabel');
   if(btn) btn.disabled = true;
   dot.style.background='#f0a500'; dot.style.animation='blink 2s infinite';
-  lbl.textContent = '⏳ Sto leggendo il sito MIMIT…';
+  lbl.textContent = '⏳ Sto leggendo il CSV MIMIT…';
   document.getElementById('fuelGrid').innerHTML =
-    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Sto recuperando i prezzi in tempo reale dal sito MIMIT…<br><span style="font-size:.72rem;margin-top:8px;display:block;">Questo può richiedere 10–20 secondi</span></div>';
+    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Sto recuperando i prezzi dal CSV ufficiale MIMIT…</div>';
 
   let parsed = null;
 
-  // 1️⃣ Try via API (reads the live MIMIT page server-side)
+  // 1) prova diretta del CSV ufficiale
   try {
-    lbl.textContent = '⏳ Sto leggendo il sito MIMIT…';
-    parsed = await fetchViaClaudeAPI(force);
-    FUEL_SOURCE = 'claude';
+    const ctrl = new AbortController();
+    const tid = setTimeout(()=>ctrl.abort(), 8000);
+    const res = await fetch(FUEL_CSV_URL, {cache: force?'no-cache':'force-cache', signal:ctrl.signal});
+    clearTimeout(tid);
+    if(res.ok){
+      const text = await res.text();
+      const candidate = parseFuelCSV(text);
+      if(candidate){ parsed = candidate; FUEL_SOURCE = 'direct'; }
+    }
   } catch(e) {
-    console.warn('API fetch failed:', e.message);
+    console.warn('Direct MIMIT CSV fetch failed:', e?.message || e);
   }
 
-  // 2️⃣ Try direct CSV proxies as secondary fallback
+  // 2) proxy di fallback
   if(!parsed){
     for(const url of FUEL_PROXIES){
       lbl.textContent = '⏳ Sto recuperando i dati…';
@@ -1843,11 +2532,11 @@ async function loadFuelData(force=false){
           const candidate = parseFuelCSV(text);
           if(candidate){ parsed = candidate; FUEL_SOURCE='proxy'; break; }
         }
-      }catch(e){ /* try next */ }
+      }catch(e){ /* prova il successivo */ }
     }
   }
 
-  // 3️⃣ Static fallback
+  // 3) fallback statico se tutto fallisce
   if(!parsed){
     parsed = FUEL_FALLBACK;
     FUEL_SOURCE = 'fallback';
@@ -1858,21 +2547,21 @@ async function loadFuelData(force=false){
   const now = new Date();
   const timeStr = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 
-  if(FUEL_SOURCE === 'claude'){
+  if(FUEL_SOURCE === 'direct'){
     dot.style.background = '#22c55e'; dot.style.animation = 'blink 2s infinite';
-    lbl.textContent = `✓ Live · ${timeStr} · MIMIT`;
+    lbl.textContent = `✓ Live diretto · ${timeStr} · MIMIT`;
     document.getElementById('fuelNote').textContent =
-      'Dati estratti in tempo reale dal sito ufficiale MIMIT. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale. Aggiornamento quotidiano dalle 08:30.';
+      'Dati letti direttamente dal CSV ufficiale MediaRegionaleStradale.csv del MIMIT. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.';
   } else if(FUEL_SOURCE === 'proxy'){
     dot.style.background = '#22c55e'; dot.style.animation = 'blink 2s infinite';
-    lbl.textContent = `✓ Live via CSV · ${timeStr} · MIMIT`;
-    document.getElementById('fuelNote').textContent =
-      'Dati ufficiali MIMIT (CSV MediaRegionaleStradale). Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.';
+    lbl.textContent = `✓ Live via proxy · ${timeStr} · MIMIT`;
+    document.getElementById('fuelNote').innerHTML =
+      'Dati ufficiali MIMIT letti dal CSV MediaRegionaleStradale.csv tramite proxy CORS. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.';
   } else {
     dot.style.background = '#f0a500'; dot.style.animation = 'blink 2s infinite';
     lbl.textContent = `⚠ Dati di riserva (${FUEL_FALLBACK_DATE})`;
     document.getElementById('fuelNote').innerHTML =
-      `Impossibile raggiungere MIMIT. Dati di riserva del <b>${FUEL_FALLBACK_DATE}</b>. 
+      `Impossibile raggiungere il CSV MIMIT dal browser. Dati di riserva del <b>${FUEL_FALLBACK_DATE}</b>. 
        Riprova con 🔄 Aggiorna oppure <a href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni" target="_blank" style="color:#e11d48;">vai al sito MIMIT →</a>`;
   }
 
@@ -1885,6 +2574,7 @@ async function initFuel(){
 }
 
 // Init
+toggleOvhField();
 calcPallet();
 syncContainerUnitsType();
 routeDefaultDates();
