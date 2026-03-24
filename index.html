@@ -887,9 +887,7 @@ function calcPallet(){
   const doRot=+document.getElementById('lrot').value===1;
 
   const areaL=pL+oh*2, areaW=pW+oh*2;
-  const layA=buildBestBoxLayer(areaL,areaW,bL,bW,false,oh);
-  const layB=buildBestBoxLayer(areaL,areaW,bL,bW,true,oh);
-  const best=layA.count>=layB.count?layA:layB;
+  const best=buildBestBoxLayer(areaL,areaW,bL,bW,false,oh);
   const autoLayerItems=buildPalletAutoItems(best.positions,bL,bW,oh);
   const spec={baseL:pL,baseW:pW,areaL,areaW,overhang:oh,pT,maxH,maxKg,bH,bKg,requestedLayers:nL,alternate:doRot};
   const sameSpec=palletPlanState.spec && palletPlanState.spec.baseL===pL && palletPlanState.spec.baseW===pW && palletPlanState.spec.overhang===oh;
@@ -1362,9 +1360,13 @@ function formatM3(mm3){
 }
 
 function buildBestBoxLayer(areaL,areaW,bL,bW,seedRot=false,overhang=0){
-  const packed=packRectanglesMaxRects(areaL,areaW,seedRot?bW:bL,seedRot?bL:bW,true,2000)
-    .sort((a,b)=>a.y-b.y||a.x-b.x);
-  const positions=packed.map(r=>({x:r.x,z:r.y,rot:seedRot?!r.rot:r.rot}));
+  // Try both orientations and pick the one with more boxes; prefer non-rotated on tie
+  const packA=packRectanglesMaxRects(areaL,areaW,bL,bW,true,2000).sort((a,b)=>a.y-b.y||a.x-b.x);
+  const packB=bL!==bW ? packRectanglesMaxRects(areaL,areaW,bW,bL,true,2000).sort((a,b)=>a.y-b.y||a.x-b.x) : [];
+  // packB seeds with rotated orientation; flip rot flags to keep consistent meaning (rot=true means 90° from original)
+  const packBNorm=packB.map(r=>({...r,rot:!r.rot}));
+  const packed=packBNorm.length>0 && packBNorm.length>packA.length ? packBNorm : packA;
+  const positions=packed.map(r=>({x:r.x,z:r.y,rot:r.rot}));
   const layoutCounts={base:0,rot:0};
   positions.forEach(p=>layoutCounts[p.rot?'rot':'base']++);
   const layoutParts=[];
@@ -1459,15 +1461,27 @@ function pruneFreeRects(rects){
 function packRectanglesMaxRects(binW,binH,rectL,rectW,allowRotate=true,maxItems=500){
   let free=[{x:0,y:0,w:binW,h:binH}];
   const placed=[];
+  // Prefer NOT rotating unless it clearly helps (same dimensions = no rotation needed)
+  const sameSize=(rectL===rectW);
   for(let step=0;step<maxItems;step++){
     let best=null;
     free.forEach((fr,idx)=>{
-      [{w:rectL,h:rectW,rot:false},{w:rectW,h:rectL,rot:true}].forEach(opt=>{
-        if((opt.rot && !allowRotate) || opt.w>fr.w || opt.h>fr.h) return;
+      // Try both orientations; if sameSize only try one
+      const opts=[{w:rectL,h:rectW,rot:false}];
+      if(allowRotate && !sameSize) opts.push({w:rectW,h:rectL,rot:true});
+      opts.forEach(opt=>{
+        if(opt.w>fr.w || opt.h>fr.h) return;
         const shortSide=Math.min(fr.w-opt.w, fr.h-opt.h);
         const longSide=Math.max(fr.w-opt.w, fr.h-opt.h);
-        const score=[shortSide,longSide,fr.y,fr.x];
-        if(!best || score.join('|')<best.score.join('|')) best={score,idx,x:fr.x,y:fr.y,w:opt.w,h:opt.h,rot:opt.rot};
+        // Numeric comparison: prefer smallest short-side leftover, then long-side, then top-left
+        const better=!best
+          || shortSide < best.shortSide
+          || (shortSide===best.shortSide && longSide < best.longSide)
+          || (shortSide===best.shortSide && longSide===best.longSide && fr.y < best.fy)
+          || (shortSide===best.shortSide && longSide===best.longSide && fr.y===best.fy && fr.x < best.fx)
+          // Prefer non-rotated when scores are equal
+          || (shortSide===best.shortSide && longSide===best.longSide && fr.y===best.fy && fr.x===best.fx && !opt.rot && best.rot);
+        if(better) best={shortSide,longSide,fy:fr.y,fx:fr.x,rot:opt.rot,idx,x:fr.x,y:fr.y,w:opt.w,h:opt.h};
       });
     });
     if(!best) break;
