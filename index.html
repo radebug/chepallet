@@ -432,6 +432,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         </div>
 
         <button class="bc bb" onclick="calcContainer()">▶ CALCOLA CONTAINER 3D</button>
+        <button class="bc bb" style="margin-top:6px;background:transparent;border:1px solid var(--blue);color:var(--blue);" onclick="balanceContainer()">⚖️ BILANCIA CARICO</button>
         <div class="alert" id="al-c">✓ Calcolo container completato!</div>
       </div>
     </div>
@@ -474,6 +475,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <button class="be bb" id="btnEditPlan" onclick="toggleContainerPlanEdit()">✏️ Modifica layout</button>
           <button class="be bb" onclick="rotateSelectedPlanItem()">🔄 Ruota pallet</button>
           <button class="be bb" onclick="resetContainerPlan()">↺ Reset layout</button>
+          <button class="be bb" onclick="balanceContainer()">⚖️ Bilancia</button>
           <button class="be bb" onclick="addContainerPlan()">➕ Aggiungi container</button>
           <button class="be bb" onclick="removeActiveContainerPlan()">➖ Rimuovi container</button>
         </div>
@@ -561,6 +563,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         </div>
 
         <button class="bc bt" onclick="calcTruck()">▶ CALCOLA TRUCK 3D</button>
+        <button class="bc bt" style="margin-top:6px;background:transparent;border:1px solid var(--teal);color:var(--teal);" onclick="balanceTruck()">⚖️ BILANCIA CARICO</button>
         <div class="alert" id="al-t">✓ Calcolo truck completato!</div>
       </div>
     </div>
@@ -1559,22 +1562,27 @@ function calcContainer(){
 
   if(cMode==='boxes'){
     const bL=+document.getElementById('cbL').value,bW=+document.getElementById('cbW').value,bH=+document.getElementById('cbH').value,bKg=+document.getElementById('cbKg').value;
-    const doRot=document.getElementById('cbRot').checked,doOpt=document.getElementById('cbOpt').checked;
-    function ft(rot){const bx=rot?bW:bL,bz=rot?bL:bW;return{nx:Math.floor(uL/bx),nz:Math.floor(uW/bz),bx,bz,rot};}
-    const fA=ft(false),fB=ft(true);
-    const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
+    const doRot=document.getElementById('cbOpt').checked;
     layers=Math.floor(uH/bH);
+    // Use MaxRects for optimal floor layout
+    const floorPacked=packRectanglesMaxRects(uL,uW,bL,bW,doRot,2000);
+    layoutLabel=`MaxRects · ${floorPacked.length} per strato`;
     for(let ly=0;ly<layers;ly++){
-      const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;
-      for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});
+      // Alternate rotation every layer if doRot
+      const useAlt=doRot&&(ly%2===1);
+      const layerPacked=useAlt?packRectanglesMaxRects(uL,uW,bW,bL,true,2000).map(r=>({...r,rot:!r.rot})):floorPacked;
+      layerPacked.forEach(r=>{
+        items.push({x:mS+r.x,y:ly*bH,z:mS+r.y,w:r.rot?bW:bL,h:bH,l:r.rot?bL:bW,type:'box'});
+      });
     }
+    const perFloor=floorPacked.length;
     totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;
     const ve=Math.round(usedVol/totalVol*100);
     document.getElementById('cs-tot').textContent=items.length;
     document.getElementById('cs-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('cs-wgt').textContent=Math.round(totKg);
     document.getElementById('cs-lay').textContent=layers;
-    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 H utile interna: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
+    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout: <b style="color:var(--text)">MaxRects ottimizzato</b></div><div>📐 Per strato: <b style="color:var(--text)">${perFloor}</b> scatole</div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 H utile interna: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
     const perCont=items.length;
     calcHowManyContainers(perCont,bKg,spec);
   } else {
@@ -1931,7 +1939,70 @@ function syncPlanTo3D(){
   }
 }
 
-// ══════ TRUCK CALC ══════
+// ══════ BALANCE / CENTER LOAD ══════
+function balanceItems(items, binL, binW, marginL=0, marginW=0){
+  if(!items||!items.length) return items;
+  // Compute bounding box of all items
+  let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;
+  items.forEach(it=>{
+    const iL=it.type==='pallet'?it.pw:(it.w||0);
+    const iW=it.type==='pallet'?it.pl:(it.l||0);
+    minX=Math.min(minX,it.x); maxX=Math.max(maxX,it.x+iL);
+    minZ=Math.min(minZ,it.z); maxZ=Math.max(maxZ,it.z+iW);
+  });
+  const loadCX=(minX+maxX)/2;
+  const loadCZ=(minZ+maxZ)/2;
+  const targetCX=binL/2;
+  const targetCZ=binW/2;
+  const dx=targetCX-loadCX;
+  const dz=targetCZ-loadCZ;
+  return items.map(it=>{
+    const iL=it.type==='pallet'?it.pw:(it.w||0);
+    const iW=it.type==='pallet'?it.pl:(it.l||0);
+    const nx=Math.max(marginL, Math.min(binL-marginL-iL, it.x+dx));
+    const nz=Math.max(marginW, Math.min(binW-marginW-iW, it.z+dz));
+    return {...it, x:nx, z:nz};
+  });
+}
+
+function balanceContainer(){
+  if(!lastC||!containerPlanState.spec){ alert('Esegui prima un calcolo container.'); return; }
+  const spec=containerPlanState.spec;
+  const mS=+document.getElementById('cMSide').value||0;
+  // Balance all containers
+  containerPlanState.containers=containerPlanState.containers.map(cont=>{
+    const balanced=balanceItems(cont.items, spec.iL, spec.iW, mS, mS);
+    return {...cont, items:balanced, originalItems:balanced, layout:'bilanciato'};
+  });
+  const active=getActiveContainerPlan();
+  containerPlanState.items=clonePlanItems(active.items);
+  renderContainerPlan(spec, containerPlanState.items, containerPlanState.mode, {layout:'bilanciato', preserveContainers:true, originalItems:containerPlanState.items});
+  syncPlanTo3D();
+  buildBoxScene(GRP_C,lastC,0x3b82f6);
+  // Also balance 3D items across all Y layers
+  lastC.items=balanceItems3D(lastC.items, spec.iL, spec.iW, mS);
+  buildBoxScene(GRP_C,lastC,0x3b82f6);
+}
+
+function balanceTruck(){
+  if(!lastT){ alert('Esegui prima un calcolo truck.'); return; }
+  const spec=TRUCKS[selectedTruck];
+  const mS=+document.getElementById('tMSide').value||0;
+  lastT.items=balanceItems3D(lastT.items, spec.iL, spec.iW, mS);
+  buildBoxScene(GRP_T,lastT,0x14b8a6);
+}
+
+function balanceItems3D(items, binL, binW, margin=0){
+  if(!items||!items.length) return items;
+  // Group by Y layer, balance each layer independently
+  const layers={};
+  items.forEach(it=>{ const k=it.y||0; if(!layers[k]) layers[k]=[]; layers[k].push(it); });
+  const result=[];
+  Object.values(layers).forEach(layerItems=>{
+    result.push(...balanceItems(layerItems, binL, binW, margin, margin));
+  });
+  return result;
+}
 let lastT=null;
 function calcTruck(){
   const spec=TRUCKS[selectedTruck];
@@ -1941,22 +2012,25 @@ function calcTruck(){
 
   if(tMode==='boxes'){
     const bL=+document.getElementById('tbL').value,bW=+document.getElementById('tbW').value,bH=+document.getElementById('tbH').value,bKg=+document.getElementById('tbKg').value;
-    const doRot=document.getElementById('tbRot').checked,doOpt=document.getElementById('tbOpt').checked;
-    function ft(rot){const bx=rot?bW:bL,bz=rot?bL:bW;return{nx:Math.floor(uL/bx),nz:Math.floor(uW/bz),bx,bz,rot};}
-    const fA=ft(false),fB=ft(true);
-    const best=doOpt&&(fA.nx*fA.nz<fB.nx*fB.nz)?fB:fA;
+    const doRot=document.getElementById('tbOpt').checked;
     layers=Math.floor(uH/bH);
+    const floorPacked=packRectanglesMaxRects(uL,uW,bL,bW,doRot,2000);
+    layoutLabel=`MaxRects · ${floorPacked.length} per strato`;
     for(let ly=0;ly<layers;ly++){
-      const f=doRot&&(ly%2===1)?(best.rot?ft(false):ft(true)):best;
-      for(let ix=0;ix<f.nx;ix++)for(let iz=0;iz<f.nz;iz++)items.push({x:mS+ix*f.bx,y:ly*bH,z:mS+iz*f.bz,w:f.rot?bW:bL,h:bH,l:f.rot?bL:bW,type:'box'});
+      const useAlt=doRot&&(ly%2===1);
+      const layerPacked=useAlt?packRectanglesMaxRects(uL,uW,bW,bL,true,2000).map(r=>({...r,rot:!r.rot})):floorPacked;
+      layerPacked.forEach(r=>{
+        items.push({x:mS+r.x,y:ly*bH,z:mS+r.y,w:r.rot?bW:bL,h:bH,l:r.rot?bL:bW,type:'box'});
+      });
     }
+    const perFloor=floorPacked.length;
     totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;
     const ve=Math.round(usedVol/totalVol*100);
     document.getElementById('ts-tot').textContent=items.length;
     document.getElementById('ts-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('ts-wgt').textContent=Math.round(totKg);
     document.getElementById('ts-lay').textContent=layers;
-    document.getElementById('tdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>📐 Per fila: <b style="color:var(--text)">${best.nx}×${best.nz}</b></div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 H utile interna: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
+    document.getElementById('tdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout: <b style="color:var(--text)">MaxRects ottimizzato</b></div><div>📐 Per strato: <b style="color:var(--text)">${perFloor}</b> scatole</div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 H utile interna: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
     calcHowManyTrucks(items.length,bKg,spec);
   } else {
     const pL=+document.getElementById('tpL').value,pW=+document.getElementById('tpW').value,pT=+document.getElementById('tpT').value,pCH=+document.getElementById('tpCH').value,pKg=+document.getElementById('tpKg').value;
