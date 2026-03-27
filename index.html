@@ -161,6 +161,13 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .hn{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;color:var(--blue);}
 .hn.t{color:var(--teal);}
 ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* MULTI-BOX TYPE */
+.mbt-row{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:7px;padding:6px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;font-size:.72rem;color:var(--muted);}
+.mbt-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.mbt-label{display:flex;flex-direction:column;gap:1px;overflow:hidden;}
+.mbt-remove{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:2px 4px;border-radius:4px;transition:color .15s;}
+.mbt-remove:hover{color:var(--accent2);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .sc,.csc{animation:fadeUp 0.35s ease both;}
 
@@ -275,6 +282,25 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <div class="tr"><span>Mostra pallet base</span><label class="tg"><input type="checkbox" id="showP" checked><span class="ts"></span></label></div>
           <div class="tr"><span>Mostra griglia</span><label class="tg"><input type="checkbox" id="showG" checked><span class="ts"></span></label></div>
           <div class="tr"><span>Vista wireframe</span><label class="tg"><input type="checkbox" id="wf"><span class="ts"></span></label></div>
+
+          <!-- MULTI-TIPO SCATOLE -->
+          <div class="tr" style="margin-top:10px;">
+            <span style="display:flex;flex-direction:column;gap:2px;"><b style="font-size:.72rem;color:var(--text);">Modalità multi-tipo scatole</b><span style="font-size:.64rem;color:var(--muted);">Mescola tipi diversi sullo stesso pallet</span></span>
+            <label class="tg"><input type="checkbox" id="multiBoxFlag" onchange="toggleMultiBox()"><span class="ts"></span></label>
+          </div>
+          <div id="multiBoxSection" style="display:none;margin-top:12px;">
+            <div class="sl" style="margin-top:0;">Tipi di scatola</div>
+            <div id="multiBoxList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:5px;align-items:end;margin-bottom:6px;" id="multiBoxAddRow">
+              <div class="fg"><label>L (mm)</label><input type="number" id="mbAddL" value="400" min="1" style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:.75rem;outline:none;width:100%;"></div>
+              <div class="fg"><label>W (mm)</label><input type="number" id="mbAddW" value="300" min="1" style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:.75rem;outline:none;width:100%;"></div>
+              <div class="fg"><label>H (mm)</label><input type="number" id="mbAddH" value="250" min="1" style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:.75rem;outline:none;width:100%;"></div>
+              <div class="fg"><label>N pezzi</label><input type="number" id="mbAddN" value="100" min="1" style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:.75rem;outline:none;width:100%;"></div>
+              <button class="be" style="height:34px;white-space:nowrap;" onclick="addMultiBoxType()">＋</button>
+            </div>
+            <button class="bc" style="margin-top:4px;font-size:.78rem;padding:9px;" onclick="calcPalletMulti()">▶ CALCOLA MULTI-TIPO 3D</button>
+            <div id="multiBoxResult" style="display:none;margin-top:8px;font-size:0.74rem;line-height:1.9;color:var(--muted);background:rgba(240,165,0,0.05);border:1px solid rgba(240,165,0,0.2);border-radius:8px;padding:10px;"></div>
+          </div>
         </div>
         <!-- PALLET -->
         <div id="tab-pallet" style="display:none;">
@@ -293,6 +319,19 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <div class="tr"><span style="display:flex;flex-direction:column;gap:2px;"><b style="font-size:.72rem;color:var(--text);">Abilita overhang</b><span style="font-size:.64rem;color:var(--muted);">Le scatole possono sporgere oltre il bordo pallet</span></span><label class="tg"><input type="checkbox" id="ovhFlag" onchange="toggleOvhField()"><span class="ts"></span></label></div>
           <div id="ovhRow" style="display:none;margin-top:6px;" class="fr"><div class="fg"><label>Overhang per lato (mm)</label><div class="iu"><input type="number" id="ovh" value="50" min="1" max="300"><span>mm</span></div></div></div>
           <input type="hidden" id="ovhHidden" value="0">
+
+          <!-- HOW MANY PALLETS -->
+          <div class="hmb" style="background:rgba(240,165,0,0.05);border-color:rgba(240,165,0,0.2);margin-top:14px;">
+            <div class="sl" style="margin-top:0;">Quanti pallet servono?</div>
+            <div class="fr">
+              <div class="fg"><label>Numero scatole da spedire</label><input type="number" id="pNBoxes" value="500" min="1" oninput="calcHowManyPallets()"></div>
+              <div class="fg"><label>Scatole per strato (auto)</label><input type="number" id="pNPerLayer" value="" placeholder="auto" min="1" oninput="calcHowManyPallets()"></div>
+            </div>
+            <div id="pNResult" style="display:none;margin-top:8px;font-size:0.76rem;line-height:1.9;">
+              <div class="hn" id="pNVal">—</div>
+              <div style="color:var(--muted);" id="pNDesc">—</div>
+            </div>
+          </div>
         </div>
         <!-- VISUAL -->
         <div id="tab-visual" style="display:none;">
@@ -829,8 +868,8 @@ function buildPalletAutoItems(positions,bL,bW,overhang){
   return positions.map((pos,idx)=>({
     x:pos.x,
     z:pos.z,
-    w:pos.rot?bW:bL,
-    l:pos.rot?bL:bW,
+    w:pos.w??(pos.rot?bW:bL),
+    l:pos.l??(pos.rot?bL:bW),
     rot:!!pos.rot,
     manual:false,
     id:`auto-${idx}`
@@ -841,6 +880,189 @@ function summarizePalletPlanMix(items){
   const uniq=[...new Set(items.map(it=>`${Math.round(it.w)}×${Math.round(it.l)}`))];
   if(!uniq.length) return '—';
   return uniq.slice(0,4).join(', ')+(uniq.length>4?'…':'');
+}
+
+// ══════ MULTI-BOX TYPES ══════
+const MULTI_BOX_COLORS=['#f0a500','#3b82f6','#22c55e','#e05c2a','#a855f7','#14b8a6','#f43f5e','#facc15','#64748b','#ec4899'];
+let multiBoxTypes=[];
+
+function toggleMultiBox(){
+  const on=document.getElementById('multiBoxFlag').checked;
+  document.getElementById('multiBoxSection').style.display=on?'block':'none';
+  if(on && multiBoxTypes.length===0) _initMultiBoxFromCurrent();
+}
+
+function _initMultiBoxFromCurrent(){
+  const bL=+document.getElementById('bL').value||400;
+  const bW=+document.getElementById('bW').value||300;
+  const bH=+document.getElementById('bH').value||250;
+  multiBoxTypes=[{l:bL,w:bW,h:bH,n:100,kg:+document.getElementById('bKg').value||1}];
+  renderMultiBoxList();
+}
+
+function addMultiBoxType(){
+  const l=+document.getElementById('mbAddL').value||400;
+  const w=+document.getElementById('mbAddW').value||300;
+  const h=+document.getElementById('mbAddH').value||250;
+  const n=+document.getElementById('mbAddN').value||100;
+  if(l<1||w<1||h<1||n<1){alert('Inserisci dimensioni valide.');return;}
+  if(multiBoxTypes.length>=10){alert('Massimo 10 tipi di scatola.');return;}
+  multiBoxTypes.push({l,w,h,n,kg:0});
+  renderMultiBoxList();
+}
+
+function removeMultiBoxType(idx){
+  multiBoxTypes.splice(idx,1);
+  renderMultiBoxList();
+}
+
+function updateMultiBoxN(idx,val){
+  multiBoxTypes[idx].n=Math.max(1,+val||1);
+}
+
+function renderMultiBoxList(){
+  const el=document.getElementById('multiBoxList');
+  if(!el) return;
+  if(!multiBoxTypes.length){el.innerHTML='<div style="font-size:.68rem;color:var(--muted);padding:4px 0;">Nessun tipo aggiunto.</div>';return;}
+  el.innerHTML=multiBoxTypes.map((t,i)=>{
+    const c=MULTI_BOX_COLORS[i%MULTI_BOX_COLORS.length];
+    return `<div class="mbt-row">
+      <div class="mbt-swatch" style="background:${c};"></div>
+      <div class="mbt-label">
+        <span style="color:var(--text);font-weight:500;">${t.l}×${t.w}×${t.h} mm</span>
+        <span style="display:flex;align-items:center;gap:5px;">N: <input type="number" value="${t.n}" min="1" style="width:60px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.72rem;outline:none;" oninput="updateMultiBoxN(${i},this.value)"> pezzi</span>
+      </div>
+      <button class="mbt-remove" onclick="removeMultiBoxType(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function calcPalletMulti(){
+  if(!multiBoxTypes.length){alert('Aggiungi almeno un tipo di scatola.');return;}
+  const pL=+document.getElementById('pL').value||1200;
+  const pW=+document.getElementById('pW').value||800;
+  const pT=+document.getElementById('pT').value||144;
+  const maxH=+document.getElementById('maxH').value||1800;
+  const nL=+document.getElementById('layers').value||4;
+  const oh=document.getElementById('ovhFlag')?.checked?(+document.getElementById('ovh').value||0):0;
+  const areaL=pL+oh*2, areaW=pW+oh*2;
+  const wf=document.getElementById('wf').checked;
+  const showBase=document.getElementById('showP').checked;
+
+  // Determine single layer height = max box height among types (simplest: keep same H per layer)
+  // For multi-type, we use the first type's H as layer height or max
+  const layerH=Math.max(...multiBoxTypes.map(t=>t.h));
+  const maxLayers=Math.min(nL, Math.max(1, Math.floor((maxH-pT)/Math.max(1,layerH))));
+
+  // Build placement: pack all requested boxes layer by layer using MaxRects with multiple rect types
+  // Strategy: per layer, pack greedily largest-first
+  const allItems=[];       // {x,z,w,l,typeIdx,layer}
+  const remaining=multiBoxTypes.map(t=>t.n);
+  let totalPlaced=0;
+  let totalWeight=0;
+
+  for(let ly=0; ly<maxLayers; ly++){
+    let freeRects=[{x:0,y:0,w:areaL,h:areaW}];
+    let layerPlaced=0;
+    // Sort types by area desc for better packing
+    const typeOrder=[...multiBoxTypes.keys()].sort((a,b)=>multiBoxTypes[b].l*multiBoxTypes[b].w - multiBoxTypes[a].l*multiBoxTypes[a].w);
+    let anyPlaced=true;
+    while(anyPlaced){
+      anyPlaced=false;
+      for(const ti of typeOrder){
+        if(remaining[ti]<=0) continue;
+        const t=multiBoxTypes[ti];
+        // Try to place one box of this type using best-short-side heuristic
+        let best=null;
+        freeRects.forEach((fr,idx)=>{
+          const opts=[{w:t.l,h:t.w,rot:false}];
+          if(t.l!==t.w) opts.push({w:t.w,h:t.l,rot:true});
+          opts.forEach(opt=>{
+            if(opt.w>fr.w+0.1||opt.h>fr.h+0.1) return;
+            const ss=Math.min(fr.w-opt.w,fr.h-opt.h);
+            const ls=Math.max(fr.w-opt.w,fr.h-opt.h);
+            const better=!best||ss<best.ss||(ss===best.ss&&ls<best.ls)||(ss===best.ss&&ls===best.ls&&fr.y<best.fy)||(ss===best.ss&&ls===best.ls&&fr.y===best.fy&&!opt.rot&&best.rot);
+            if(better) best={ss,ls,fy:fr.y,idx,x:fr.x,y:fr.y,w:opt.w,h:opt.h,rot:opt.rot,ti};
+          });
+        });
+        if(!best) continue;
+        const used={x:best.x,y:best.y,w:best.w,h:best.h};
+        allItems.push({x:best.x,z:best.y,w:best.w,l:best.h,layer:ly,typeIdx:ti,rot:best.rot});
+        remaining[ti]--;
+        totalPlaced++;
+        totalWeight+=multiBoxTypes[ti].kg||0;
+        // Split free rects
+        const next=[];
+        freeRects.forEach(fr=>{
+          const ints=!(used.x+used.w<=fr.x||fr.x+fr.w<=used.x||used.y+used.h<=fr.y||fr.y+fr.h<=used.y);
+          if(!ints){next.push(fr);return;}
+          const split=splitFreeRect(fr,used);
+          next.push(...split);
+        });
+        freeRects=pruneFreeRects(next);
+        layerPlaced++;
+        anyPlaced=true;
+      }
+    }
+    if(layerPlaced===0) break; // no more items fit
+  }
+
+  // Check if all were placed
+  const notPlaced=remaining.reduce((s,r)=>s+Math.max(0,r),0);
+  const totalRequested=multiBoxTypes.reduce((s,t)=>s+t.n,0);
+
+  // Summary
+  const byType=multiBoxTypes.map((t,i)=>({...t,placed:t.n-Math.max(0,remaining[i]),color:MULTI_BOX_COLORS[i%MULTI_BOX_COLORS.length]}));
+  const summaryHTML=byType.map(t=>`<div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:2px;background:${t.color};flex-shrink:0;"></div><span style="color:var(--text);">${t.l}×${t.w}×${t.h}</span>: <b style="color:var(--text);">${t.placed}</b>/${t.n} piazzati</div>`).join('');
+  const resultEl=document.getElementById('multiBoxResult');
+  resultEl.style.display='block';
+  resultEl.innerHTML=`<div style="font-size:.78rem;font-weight:700;color:var(--accent);margin-bottom:6px;">📦 ${totalPlaced} / ${totalRequested} scatole piazzate${notPlaced>0?` · <span style="color:var(--accent2)">⚠ ${notPlaced} non entrano</span>`:' ✓'}</div>${summaryHTML}<div style="margin-top:6px;color:var(--muted);">Strati: ${maxLayers} · H layer: ${layerH}mm · H tot: ${pT+maxLayers*layerH}mm</div>`;
+
+  // Update KPI cards
+  document.getElementById('sp-tot').textContent=totalPlaced;
+  document.getElementById('sp-lay').textContent=byType.length+' tipi';
+  document.getElementById('sp-wgt').textContent=Math.round(totalWeight*10)/10||'—';
+  document.getElementById('sp-eff').textContent=Math.round(allItems.reduce((s,it)=>s+it.w*it.l,0)/(areaL*areaW)*100)+'%';
+  document.querySelectorAll('.sc').forEach(c=>c.classList.add('on'));
+
+  // Build 3D scene
+  buildPSceneMulti({pL,pW,areaL,areaW,pT,layers:maxLayers,items:allItems,wf,showBase,overhang:oh});
+  showAlert('al-p');
+}
+
+function buildPSceneMulti(res){
+  clr(GRP_P);
+  const{pL,pW,areaL=pL,areaW=pW,pT,items,wf,showBase,overhang=0}=res;
+  const cp=document.getElementById('cPal').value,cb=document.getElementById('cBg').value;
+  RP.r.setClearColor(h2t(cb),1);SP.g.visible=document.getElementById('showG').checked;
+  if(showBase){
+    const pm=new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.8});
+    const baseMesh=new THREE.Mesh(new THREE.BoxGeometry(areaL,pT,areaW),pm);
+    baseMesh.position.set(0,pT/2,0);baseMesh.receiveShadow=true;GRP_P.add(baseMesh);
+    if(overhang>0){
+      const fpGeo=new THREE.BoxGeometry(pL,6,pW);
+      const fpEdge=new THREE.LineSegments(new THREE.EdgesGeometry(fpGeo),new THREE.LineBasicMaterial({color:0x475569,transparent:true,opacity:0.9}));
+      fpEdge.position.set(0,pT+4,0);GRP_P.add(fpEdge);
+    }else{
+      for(let i=0;i<3;i++){const bg=new THREE.BoxGeometry(areaL,pT*0.38,areaW*0.17);const bm=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.9}));bm.position.set(0,pT*0.69,(i-1)*areaW*0.34);GRP_P.add(bm);}
+    }
+  }
+  items.forEach(it=>{
+    const c=MULTI_BOX_COLORS[it.typeIdx%MULTI_BOX_COLORS.length];
+    const layerH=multiBoxTypes[it.typeIdx]?.h||+document.getElementById('bH').value||250;
+    const geo=new THREE.BoxGeometry(it.w,layerH,it.l);
+    const mat=new THREE.MeshStandardMaterial({color:h2t(c),roughness:0.55,metalness:0.08});
+    if(wf) mat.wireframe=true;
+    const mesh=new THREE.Mesh(geo,mat);
+    const px=it.x+it.w/2-areaL/2, py=pT+it.layer*layerH+layerH/2, pz=it.z+it.l/2-areaW/2;
+    mesh.position.set(px,py,pz);mesh.castShadow=true;GRP_P.add(mesh);
+    addEdges(GRP_P,geo,mesh.position);
+  });
+  const maxLayerH=multiBoxTypes.length?Math.max(...multiBoxTypes.map(t=>t.h)):250;
+  const maxLayer=items.length?Math.max(...items.map(it=>it.layer))+1:1;
+  const midY=pT+maxLayer*maxLayerH/2;
+  CAM_P.tgt=new THREE.Vector3(0,midY,0);
+  CAM_P.r=Math.max(2000,(areaL+areaW+maxLayer*maxLayerH)*1.6);CAM_P.upd();
 }
 
 function toggleOvhField(){
@@ -947,6 +1169,7 @@ function updatePalletPlanResults(){
   lastP={pL:spec.baseL,pW:spec.baseW,areaL:spec.areaL,areaW:spec.areaW,pT,layers:actL,positions:all,wf,showBase,overhang:spec.overhang,schemaItems:clonePlanItems(layerItems)};
   buildPScene(lastP);
   setupLightsP();
+  calcHowManyPallets();
 }
 
 function renderPalletPlan(spec,items,meta={}){
@@ -1363,19 +1586,54 @@ function formatM3(mm3){
 }
 
 function buildBestBoxLayer(areaL,areaW,bL,bW,seedRot=false,overhang=0){
-  // Try both orientations and pick the one with more boxes; prefer non-rotated on tie
-  const packA=packRectanglesMaxRects(areaL,areaW,bL,bW,true,2000).sort((a,b)=>a.y-b.y||a.x-b.x);
-  const packB=bL!==bW ? packRectanglesMaxRects(areaL,areaW,bW,bL,true,2000).sort((a,b)=>a.y-b.y||a.x-b.x) : [];
-  // packB seeds with rotated orientation; flip rot flags to keep consistent meaning (rot=true means 90° from original)
-  const packBNorm=packB.map(r=>({...r,rot:!r.rot}));
-  const packed=packBNorm.length>0 && packBNorm.length>packA.length ? packBNorm : packA;
-  const positions=packed.map(r=>({x:r.x,z:r.y,rot:r.rot}));
+  const sameSize=(bL===bW);
+
+  // Strategy A: MaxRects allowing both orientations freely (best mixed layout)
+  const packA=packRectanglesMaxRects(areaL,areaW,bL,bW,true,2000);
+
+  // Strategy B: seed with rotated orientation (flip rot flag for consistent meaning)
+  const packB=(!sameSize)?packRectanglesMaxRects(areaL,areaW,bW,bL,true,2000).map(r=>({...r,rot:!r.rot})):[];
+
+  // Strategy C: stripe layout (rows of base + rows of rotated) — often wins for rectangles
+  const stripeC=buildStripedLayout(areaL,areaW,bL,bW,0,0);
+  const packC=stripeC.positions.map(p=>({x:p.x,y:p.z??p.z??0,w:p.pw,h:p.pl,rot:p.rot}));
+
+  // Strategy D: stripe with dimensions swapped
+  const stripeD=(!sameSize)?buildStripedLayout(areaL,areaW,bW,bL,0,0):{count:0,positions:[]};
+  const packD=stripeD.positions.map(p=>({x:p.x,y:p.z??0,w:p.pw,h:p.pl,rot:!p.rot}));
+
+  // Pick best candidate by count, then area coverage
+  const candidates=[
+    {pack:packA, label:'MaxRects misto'},
+    {pack:packB, label:'MaxRects ruotato'},
+    {pack:packC, label:'Righe ottimizzate'},
+    {pack:packD, label:'Righe ruotate'},
+  ].filter(c=>c.pack.length>0);
+
+  let best=candidates[0];
+  const area=(p)=>p.pack.reduce((s,r)=>{
+    const rw=r.w??(r.rot?bW:bL);
+    const rh=r.h??(r.rot?bL:bW);
+    return s+rw*rh;
+  },0);
+  for(const c of candidates){
+    if(c.pack.length>best.pack.length) best=c;
+    else if(c.pack.length===best.pack.length && area(c)>area(best)) best=c;
+  }
+
+  const packed=best.pack;
+  // Normalise to {x,z,rot} — w/h from pack or derive from rot flag
+  const positions=packed.map(r=>{
+    const rot=!!r.rot;
+    return {x:r.x, z:(r.y??r.z??0), rot, w:r.w??(rot?bW:bL), l:r.h??(rot?bL:bW)};
+  });
   const layoutCounts={base:0,rot:0};
   positions.forEach(p=>layoutCounts[p.rot?'rot':'base']++);
   const layoutParts=[];
   if(layoutCounts.base) layoutParts.push(`${layoutCounts.base} base`);
   if(layoutCounts.rot) layoutParts.push(`${layoutCounts.rot} ruotate`);
-  return{count:positions.length,positions,layout:layoutParts.length?layoutParts.join(' + '):'Nessun layout'};
+  const layoutStr=layoutParts.length?`${best.label}: ${layoutParts.join(' + ')}`:'Nessun layout';
+  return{count:positions.length,positions,layout:layoutStr};
 }
 
 function buildStripedLayout(binL,binW,pL,pW,startX=0,startZ=0){
@@ -1627,6 +1885,47 @@ function calcContainer(){
   CAM_C.tgt=new THREE.Vector3(spec.iL/2,spec.iH/2,spec.iW/2);
   CAM_C.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_C.upd();
   showAlert('al-c');
+}
+
+function calcHowManyPallets(){
+  const nBoxesEl=document.getElementById('pNBoxes');
+  if(!nBoxesEl) return;
+  const nBoxes=+nBoxesEl.value||0;
+  if(!nBoxes){ document.getElementById('pNResult').style.display='none'; return; }
+  const perLayerOverrideEl=document.getElementById('pNPerLayer');
+  const overridePerLayer=perLayerOverrideEl?+perLayerOverrideEl.value||0:0;
+  let perLayer=overridePerLayer;
+  let actL=1;
+  if(!perLayer && palletPlanState.spec && palletPlanState.items.length){
+    perLayer=palletPlanState.items.length;
+    const spec=palletPlanState.spec;
+    const maxH=+document.getElementById('maxH').value||1800;
+    const pT=spec.pT||+document.getElementById('pT').value||144;
+    const bH=spec.bH||+document.getElementById('bH').value||1;
+    const nL=+document.getElementById('layers').value||1;
+    actL=Math.min(nL,Math.max(1,Math.floor((maxH-pT)/Math.max(1,bH))));
+  } else if(!perLayer){
+    // fallback: calculate from inputs even before first run
+    const bL=+document.getElementById('bL').value||400;
+    const bW=+document.getElementById('bW').value||300;
+    const pL=+document.getElementById('pL').value||1200;
+    const pW=+document.getElementById('pW').value||800;
+    const maxH=+document.getElementById('maxH').value||1800;
+    const pT=+document.getElementById('pT').value||144;
+    const bH=+document.getElementById('bH').value||1;
+    const nL=+document.getElementById('layers').value||1;
+    const oh=document.getElementById('ovhFlag')?.checked?(+document.getElementById('ovh').value||0):0;
+    const layer=buildBestBoxLayer(pL+oh*2,pW+oh*2,bL,bW);
+    perLayer=layer.count;
+    actL=Math.min(nL,Math.max(1,Math.floor((maxH-pT)/Math.max(1,bH))));
+  }
+  if(perLayer<=0){ document.getElementById('pNResult').style.display='none'; return; }
+  const boxesPerPallet=perLayer*actL;
+  const pallets=Math.ceil(nBoxes/boxesPerPallet);
+  const totalBoxes=pallets*boxesPerPallet;
+  document.getElementById('pNResult').style.display='block';
+  document.getElementById('pNVal').textContent=pallets+' pallet';
+  document.getElementById('pNDesc').innerHTML=`Per ${nBoxes.toLocaleString()} scatole · <b style="color:var(--text)">${boxesPerPallet}</b> sc/pallet (${perLayer}/strato × ${actL} strati) · Totale spedibili: <b style="color:var(--text)">${totalBoxes.toLocaleString()}</b>`;
 }
 
 function calcHowManyContainers(unitsPerCont,kgPerUnit,spec){
