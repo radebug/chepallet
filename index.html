@@ -3345,10 +3345,10 @@ function clearHist() {
   if(!confirm('Svuotare lo storico?'))return;
   localStorage.removeItem(HKEY);renderHist();
 }
-// Hook calcPallet for history
-const _cp=calcPallet;
-function calcPallet() {
-  _cp.apply(this,arguments);
+// Hook calcPallet for history (arrow function avoids hoisting conflict)
+const _cpOrig=calcPallet;
+calcPallet=function() {
+  _cpOrig.apply(this,arguments);
   try {
     const l=document.getElementById('boxL')?.value;
     const w=document.getElementById('boxW')?.value;
@@ -3356,7 +3356,7 @@ function calcPallet() {
     const kg=document.getElementById('boxKg')?.value;
     if(l&&w&&h&&kg) saveHist('pallet',`Scatola ${l}×${w}×${h}mm · ${kg}kg`,{boxL:l,boxW:w,boxH:h,boxKg:kg});
   }catch(e){}
-}
+};
 
 // Condivisione link
 function genLink() {
