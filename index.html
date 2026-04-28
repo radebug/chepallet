@@ -7,10 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-:root{--bg:#f0f2f5;--surface:#ffffff;--surface2:#e8eaed;--border:#d1d5db;--accent:#d4880a;--accent2:#c04a1a;--blue:#2563eb;--teal:#0d9488;--fuel:#dc2626;--text:#111827;--muted:#6b7280;--green:#16a34a;--radius:12px;}
+:root{--bg:#0a0c10;--surface:#111318;--surface2:#181b22;--border:#252932;--accent:#f0a500;--accent2:#e05c2a;--blue:#3b82f6;--teal:#14b8a6;--fuel:#e11d48;--text:#eef0f4;--muted:#6b7280;--green:#22c55e;--radius:12px;}
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;}
-header{display:flex;align-items:center;justify-content:space-between;padding:13px 32px;border-bottom:1px solid var(--border);background:rgba(240,242,245,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;gap:10px;flex-wrap:wrap;}
+header{display:flex;align-items:center;justify-content:space-between;padding:13px 32px;border-bottom:1px solid var(--border);background:rgba(10,12,16,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;gap:10px;flex-wrap:wrap;}
 .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:-0.03em;white-space:nowrap;}.logo span{color:var(--accent);}
 .main-nav{display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;}
 .nav-btn{padding:8px 16px;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.74rem;cursor:pointer;border-radius:7px;transition:all 0.2s;white-space:nowrap;}
@@ -19,9 +19,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:13p
 .nav-btn.nt.active{background:var(--teal);color:#fff;}
 .header-badge{background:var(--surface2);border:1px solid var(--border);padding:4px 10px;border-radius:100px;font-size:0.64rem;color:var(--muted);letter-spacing:0.06em;white-space:nowrap;}
 .hero{padding:44px 32px 28px;text-align:center;position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:560px;height:260px;background:radial-gradient(ellipse,rgba(212,136,10,0.08) 0%,transparent 70%);pointer-events:none;}
-.hero.bh::before{background:radial-gradient(ellipse,rgba(37,99,235,0.08) 0%,transparent 70%);}
-.hero.th::before{background:radial-gradient(ellipse,rgba(13,148,136,0.08) 0%,transparent 70%);}
+.hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:560px;height:260px;background:radial-gradient(ellipse,rgba(240,165,0,0.1) 0%,transparent 70%);pointer-events:none;}
+.hero.bh::before{background:radial-gradient(ellipse,rgba(59,130,246,0.1) 0%,transparent 70%);}
+.hero.th::before{background:radial-gradient(ellipse,rgba(20,184,166,0.1) 0%,transparent 70%);}
 .hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:800;line-height:1.05;letter-spacing:-0.04em;margin-bottom:10px;}
 .hero h1 em{font-style:normal;color:var(--accent);}
 .hero h1 em.b{color:var(--blue);}
@@ -72,7 +72,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .sv{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--accent);line-height:1;margin-bottom:3px;}
 .sv.b{color:var(--blue);}.sv.t{color:var(--teal);}
 .slb{font-size:0.59rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
-.cw{width:100%;height:445px;background:radial-gradient(ellipse at 40% 40%,#dde1e8 0%,#c8cdd6 100%);border-radius:0 0 var(--radius) var(--radius);position:relative;overflow:hidden;}
+.cw{width:100%;height:445px;background:radial-gradient(ellipse at 40% 40%,#161920 0%,#0a0c10 100%);border-radius:0 0 var(--radius) var(--radius);position:relative;overflow:hidden;}
 .cw canvas{width:100%!important;height:100%!important;}
 .vc{position:absolute;bottom:12px;right:12px;display:flex;gap:5px;}
 .cb{width:30px;height:30px;background:rgba(17,19,24,0.9);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;backdrop-filter:blur(8px);}
@@ -148,7 +148,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .plan-item.editing{cursor:grab;}
 .plan-item.dragging{cursor:grabbing;z-index:10;}
 .plan-box.editing .plan-item{pointer-events:auto;}
-.plan-box::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px);background-size:24px 24px;opacity:0;transition:opacity .2s;pointer-events:none;}
+.plan-box::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(15,23,42,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.05) 1px,transparent 1px);background-size:24px 24px;opacity:0;transition:opacity .2s;pointer-events:none;}
 .plan-box.editing::after{opacity:1;}
 
 /* TRANSFER */
@@ -160,7 +160,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .hmb .sl{margin-top:0;}
 .hn{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;color:var(--blue);}
 .hn.t{color:var(--teal);}
-::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:#9ca3af;border-radius:3px;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
 /* MULTI-BOX TYPE */
 .mbt-row{display:grid;grid-template-columns:14px 1fr auto;align-items:center;gap:7px;padding:6px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;font-size:.72rem;color:var(--muted);}
@@ -172,7 +172,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .sc,.csc{animation:fadeUp 0.35s ease both;}
 
 /* ROUTES */
-.nav-btn.nr{background:rgba(168,85,247,0.10);border-color:rgba(168,85,247,0.30)}
+.nav-btn.nr{background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.24)}
 .route-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;}
 .route-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
 .route-kpi{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px;}
@@ -183,7 +183,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .routes-line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.06);font-size:.78rem;color:var(--muted)}
 .routes-line:last-child{border-bottom:none;}
 .routes-line b{color:var(--text)}
-.badge-soft{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25);font-size:.68rem;color:var(--text)}
+.badge-soft{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.22);font-size:.68rem;color:var(--text)}
 .routes-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;}
 .routes-warn{font-size:.72rem;color:#fbbf24;margin-top:8px;}
 @media (max-width:960px){.route-grid{grid-template-columns:1fr;}.route-kpis{grid-template-columns:repeat(2,1fr);}}
@@ -202,9 +202,9 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .plan-dimrow.bottom{margin-top:2px;}
 
 /* FUEL PAGE */
-.nav-btn.nf{background:rgba(220,38,38,0.08);}
+.nav-btn.nf{background:rgba(225,29,72,0.08);}
 .nav-btn.nf.active{background:var(--fuel,#e11d48);color:#fff;}
-.hero.fh::before{background:radial-gradient(ellipse,rgba(220,38,38,0.08) 0%,transparent 70%);}
+.hero.fh::before{background:radial-gradient(ellipse,rgba(225,29,72,0.1) 0%,transparent 70%);}
 .hero h1 em.f{color:#e11d48;}
 .fuel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;padding:20px 32px 56px;max-width:1440px;margin:0 auto;}
 .fuel-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s;}
@@ -237,93 +237,79 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .fuel-note{font-size:.65rem;color:var(--muted);padding:0 32px 20px;max-width:1440px;margin:0 auto;line-height:1.6;}
 @media(max-width:960px){.fuel-grid{padding:12px;}.fuel-kpi-grid{grid-template-columns:repeat(2,1fr);padding:0 12px 12px;}.fuel-filter-bar{padding:0 12px 12px;}.fuel-note{padding:0 12px 16px;}}
 
-/* TOOLS PAGE */
-.nav-btn.nt2{background:rgba(99,102,241,0.10);}
-.nav-btn.nt2.active{background:#6366f1;color:#fff;}
-.hero.toolsh::before{background:radial-gradient(ellipse,rgba(99,102,241,0.08) 0%,transparent 70%);}
-.hero h1 em.i{color:#6366f1;}
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;padding:0 32px 56px;max-width:1440px;margin:0 auto;}
-@media(max-width:960px){.tools-grid{padding:12px;grid-template-columns:1fr;}}
-.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
-.tool-card-head{padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;}
-.tool-card-head h3{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
-.tool-card-body{padding:16px;}
-.tool-result{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:12px;font-size:.78rem;line-height:1.9;display:none;}
-.tool-result.show{display:block;}
-.tool-result b{color:#6366f1;}
-.tool-kpi{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#6366f1;line-height:1;}
-.tool-kpi.green{color:var(--green);}
-.tool-kpi.amber{color:var(--accent);}
-.tool-sub{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;}
-.tool-row{display:flex;align-items:baseline;gap:10px;margin-top:8px;}
-.hist-list{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;}
-.hist-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.72rem;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:8px;}
-.hist-item:hover{border-color:#6366f1;}
-.hist-badge{font-size:.58rem;padding:2px 7px;border-radius:4px;background:rgba(99,102,241,.12);color:#818cf8;flex-shrink:0;}
-.hist-meta{color:var(--muted);font-size:.64rem;margin-top:2px;}
-.hist-empty{text-align:center;padding:24px;color:var(--muted);font-size:.78rem;}
-.share-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.7rem;color:var(--muted);word-break:break-all;margin-top:10px;display:none;}
-.share-box.show{display:block;}
-.cur-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
-.cur-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
-.cur-flag{font-size:1.3rem;}
-.cur-rate{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);}
-.cur-label{font-size:.6rem;color:var(--muted);margin-top:2px;}
-.cur-ts{font-size:.6rem;color:var(--muted);margin-top:8px;text-align:right;}
-.road-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
-.road-kpi-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
-.glos-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;}
-.glos-item{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.glos-term{padding:8px 12px;background:var(--surface2);font-size:.74rem;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:color .2s;}
-.glos-term:hover{color:#6366f1;}
-.glos-def{padding:10px 12px;font-size:.71rem;color:var(--muted);line-height:1.7;display:none;}
-.glos-def.open{display:block;}
-.glos-search{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:.75rem;outline:none;margin-bottom:10px;}
-.glos-search:focus{border-color:#6366f1;}
-.vol-badge{display:inline-block;padding:3px 8px;border-radius:5px;font-size:.65rem;margin-left:6px;}
-
-/* QUOTES */
-.nav-btn.nq{background:rgba(22,163,74,0.10);}
-.nav-btn.nq.active{background:var(--green);color:#fff;}
-.hero.qh::before{background:radial-gradient(ellipse,rgba(22,163,74,0.08) 0%,transparent 70%);}
-.hero h1 em.q{color:var(--green);}
-.quotes-wrap{max-width:1100px;margin:0 auto;padding:0 32px 56px;display:flex;flex-direction:column;gap:20px;}
-.q-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.q-route-row{display:grid;grid-template-columns:1fr 40px 1fr;gap:8px;align-items:end;}
-.q-arrow{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.2rem;padding-bottom:6px;}
-.q-sources{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-.q-source-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:.7rem;color:var(--muted);cursor:pointer;transition:all .2s;user-select:none;}
-.q-source-pill input{display:none;}
-.q-source-pill.active-sh{border-color:#7c3aed;color:#7c3aed;background:rgba(124,58,237,.08);}
-.q-source-pill.active-pk{border-color:var(--accent);color:var(--accent);background:rgba(212,136,10,.08);}
-.q-results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:4px;}
-.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .25s,transform .2s,box-shadow .2s;animation:fadeUp .3s ease both;}
-.q-card:hover{border-color:var(--green);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.08);}
-.q-card-head{padding:11px 14px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.q-carrier-logo{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
-.q-carrier-name{font-family:'Syne',sans-serif;font-size:.84rem;font-weight:700;color:var(--text);}
-.q-service-name{font-size:.65rem;color:var(--muted);margin-top:1px;}
-.q-card-body{padding:13px 14px;display:flex;flex-direction:column;gap:8px;}
-.q-price-row{display:flex;align-items:baseline;gap:5px;}
-.q-price{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;line-height:1;}
-.q-currency{font-size:.9rem;font-weight:600;}
-.q-meta-row{display:flex;gap:6px;flex-wrap:wrap;}
-.q-meta-pill{padding:3px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;font-size:.63rem;color:var(--muted);}
-.q-meta-pill.hi{border-color:rgba(22,163,74,.3);color:var(--green);}
-.q-empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:.84rem;grid-column:1/-1;}
-.q-empty-icon{font-size:2.5rem;margin-bottom:10px;}
-.q-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.12);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;}
+/* TOOLS */
+.nav-btn.ns{background:rgba(99,102,241,0.08);}
+.nav-btn.ns.active{background:#6366f1;color:#fff;}
+.hero.sh::before{background:radial-gradient(ellipse,rgba(99,102,241,0.1) 0%,transparent 70%);}
+.hero h1 em.si{color:#6366f1;}
+.tools-wrap{max-width:1200px;margin:0 auto;padding:0 32px 56px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;}
+@media(max-width:960px){.tools-wrap{padding:12px;grid-template-columns:1fr;}}
+.tc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.tc-h{padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;}
+.tc-h h3{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.tc-b{padding:16px;}
+.tres{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:12px;font-size:.78rem;line-height:1.9;display:none;}
+.tres.show{display:block;}
+.tres b{color:#6366f1;}
+.tkpi{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:#6366f1;line-height:1;}
+.tkpi.g{color:var(--green);}
+.tkpi.a{color:var(--accent);}
+.tkpi.b{color:var(--blue);}
+.rg2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.rg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+.rkc{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.hist-list{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;}
+.hi{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.72rem;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:8px;}
+.hi:hover{border-color:#6366f1;}
+.hbadge{font-size:.58rem;padding:2px 7px;border-radius:4px;background:rgba(99,102,241,.12);color:#818cf8;flex-shrink:0;}
+.hempty{text-align:center;padding:24px;color:var(--muted);font-size:.78rem;line-height:1.6;}
+.sbox{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.68rem;color:var(--muted);word-break:break-all;margin-top:10px;display:none;}
+.sbox.show{display:block;}
+.cxg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.cxc{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.cxr{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;color:var(--text);}
+.glist{display:flex;flex-direction:column;gap:5px;max-height:320px;overflow-y:auto;}
+.gitem{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.gterm{padding:8px 12px;background:var(--surface2);font-size:.74rem;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:color .2s;}
+.gterm:hover{color:#6366f1;}
+.gdef{padding:10px 12px;font-size:.71rem;color:var(--muted);line-height:1.7;display:none;}
+.gdef.open{display:block;}
+.gsearch{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:.75rem;outline:none;margin-bottom:10px;}
+.gsearch:focus{border-color:#6366f1;}
+.qwrap{max-width:1100px;margin:0 auto;padding:0 32px 56px;display:flex;flex-direction:column;gap:20px;}
+@media(max-width:760px){.qwrap{padding:12px;}}
+.qrrow{display:grid;grid-template-columns:1fr 40px 1fr;gap:8px;align-items:end;}
+.qarr{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.2rem;padding-bottom:6px;}
+.qsrcs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.qpill{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:.7rem;color:var(--muted);cursor:pointer;transition:all .2s;user-select:none;}
+.qpill input{display:none;}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:4px;}
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .25s,transform .2s;animation:fadeUp .3s ease both;}
+.qcard:hover{border-color:var(--green);transform:translateY(-2px);}
+.qch{padding:11px 14px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.qcn{font-family:'Syne',sans-serif;font-size:.84rem;font-weight:700;color:var(--text);}
+.qcs{font-size:.65rem;color:var(--muted);margin-top:1px;}
+.qcb{padding:13px 14px;display:flex;flex-direction:column;gap:8px;}
+.qpr{display:flex;align-items:baseline;gap:5px;}
+.qprice{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;line-height:1;}
+.qmr{display:flex;gap:6px;flex-wrap:wrap;}
+.qmp{padding:3px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;font-size:.63rem;color:var(--muted);}
+.qmp.hi{border-color:rgba(34,197,94,.3);color:var(--green);}
+.qempty{text-align:center;padding:40px 20px;color:var(--muted);font-size:.84rem;grid-column:1/-1;}
+.qspin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.15);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.q-status-bar{display:flex;align-items:center;gap:10px;font-size:.72rem;color:var(--muted);padding:10px 0 4px;}
-.q-status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.q-error-banner{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:10px 14px;font-size:.74rem;color:#dc2626;display:none;}
-.q-summary-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px;}
-.q-summary-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center;}
-.q-sort-bar{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
-.q-sort-bar select{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:.72rem;outline:none;}
-.q-sort-bar select:focus{border-color:var(--green);}
-.q-count{font-size:.7rem;color:var(--muted);margin-left:auto;}
-@media(max-width:760px){.q-form-grid{grid-template-columns:1fr;}.q-route-row{grid-template-columns:1fr;}.q-arrow{display:none;}.q-summary-bar{grid-template-columns:1fr 1fr;}}
+.qsbar{display:flex;align-items:center;gap:10px;font-size:.72rem;color:var(--muted);padding:10px 0 4px;}
+.qsdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.qerr{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;font-size:.74rem;color:#f87171;display:none;}
+.qsum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px;}
+.qsumc{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center;}
+.qsortbar{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.qsortbar select{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:.72rem;outline:none;}
+.nav-btn.nq{background:rgba(34,197,94,0.08);}
+.nav-btn.nq.active{background:var(--green);color:#000;}
+.hero.qh::before{background:radial-gradient(ellipse,rgba(34,197,94,0.1) 0%,transparent 70%);}
+.hero h1 em.q{color:var(--green);}
+@media(max-width:700px){.qrrow{grid-template-columns:1fr;}.qarr{display:none;}.qsum{grid-template-columns:1fr 1fr;}}
 
 </style>
 </head>
@@ -337,8 +323,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <button class="nav-btn nt" onclick="showPage('truck',this)">🚛 Truck</button>
     <button class="nav-btn nr" onclick="showPage('routes',this);initRoutes()">🌍 Routes</button>
     <button class="nav-btn nf" onclick="showPage('fuel',this);initFuel()">⛽ Carburanti</button>
-    <button class="nav-btn nt2" onclick="showPage('tools',this);initTools()">🛠 Strumenti</button>
-    <button class="nav-btn nq" onclick="showPage('quotes',this)">💸 Quotazioni</button>
+    <button class="nav-btn ns" onclick="showPage('tools',this);initTools()">🛠 Strumenti</button>
   </nav>
   <div class="header-badge">v4.5</div>
 </header>
@@ -829,109 +814,96 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 </div>
 <div class="fuel-note" id="fuelNote"></div>
 </div>
-
 <div id="page-tools" class="page">
-<section class="hero toolsh">
-  <h1>Strumenti <br><em class="i">logistici</em></h1>
-  <p>Peso volumetrico, costo trasporto, storico calcoli, condivisione link, cambio valuta e glossario.</p>
+<section class="hero sh">
+  <h1>Strumenti <em class="si">logistici</em></h1>
+  <p>Peso volumetrico, costo trasporto, storico, condivisione link, cambio valuta, glossario.</p>
 </section>
+<div class="tools-wrap">
 
-<div class="tools-grid">
-
-  <!-- PESO VOLUMETRICO -->
-  <div class="tool-card">
-    <div class="tool-card-head"><div class="pi">⚖️</div><h3>Peso Volumetrico</h3></div>
-    <div class="tool-card-body">
-      <div class="sl" style="color:#6366f1;--accent:#6366f1">Misure collo</div>
+  <div class="tc">
+    <div class="tc-h"><div class="pi">⚖️</div><h3>Peso Volumetrico</h3></div>
+    <div class="tc-b">
+      <div class="sl" style="color:#6366f1;">Misure collo</div>
       <div class="fr" style="margin-bottom:8px;">
-        <div class="fg"><label>Lunghezza (cm)</label><input type="number" id="vw-l" value="60" min="1" oninput="calcVolWeight()"></div>
-        <div class="fg"><label>Larghezza (cm)</label><input type="number" id="vw-w" value="40" min="1" oninput="calcVolWeight()"></div>
+        <div class="fg"><label>Lunghezza (cm)</label><input type="number" id="vl" value="60" min="1" oninput="calcVW()"></div>
+        <div class="fg"><label>Larghezza (cm)</label><input type="number" id="vw" value="40" min="1" oninput="calcVW()"></div>
       </div>
-      <div class="fr">
-        <div class="fg"><label>Altezza (cm)</label><input type="number" id="vw-h" value="40" min="1" oninput="calcVolWeight()"></div>
-        <div class="fg"><label>Peso reale (kg)</label><input type="number" id="vw-kg" value="10" min="0.1" step="0.1" oninput="calcVolWeight()"></div>
+      <div class="fr" style="margin-bottom:8px;">
+        <div class="fg"><label>Altezza (cm)</label><input type="number" id="vh" value="40" min="1" oninput="calcVW()"></div>
+        <div class="fg"><label>Peso reale (kg)</label><input type="number" id="vkg" value="10" min="0.1" step="0.1" oninput="calcVW()"></div>
       </div>
-      <div class="fg" style="margin-top:8px;">
+      <div class="fg">
         <label>Divisore volumetrico</label>
-        <select id="vw-div" onchange="calcVolWeight()">
-          <option value="5000">5000 — Standard aereo/corriere</option>
+        <select id="vdiv" onchange="calcVW()">
+          <option value="5000">5000 — Standard corriere/aereo</option>
           <option value="4000">4000 — DHL Express</option>
-          <option value="3000">3000 — Alcuni courier LCL</option>
+          <option value="3000">3000 — Courier LCL</option>
           <option value="6000">6000 — Marittimo LCL</option>
         </select>
       </div>
-      <div class="tool-result show" id="vw-result"></div>
+      <div class="tres show" id="vres"></div>
     </div>
   </div>
 
-  <!-- COSTO TRASPORTO STRADALE -->
-  <div class="tool-card">
-    <div class="tool-card-head"><div class="pi">🚛</div><h3>Costo Trasporto Stradale</h3></div>
-    <div class="tool-card-body">
+  <div class="tc">
+    <div class="tc-h"><div class="pi">🚛</div><h3>Costo Trasporto Stradale</h3></div>
+    <div class="tc-b">
       <div class="fr" style="margin-bottom:8px;">
-        <div class="fg"><label>Distanza (km)</label><input type="number" id="rt-km" value="500" min="1"></div>
-        <div class="fg"><label>N° veicoli</label><input type="number" id="rt-veh" value="1" min="1"></div>
-      </div>
-      <div class="fr" style="margin-bottom:8px;">
-        <div class="fg"><label>Consumo (L/100km)</label><input type="number" id="rt-cons" value="32" min="1" step="0.5"></div>
-        <div class="fg"><label>€/L gasolio</label><input type="number" id="rt-fuel" value="1.65" min="0.5" step="0.01"></div>
+        <div class="fg"><label>Distanza (km)</label><input type="number" id="rtkm" value="500" min="1"></div>
+        <div class="fg"><label>N° veicoli</label><input type="number" id="rtveh" value="1" min="1"></div>
       </div>
       <div class="fr" style="margin-bottom:8px;">
-        <div class="fg"><label>Costo autista (€/giorno)</label><input type="number" id="rt-driver" value="180" min="0"></div>
-        <div class="fg"><label>Velocità media (km/h)</label><input type="number" id="rt-speed" value="80" min="10"></div>
+        <div class="fg"><label>Consumo (L/100km)</label><input type="number" id="rtcons" value="32" step="0.5"></div>
+        <div class="fg"><label>€/L gasolio</label><input type="number" id="rtfuel" value="1.65" step="0.01"></div>
       </div>
-      <div class="fg" style="margin-bottom:8px;">
-        <label>Pedaggi stimati (€ totale)</label>
-        <input type="number" id="rt-toll" value="0" min="0" step="5">
+      <div class="fr" style="margin-bottom:8px;">
+        <div class="fg"><label>Autista (€/giorno)</label><input type="number" id="rtdrv" value="180" min="0"></div>
+        <div class="fg"><label>Velocità media (km/h)</label><input type="number" id="rtspd" value="80" min="10"></div>
       </div>
-      <button class="bc" style="background:#6366f1;color:#fff;" onclick="calcRoadCost()">▶ CALCOLA</button>
-      <div class="tool-result" id="rt-result"></div>
+      <div class="fg" style="margin-bottom:4px;">
+        <label>Pedaggi totali (€)</label><input type="number" id="rttoll" value="0" step="5">
+      </div>
+      <button class="bc" style="background:#6366f1;color:#fff;" onclick="calcRoad()">▶ CALCOLA</button>
+      <div class="tres" id="rtres"></div>
     </div>
   </div>
 
-  <!-- STORICO CALCOLI -->
-  <div class="tool-card">
-    <div class="tool-card-head">
-      <div class="pi">📋</div><h3>Storico Calcoli</h3>
-      <button class="be" style="margin-left:auto;font-size:.62rem;border-color:#6366f1;color:#6366f1;" onclick="clearHistory()">🗑 Svuota</button>
+  <div class="tc">
+    <div class="tc-h"><div class="pi">📋</div><h3>Storico Calcoli</h3>
+      <button class="be" style="margin-left:auto;font-size:.62rem;border-color:#6366f1;color:#6366f1;" onclick="clearHist()">🗑 Svuota</button>
     </div>
-    <div class="tool-card-body">
-      <div class="hist-list" id="hist-list">
-        <div class="hist-empty">Nessun calcolo salvato.<br>I calcoli pallet, container e truck vengono salvati automaticamente.</div>
-      </div>
+    <div class="tc-b">
+      <div class="hist-list" id="histlist"></div>
     </div>
   </div>
 
-  <!-- CONDIVISIONE LINK -->
-  <div class="tool-card">
-    <div class="tool-card-head"><div class="pi">🔗</div><h3>Condivisione Link</h3></div>
-    <div class="tool-card-body">
-      <div class="sl" style="color:#6366f1;">Parametri da condividere</div>
+  <div class="tc">
+    <div class="tc-h"><div class="pi">🔗</div><h3>Condivisione Link</h3></div>
+    <div class="tc-b">
       <div class="fg" style="margin-bottom:8px;">
         <label>Sezione</label>
-        <select id="sh-section">
+        <select id="shsec">
           <option value="pallet">📦 Pallet</option>
           <option value="container">🚢 Container</option>
           <option value="truck">🚛 Truck</option>
         </select>
       </div>
-      <button class="bc" style="background:#6366f1;color:#fff;" onclick="generateShareLink()">🔗 GENERA LINK</button>
-      <div class="share-box" id="share-box"></div>
-      <button class="be" id="share-copy-btn" style="display:none;margin-top:8px;border-color:#6366f1;color:#6366f1;width:100%;" onclick="copyShareLink()">📋 Copia link</button>
-      <div style="font-size:.64rem;color:var(--muted);margin-top:10px;line-height:1.6;">Il link contiene tutti i parametri attuali della sezione selezionata. Chi lo apre vede il calcolo già impostato.</div>
+      <button class="bc" style="background:#6366f1;color:#fff;" onclick="genLink()">🔗 GENERA LINK</button>
+      <div class="sbox" id="sbox"></div>
+      <button class="be" id="copybtn" style="display:none;margin-top:8px;border-color:#6366f1;color:#6366f1;width:100%;" onclick="copyLink()">📋 Copia link</button>
     </div>
   </div>
 
-  <!-- CAMBIO VALUTA -->
-  <div class="tool-card">
-    <div class="tool-card-head"><div class="pi">💱</div><h3>Cambio Valuta</h3>
-      <button class="be" style="margin-left:auto;font-size:.62rem;border-color:#6366f1;color:#6366f1;" onclick="refreshRates()">🔄</button>
+  <div class="tc">
+    <div class="tc-h"><div class="pi">💱</div><h3>Cambio Valuta</h3>
+      <button class="be" style="margin-left:auto;font-size:.62rem;border-color:#6366f1;color:#6366f1;" onclick="refreshCX()">🔄</button>
     </div>
-    <div class="tool-card-body">
+    <div class="tc-b">
       <div class="fr" style="margin-bottom:8px;">
-        <div class="fg"><label>Importo</label><input type="number" id="cx-amount" value="1000" min="0" step="10" oninput="convertCurrency()"></div>
+        <div class="fg"><label>Importo</label><input type="number" id="cxamt" value="1000" step="10" oninput="convCX()"></div>
         <div class="fg"><label>Valuta base</label>
-          <select id="cx-from" onchange="convertCurrency()">
+          <select id="cxfrom" onchange="convCX()">
             <option value="EUR">🇪🇺 EUR</option>
             <option value="USD">🇺🇸 USD</option>
             <option value="GBP">🇬🇧 GBP</option>
@@ -940,145 +912,98 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           </select>
         </div>
       </div>
-      <div class="cur-grid" id="cx-grid">
-        <div class="cur-card"><div class="cur-flag">⏳</div><div class="cur-rate">—</div><div class="cur-label">Caricamento…</div></div>
-      </div>
-      <div class="cur-ts" id="cx-ts"></div>
+      <div class="cxg" id="cxgrid"><div class="cxc" style="grid-column:1/-1;color:var(--muted);font-size:.75rem;">⏳ Caricamento tassi…</div></div>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:8px;text-align:right;" id="cxts"></div>
     </div>
   </div>
 
-  <!-- GLOSSARIO -->
-  <div class="tool-card" style="grid-column: span 1;">
-    <div class="tool-card-head"><div class="pi">📖</div><h3>Glossario Logistico</h3></div>
-    <div class="tool-card-body">
-      <input type="text" class="glos-search" id="glos-search" placeholder="Cerca termine…" oninput="filterGlossary()">
-      <div class="glos-list" id="glos-list"></div>
+  <div class="tc" style="grid-column:span 1;">
+    <div class="tc-h"><div class="pi">📖</div><h3>Glossario Logistico</h3></div>
+    <div class="tc-b">
+      <input type="text" class="gsearch" id="gsearch" placeholder="Cerca termine…" oninput="filterGlos()">
+      <div class="glist" id="glist"></div>
     </div>
   </div>
 
+</div>
 </div>
 
 <div id="page-quotes" class="page">
 <section class="hero qh">
-  <h1>Confronta <br><em class="q">quotazioni</em> di spedizione</h1>
-  <p>Inserisci rotta e misure — tariffe reali da DHL, UPS, FedEx e altri corrieri in tempo reale.</p>
+  <h1>Confronta <em class="q">quotazioni</em></h1>
+  <p>Tariffe reali da DHL, UPS, FedEx e altri. Dati live via Shippo.</p>
 </section>
-<div class="quotes-wrap">
-
+<div class="qwrap">
   <div class="panel">
-    <div class="ph">
-      <div class="pi">📋</div><h3>Parametri spedizione</h3>
-      <button class="be" style="margin-left:auto;font-size:.65rem;" onclick="importFromPallet()">📦 Importa da Pallet</button>
+    <div class="ph"><div class="pi">📋</div><h3>Parametri spedizione</h3>
+      <button class="be" style="margin-left:auto;font-size:.65rem;" onclick="qImport()">📦 Importa da Pallet</button>
     </div>
     <div class="pb">
       <div class="sl">Rotta</div>
-      <div class="q-route-row">
+      <div class="qrrow">
         <div>
-          <div class="fg" style="margin-bottom:8px;">
-            <label>Paese mittente</label>
-            <select id="q-from-country">
-              <option value="IT">🇮🇹 Italia</option><option value="DE">🇩🇪 Germania</option><option value="FR">🇫🇷 Francia</option><option value="ES">🇪🇸 Spagna</option><option value="GB">🇬🇧 Regno Unito</option><option value="US">🇺🇸 USA</option><option value="CN">🇨🇳 Cina</option><option value="NL">🇳🇱 Paesi Bassi</option><option value="PL">🇵🇱 Polonia</option><option value="BE">🇧🇪 Belgio</option><option value="CH">🇨🇭 Svizzera</option><option value="AT">🇦🇹 Austria</option><option value="SE">🇸🇪 Svezia</option><option value="JP">🇯🇵 Giappone</option><option value="AU">🇦🇺 Australia</option><option value="CA">🇨🇦 Canada</option><option value="BR">🇧🇷 Brasile</option><option value="AE">🇦🇪 Emirati Arabi</option>
-            </select>
+          <div class="fg" style="margin-bottom:8px;"><label>Paese mittente</label>
+            <select id="qfc"><option value="IT">🇮🇹 Italia</option><option value="DE">🇩🇪 Germania</option><option value="FR">🇫🇷 Francia</option><option value="ES">🇪🇸 Spagna</option><option value="GB">🇬🇧 Regno Unito</option><option value="US">🇺🇸 USA</option><option value="CN">🇨🇳 Cina</option><option value="NL">🇳🇱 Paesi Bassi</option><option value="PL">🇵🇱 Polonia</option><option value="BE">🇧🇪 Belgio</option><option value="CH">🇨🇭 Svizzera</option><option value="AT">🇦🇹 Austria</option><option value="SE">🇸🇪 Svezia</option><option value="JP">🇯🇵 Giappone</option><option value="AU">🇦🇺 Australia</option><option value="CA">🇨🇦 Canada</option><option value="AE">🇦🇪 Emirati Arabi</option></select>
           </div>
           <div class="fr">
-            <div class="fg"><label>CAP mittente</label><input type="text" id="q-from-zip" value="20100" placeholder="CAP / ZIP"></div>
-            <div class="fg"><label>Città</label><input type="text" id="q-from-city" value="Milano" placeholder="Città"></div>
+            <div class="fg"><label>CAP mittente</label><input type="text" id="qfz" value="20100"></div>
+            <div class="fg"><label>Città</label><input type="text" id="qfcity" value="Milano"></div>
           </div>
         </div>
-        <div class="q-arrow">→</div>
+        <div class="qarr">→</div>
         <div>
-          <div class="fg" style="margin-bottom:8px;">
-            <label>Paese destinatario</label>
-            <select id="q-to-country">
-              <option value="IT">🇮🇹 Italia</option><option value="DE" selected>🇩🇪 Germania</option><option value="FR">🇫🇷 Francia</option><option value="ES">🇪🇸 Spagna</option><option value="GB">🇬🇧 Regno Unito</option><option value="US">🇺🇸 USA</option><option value="CN">🇨🇳 Cina</option><option value="NL">🇳🇱 Paesi Bassi</option><option value="PL">🇵🇱 Polonia</option><option value="BE">🇧🇪 Belgio</option><option value="CH">🇨🇭 Svizzera</option><option value="AT">🇦🇹 Austria</option><option value="SE">🇸🇪 Svezia</option><option value="JP">🇯🇵 Giappone</option><option value="AU">🇦🇺 Australia</option><option value="CA">🇨🇦 Canada</option><option value="BR">🇧🇷 Brasile</option><option value="AE">🇦🇪 Emirati Arabi</option>
-            </select>
+          <div class="fg" style="margin-bottom:8px;"><label>Paese destinatario</label>
+            <select id="qtc"><option value="IT">🇮🇹 Italia</option><option value="DE" selected>🇩🇪 Germania</option><option value="FR">🇫🇷 Francia</option><option value="ES">🇪🇸 Spagna</option><option value="GB">🇬🇧 Regno Unito</option><option value="US">🇺🇸 USA</option><option value="CN">🇨🇳 Cina</option><option value="NL">🇳🇱 Paesi Bassi</option><option value="PL">🇵🇱 Polonia</option><option value="BE">🇧🇪 Belgio</option><option value="CH">🇨🇭 Svizzera</option><option value="AT">🇦🇹 Austria</option><option value="SE">🇸🇪 Svezia</option><option value="JP">🇯🇵 Giappone</option><option value="AU">🇦🇺 Australia</option><option value="CA">🇨🇦 Canada</option><option value="AE">🇦🇪 Emirati Arabi</option></select>
           </div>
           <div class="fr">
-            <div class="fg"><label>CAP destinatario</label><input type="text" id="q-to-zip" value="10115" placeholder="CAP / ZIP"></div>
-            <div class="fg"><label>Città</label><input type="text" id="q-to-city" value="Berlino" placeholder="Città"></div>
+            <div class="fg"><label>CAP destinatario</label><input type="text" id="qtz" value="10115"></div>
+            <div class="fg"><label>Città</label><input type="text" id="qtcity" value="Berlino"></div>
           </div>
         </div>
       </div>
-
-      <div class="sl" style="margin-top:18px;">Misure collo</div>
-      <div class="q-form-grid">
-        <div>
-          <div class="fr">
-            <div class="fg"><label>Lunghezza (cm)</label><input type="number" id="q-len" value="60" min="1"></div>
-            <div class="fg"><label>Larghezza (cm)</label><input type="number" id="q-wid" value="40" min="1"></div>
-          </div>
-          <div class="fr" style="margin-top:8px;">
-            <div class="fg"><label>Altezza (cm)</label><input type="number" id="q-hei" value="40" min="1"></div>
-            <div class="fg"><label>Peso (kg)</label><input type="number" id="q-wei" value="10" min="0.1" step="0.1"></div>
-          </div>
-        </div>
-        <div>
-          <div class="fg" style="margin-bottom:8px;">
-            <label>Tipo spedizione</label>
-            <select id="q-shiptype">
-              <option value="PACKAGE">📦 Pacco / Collo singolo</option>
-              <option value="PALLET">🪵 Pallet (LTL)</option>
-              <option value="FREIGHT">🚛 Freight / Groupage</option>
-            </select>
-          </div>
-          <div class="fg">
-            <label>Valore dichiarato (€) — opzionale</label>
-            <input type="number" id="q-value" value="" placeholder="es. 500" min="0">
-          </div>
-        </div>
+      <div class="sl" style="margin-top:16px;">Misure collo</div>
+      <div class="fr" style="margin-bottom:8px;">
+        <div class="fg"><label>Lunghezza (cm)</label><input type="number" id="qlen" value="60" min="1"></div>
+        <div class="fg"><label>Larghezza (cm)</label><input type="number" id="qwid" value="40" min="1"></div>
       </div>
-
-      <div class="sl" style="margin-top:16px;">Sorgenti</div>
-      <div class="q-sources">
-        <label class="q-source-pill active-sh" id="pill-sh" onclick="toggleQSource('sh')">
-          <input type="checkbox" id="src-sh" checked> 🟣 Shippo (live)
-        </label>
-        <label class="q-source-pill active-pk" id="pill-pk" onclick="toggleQSource('pk')">
-          <input type="checkbox" id="src-pk" checked> 🟡 Packlink
-        </label>
-        <label class="q-source-pill" id="pill-sp" onclick="toggleQSource('sp')" style="border-color:var(--teal);color:var(--teal);background:rgba(13,148,136,.08);">
-          <input type="checkbox" id="src-sp" checked> 🟢 Spedire.com
-        </label>
-        <label class="q-source-pill" id="pill-sb" onclick="toggleQSource('sb')" style="border-color:#f97316;color:#f97316;background:rgba(249,115,22,.08);">
-          <input type="checkbox" id="src-sb" checked> 🟠 Sendabox
-        </label>
+      <div class="fr" style="margin-bottom:8px;">
+        <div class="fg"><label>Altezza (cm)</label><input type="number" id="qhei" value="40" min="1"></div>
+        <div class="fg"><label>Peso (kg)</label><input type="number" id="qwei" value="10" min="0.1" step="0.1"></div>
       </div>
-
-      <button class="bc" style="background:var(--green);color:#fff;margin-top:16px;" onclick="runQuotes()">
-        ▶ CONFRONTA CORRIERI
-      </button>
+      <div class="sl" style="margin-top:12px;">Sorgenti</div>
+      <div class="qsrcs">
+        <label class="qpill" id="qpsh" style="border-color:#8b5cf6;color:#8b5cf6;background:rgba(139,92,246,.08);" onclick="qToggle('sh')"><input type="checkbox" checked> 🟣 Shippo</label>
+        <label class="qpill" id="qppk" style="border-color:var(--accent);color:var(--accent);background:rgba(240,165,0,.08);" onclick="qToggle('pk')"><input type="checkbox" checked> 🟡 Packlink</label>
+        <label class="qpill" id="qpsp" style="border-color:var(--teal);color:var(--teal);background:rgba(20,184,166,.08);" onclick="qToggle('sp')"><input type="checkbox" checked> 🟢 Spedire.com</label>
+        <label class="qpill" id="qpsb" style="border-color:#f97316;color:#f97316;background:rgba(249,115,22,.08);" onclick="qToggle('sb')"><input type="checkbox" checked> 🟠 Sendabox</label>
+      </div>
+      <button class="bc" style="background:var(--green);color:#000;margin-top:14px;" onclick="runQ()">▶ CONFRONTA CORRIERI</button>
     </div>
   </div>
 
-  <div id="q-results-section" style="display:none;">
-    <div class="q-status-bar" id="q-status-bar"></div>
-    <div class="q-error-banner" id="q-error-banner"></div>
-    <div class="q-summary-bar" id="q-summary-bar" style="display:none;">
-      <div class="q-summary-card"><div class="sv" id="qs-count" style="color:var(--green);">—</div><div class="slb">Quotazioni</div></div>
-      <div class="q-summary-card"><div class="sv" id="qs-min" style="color:var(--green);">—</div><div class="slb">Prezzo minimo</div></div>
-      <div class="q-summary-card"><div class="sv" id="qs-max" style="color:var(--muted);">—</div><div class="slb">Prezzo massimo</div></div>
+  <div id="qrsec" style="display:none;">
+    <div class="qsbar" id="qsbar"></div>
+    <div class="qerr" id="qerr"></div>
+    <div class="qsum" id="qsum" style="display:none;">
+      <div class="qsumc"><div class="sv" id="qsn" style="color:var(--green);">—</div><div class="slb">Trovate</div></div>
+      <div class="qsumc"><div class="sv" id="qsmin" style="color:var(--green);">—</div><div class="slb">Minimo</div></div>
+      <div class="qsumc"><div class="sv" id="qsmax" style="color:var(--muted);">—</div><div class="slb">Massimo</div></div>
     </div>
-    <div class="q-sort-bar" id="q-sort-bar" style="display:none;">
-      <span style="font-size:.7rem;color:var(--muted);">Ordina per:</span>
-      <select id="q-sort-sel" onchange="renderQuoteCards()">
-        <option value="price_asc">Prezzo ↑</option>
-        <option value="price_desc">Prezzo ↓</option>
-        <option value="days_asc">Consegna ↑</option>
-        <option value="carrier">Corriere A-Z</option>
+    <div class="qsortbar" id="qsortbar" style="display:none;">
+      <span style="font-size:.7rem;color:var(--muted);">Ordina:</span>
+      <select id="qsort" onchange="renderQ()">
+        <option value="pa">Prezzo ↑</option><option value="pd">Prezzo ↓</option>
+        <option value="da">Consegna ↑</option><option value="ca">Corriere A-Z</option>
       </select>
-      <span class="q-count" id="q-count-label"></span>
+      <span style="font-size:.7rem;color:var(--muted);margin-left:auto;" id="qcnt"></span>
     </div>
-    <div class="q-results-grid" id="q-results-grid"></div>
-    <div id="q-redirect-panel" style="display:none;margin-top:20px;">
+    <div class="qgrid" id="qgrid"></div>
+    <div id="qredir" style="display:none;margin-top:18px;">
       <div class="sl" style="margin-bottom:10px;">🔗 Preventivi su siti esterni</div>
-      <div id="q-redirect-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+      <div id="qrcards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
     </div>
-    <div style="font-size:.64rem;color:var(--muted);margin-top:14px;line-height:1.7;opacity:.75;">
-      Prezzi indicativi. IVA e sovrattasse escluse.
-    </div>
+    <div style="font-size:.63rem;color:var(--muted);margin-top:12px;line-height:1.7;opacity:.75;">Prezzi indicativi. IVA e sovrattasse escluse.</div>
   </div>
-
-</div>
 </div>
 </div>
 
@@ -1123,7 +1048,7 @@ function makeScene(color=0x252932){
   const g=new THREE.GridHelper(20000,40,color,color);sc.add(g);
   return{sc,g};
 }
-const SP=makeScene(0xd1d5db),SC=makeScene(0xc5cad4),ST=makeScene(0xc5d4c8);
+const SP=makeScene(0x252932),SC=makeScene(0x1a1d24),ST=makeScene(0x1a2416);
 
 function makeLights(sc,style='studio'){
   const a=new THREE.AmbientLight(0xffffff,0.55);sc.add(a);
@@ -3323,459 +3248,6 @@ async function initFuel(){
   await loadFuelData(false);
 }
 
-// ══════ QUOTAZIONI ══════
-const SHIPPO_TOKEN = 'shippo_live_40db4861be86c7e77555c38b397633bbf400c0a6';
-let qAllResults = [];
-let qSrc = {sh:true, pk:true, sp:true, sb:true};
-
-function toggleQSource(src) {
-  qSrc[src] = !qSrc[src];
-  const pill = document.getElementById('pill-'+src);
-  if (!pill) return;
-  const on = {sh:'border-color:#7c3aed;color:#7c3aed;background:rgba(124,58,237,.08)', pk:'border-color:var(--accent);color:var(--accent);background:rgba(212,136,10,.08)', sp:'border-color:var(--teal);color:var(--teal);background:rgba(13,148,136,.08)', sb:'border-color:#f97316;color:#f97316;background:rgba(249,115,22,.08)'};
-  const off = 'border-color:var(--border);color:var(--muted);background:var(--surface2)';
-  pill.style.cssText = qSrc[src] ? on[src] : off;
-  if (src==='sh') pill.classList.toggle('active-sh', qSrc[src]);
-  if (src==='pk') pill.classList.toggle('active-pk', qSrc[src]);
-}
-
-function importFromPallet() {
-  const lmm = parseFloat(document.getElementById('boxL')?.value||0);
-  const wmm = parseFloat(document.getElementById('boxW')?.value||0);
-  const hmm = parseFloat(document.getElementById('boxH')?.value||0);
-  const wkg = parseFloat(document.getElementById('boxKg')?.value||0);
-  if (lmm>0) document.getElementById('q-len').value = Math.round(lmm/10);
-  if (wmm>0) document.getElementById('q-wid').value = Math.round(wmm/10);
-  if (hmm>0) document.getElementById('q-hei').value = Math.round(hmm/10);
-  if (wkg>0) document.getElementById('q-wei').value = wkg;
-  ['q-len','q-wid','q-hei','q-wei'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.borderColor='var(--green)';setTimeout(()=>el.style.borderColor='',900);}});
-}
-
-function setQStatus(html, color='var(--muted)') {
-  document.getElementById('q-status-bar').innerHTML=`<div class="q-status-dot" style="background:${color};"></div>${html}`;
-}
-
-function hideQError() { document.getElementById('q-error-banner').style.display='none'; }
-function showQError(msg) { const el=document.getElementById('q-error-banner');el.style.display='block';el.textContent=msg; }
-
-function cEmoji(name) {
-  const u=(name||'').toUpperCase();
-  if(u.includes('DHL')) return '🟡';if(u.includes('UPS')) return '🟤';
-  if(u.includes('FEDEX')) return '🟣';if(u.includes('TNT')) return '🟠';
-  if(u.includes('GLS')) return '🔴';if(u.includes('BRT')) return '🔵';
-  if(u.includes('SDA')) return '🟢';return '📦';
-}
-
-function fmtDays(d) { const n=parseInt(d);return isNaN(n)?null:n===1?'1 giorno':`${n} giorni`; }
-
-function renderQuoteCards() {
-  const grid=document.getElementById('q-results-grid');
-  const sort=document.getElementById('q-sort-sel')?.value||'price_asc';
-  let res=[...qAllResults];
-  if(sort==='price_asc') res.sort((a,b)=>a.rate-b.rate);
-  else if(sort==='price_desc') res.sort((a,b)=>b.rate-a.rate);
-  else if(sort==='days_asc') res.sort((a,b)=>(a.days||999)-(b.days||999));
-  else res.sort((a,b)=>a.carrier.localeCompare(b.carrier));
-  if(!res.length){grid.innerHTML=`<div class="q-empty"><div class="q-empty-icon">🔍</div><div>Nessuna tariffa trovata per questa rotta.</div></div>`;return;}
-  document.getElementById('q-count-label').textContent=`${res.length} opzion${res.length===1?'e':'i'}`;
-  const prices=res.map(r=>r.rate);
-  const minP=Math.min(...prices),maxP=Math.max(...prices);
-  document.getElementById('qs-count').textContent=res.length;
-  const fmt=(v,c)=>new Intl.NumberFormat('it-IT',{style:'currency',currency:c||'EUR',minimumFractionDigits:2}).format(v);
-  document.getElementById('qs-min').textContent=fmt(minP,res[0].currency);
-  document.getElementById('qs-max').textContent=fmt(maxP,res[0].currency);
-  document.getElementById('q-summary-bar').style.display='grid';
-  document.getElementById('q-sort-bar').style.display='flex';
-  grid.innerHTML=res.map((r,i)=>{
-    const best=r.rate===minP;
-    const days=fmtDays(r.days);
-    const col=best?'var(--green)':'var(--text)';
-    return `<div class="q-card" style="animation-delay:${i*.04}s${best?';border-color:var(--green)':''}">
-      <div class="q-card-head">
-        <div class="q-carrier-logo" style="background:var(--surface2);">${cEmoji(r.carrier)}</div>
-        <div><div class="q-carrier-name">${r.carrier}</div><div class="q-service-name">${r.service||'—'}</div></div>
-        <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-          ${best?'<span style="font-size:.6rem;color:var(--green);font-weight:700;">✅ BEST</span>':''}
-          <span style="font-size:.58rem;padding:2px 7px;border-radius:4px;background:rgba(124,58,237,.1);color:#7c3aed;">Shippo</span>
-        </div>
-      </div>
-      <div class="q-card-body">
-        <div class="q-price-row"><span class="q-currency" style="color:${col}">${r.currency||'EUR'}</span><span class="q-price" style="color:${col}">${parseFloat(r.rate).toFixed(2)}</span></div>
-        <div class="q-meta-row">${days?`<span class="q-meta-pill hi">🕐 ${days}</span>`:''}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function fetchShippo(params) {
-  setQStatus('<span class="q-spinner" style="color:#7c3aed;"></span>Richiesta tariffe…','#7c3aed');
-  try {
-    const payload={
-      address_from:{name:'Mittente',street1:'Via Roma 1',city:params.fromCity,zip:params.fromZip,country:params.fromCountry},
-      address_to:{name:'Destinatario',street1:'1 Main St',city:params.toCity,zip:params.toZip,country:params.toCountry},
-      parcels:[{length:String(params.lengthCm),width:String(params.widthCm),height:String(params.heightCm),distance_unit:'cm',weight:String(params.weightKg),mass_unit:'kg'}],
-      async:false
-    };
-    const res=await fetch('https://api.goshippo.com/shipments/',{method:'POST',headers:{'Authorization':`ShippoToken ${SHIPPO_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.detail||`HTTP ${res.status}`);}
-    const data=await res.json();
-    console.log('Shippo rates:',data.rates?.length, data.messages);
-    return (data.rates||[]).map(r=>{
-      const amount=parseFloat(r.amount_local||r.amount);
-      return {source:'Shippo',carrier:r.provider||'?',service:r.servicelevel?.name||'?',rate:amount,currency:r.currency_local||r.currency||'EUR',days:r.estimated_days,deliveryDate:r.arrives_by?r.arrives_by.slice(0,10):null};
-    }).filter(r=>!isNaN(r.rate)&&r.rate>0);
-  }catch(e){
-    console.warn('Shippo error:',e);
-    showQError(`Shippo: ${e.message}`);
-    return[];
-  }
-}
-
-function buildRedirects(params) {
-  const wg=Math.max(1,Math.round(parseFloat(params.weightKg)));
-  const lcm=Math.round(params.lengthCm),wcm=Math.round(params.widthCm),hcm=Math.round(params.heightCm);
-  const fc=params.fromCountry,tc=params.toCountry,fz=params.fromZip,tz=params.toZip;
-  const links=[];
-  if(qSrc.pk) links.push({name:'Packlink',emoji:'🟡',color:'var(--accent)',bg:'rgba(212,136,10,.08)',url:`https://www.packlink.it/it-IT/prezzi/?origin_country=${fc}&destination_country=${tc}&weight=${wg}&length=${lcm}&width=${wcm}&height=${hcm}`,note:'DHL, UPS, GLS, BRT'});
-  if(qSrc.sp) links.push({name:'Spedire.com',emoji:'🟢',color:'var(--teal)',bg:'rgba(13,148,136,.08)',url:`https://www.spedire.com/${fc!==tc?'spedizioni-internazionali/':''}?peso=${wg}&lunghezza=${lcm}&larghezza=${wcm}&altezza=${hcm}${fz?'&cap_mittente='+fz:''}${tz?'&cap_destinatario='+tz:''}`,note:'Nazionale + internazionale'});
-  if(qSrc.sb) links.push({name:'Sendabox',emoji:'🟠',color:'#f97316',bg:'rgba(249,115,22,.08)',url:`https://www.sendabox.it/preventivo/?weight=${wg*1000}&length=${lcm}&width=${wcm}&height=${hcm}&from_country=${fc}&to_country=${tc}`,note:'DHL, UPS, FedEx, GLS'});
-  return links;
-}
-
-function renderRedirects(params) {
-  const links=buildRedirects(params);
-  const panel=document.getElementById('q-redirect-panel');
-  const cards=document.getElementById('q-redirect-cards');
-  if(!links.length){panel.style.display='none';return;}
-  panel.style.display='block';
-  cards.innerHTML=links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener" style="text-decoration:none;"><div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:5px;transition:border-color .2s,transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.06);" onmouseover="this.style.borderColor='${l.color}';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:1.1rem;">${l.emoji}</span><span style="font-family:'Syne',sans-serif;font-size:.86rem;font-weight:700;color:var(--text);">${l.name}</span><span style="margin-left:auto;font-size:.6rem;padding:2px 8px;border-radius:4px;background:${l.bg};color:${l.color};border:1px solid ${l.color}44;">↗ Apri</span></div><div style="font-size:.63rem;color:${l.color};opacity:.85;">${l.note}</div></div></a>`).join('');
-}
-
-async function runQuotes() {
-  hideQError(); qAllResults=[];
-  const fromCountry=document.getElementById('q-from-country').value;
-  const fromZip=document.getElementById('q-from-zip').value.trim();
-  const fromCity=document.getElementById('q-from-city').value.trim();
-  const toCountry=document.getElementById('q-to-country').value;
-  const toZip=document.getElementById('q-to-zip').value.trim();
-  const toCity=document.getElementById('q-to-city').value.trim();
-  const lenCm=parseFloat(document.getElementById('q-len').value)||60;
-  const widCm=parseFloat(document.getElementById('q-wid').value)||40;
-  const heiCm=parseFloat(document.getElementById('q-hei').value)||40;
-  const weightKg=parseFloat(document.getElementById('q-wei').value)||1;
-  if(!fromZip||!toZip){showQError('Inserisci CAP mittente e destinatario.');return;}
-  const params={fromCountry,fromZip,fromCity,toCountry,toZip,toCity,lengthCm:lenCm,widthCm:widCm,heightCm:heiCm,weightKg:weightKg.toFixed(3)};
-  document.getElementById('q-results-section').style.display='block';
-  document.getElementById('q-summary-bar').style.display='none';
-  document.getElementById('q-sort-bar').style.display='none';
-  document.getElementById('q-redirect-panel').style.display='none';
-  document.getElementById('q-results-grid').innerHTML=`<div class="q-empty"><div class="q-spinner" style="width:26px;height:26px;border-width:3px;color:var(--green);margin:0 auto 12px;"></div><div>Richiesta tariffe in corso…</div></div>`;
-  const shResults=qSrc.sh?await fetchShippo(params):[];
-  qAllResults=[...shResults];
-  if(qAllResults.length>0){setQStatus(`✅ ${qAllResults.length} tariffe trovate`,'var(--green)');renderQuoteCards();}
-  else{setQStatus('Nessuna tariffa disponibile per questa rotta','#dc2626');document.getElementById('q-results-grid').innerHTML=`<div class="q-empty"><div class="q-empty-icon">⚠️</div><div>Nessuna tariffa Shippo trovata per questa rotta.<br>Usa i link esterni per un preventivo.</div></div>`;}
-  renderRedirects(params);
-}
-
-// ══════ STRUMENTI ══════
-
-// --- Peso Volumetrico ---
-function calcVolWeight() {
-  const l = parseFloat(document.getElementById('vw-l').value)||0;
-  const w = parseFloat(document.getElementById('vw-w').value)||0;
-  const h = parseFloat(document.getElementById('vw-h').value)||0;
-  const kg = parseFloat(document.getElementById('vw-kg').value)||0;
-  const div = parseInt(document.getElementById('vw-div').value)||5000;
-  const vol = (l * w * h) / div;
-  const chargeable = Math.max(kg, vol);
-  const isBillVol = vol > kg;
-  const diff = Math.abs(vol - kg);
-  const el = document.getElementById('vw-result');
-  el.classList.add('show');
-  el.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
-      <div class="road-kpi-card"><div class="tool-kpi amber">${kg.toFixed(1)}</div><div class="tool-sub">Peso reale (kg)</div></div>
-      <div class="road-kpi-card"><div class="tool-kpi ${isBillVol?'green':'amber'}">${vol.toFixed(1)}</div><div class="tool-sub">Peso vol. (kg)</div></div>
-      <div class="road-kpi-card"><div class="tool-kpi" style="color:#6366f1;">${chargeable.toFixed(1)}</div><div class="tool-sub">Fatturato (kg)</div></div>
-    </div>
-    <div style="font-size:.72rem;color:var(--muted);line-height:1.8;">
-      Volume: <b style="color:var(--text)">${(l*w*h/1000000).toFixed(4)} m³</b><br>
-      Peso fatturato: <b style="color:#6366f1">${isBillVol?'Volumetrico':'Reale'}</b>
-      <span class="vol-badge" style="background:${isBillVol?'rgba(34,197,94,.12)':'rgba(240,165,0,.12)'};color:${isBillVol?'var(--green)':'var(--accent)'}">
-        ${isBillVol?'+'+diff.toFixed(1)+' kg vol.':'-'+diff.toFixed(1)+' kg'}
-      </span>
-    </div>`;
-}
-
-// --- Costo Trasporto Stradale ---
-function calcRoadCost() {
-  const km = parseFloat(document.getElementById('rt-km').value)||0;
-  const veh = parseInt(document.getElementById('rt-veh').value)||1;
-  const cons = parseFloat(document.getElementById('rt-cons').value)||32;
-  const fuelP = parseFloat(document.getElementById('rt-fuel').value)||1.65;
-  const driver = parseFloat(document.getElementById('rt-driver').value)||0;
-  const speed = parseFloat(document.getElementById('rt-speed').value)||80;
-  const toll = parseFloat(document.getElementById('rt-toll').value)||0;
-
-  const hours = km / speed;
-  const days = Math.ceil(hours / 9); // 9h driving per day
-  const fuelCost = (km / 100) * cons * fuelP;
-  const driverCost = days * driver;
-  const totalPerVeh = fuelCost + driverCost + toll;
-  const total = totalPerVeh * veh;
-  const perKm = total / km;
-
-  const fmt = v => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(v);
-  const el = document.getElementById('rt-result');
-  el.classList.add('show');
-  el.innerHTML = `
-    <div class="road-result-grid">
-      <div class="road-kpi-card"><div class="tool-kpi green">${fmt(total)}</div><div class="tool-sub">Costo totale</div></div>
-      <div class="road-kpi-card"><div class="tool-kpi" style="color:var(--accent);">${fmt(perKm)}/km</div><div class="tool-sub">Costo per km</div></div>
-      <div class="road-kpi-card"><div class="tool-kpi" style="color:var(--blue);">${fmt(fuelCost*veh)}</div><div class="tool-sub">Carburante</div></div>
-      <div class="road-kpi-card"><div class="tool-kpi" style="color:var(--muted);">${fmt(driverCost*veh)}</div><div class="tool-sub">Autista (${days}gg)</div></div>
-    </div>
-    <div style="font-size:.71rem;color:var(--muted);line-height:1.9;margin-top:10px;">
-      Percorso: <b style="color:var(--text)">${km.toLocaleString('it-IT')} km</b> · Tempo: <b style="color:var(--text)">${hours.toFixed(1)}h</b><br>
-      Veicoli: <b style="color:var(--text)">${veh}</b> · Pedaggi: <b style="color:var(--text)">${fmt(toll*veh)}</b>
-    </div>`;
-}
-
-// --- Storico ---
-const HIST_KEY = 'chepallet_history';
-const MAX_HIST = 30;
-
-function saveToHistory(type, label, params) {
-  let hist = [];
-  try { hist = JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch(e){}
-  hist.unshift({type, label, params, ts: Date.now()});
-  if (hist.length > MAX_HIST) hist = hist.slice(0, MAX_HIST);
-  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
-  renderHistory();
-}
-
-function renderHistory() {
-  const el = document.getElementById('hist-list');
-  if (!el) return;
-  let hist = [];
-  try { hist = JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch(e){}
-  if (!hist.length) {
-    el.innerHTML = '<div class="hist-empty">Nessun calcolo salvato.<br>I calcoli vengono salvati automaticamente.</div>';
-    return;
-  }
-  const icons = {pallet:'📦', container:'🚢', truck:'🚛'};
-  el.innerHTML = hist.map((h,i) => `
-    <div class="hist-item" onclick="restoreFromHistory(${i})">
-      <span style="font-size:1.1rem;">${icons[h.type]||'📋'}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.label}</div>
-        <div class="hist-meta">${new Date(h.ts).toLocaleString('it-IT')}</div>
-      </div>
-      <span class="hist-badge">${h.type}</span>
-    </div>`).join('');
-}
-
-function restoreFromHistory(i) {
-  let hist = [];
-  try { hist = JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch(e){}
-  const h = hist[i];
-  if (!h) return;
-  const p = h.params;
-  if (h.type === 'pallet') {
-    if (p.boxL) document.getElementById('boxL').value = p.boxL;
-    if (p.boxW) document.getElementById('boxW').value = p.boxW;
-    if (p.boxH) document.getElementById('boxH').value = p.boxH;
-    if (p.boxKg) document.getElementById('boxKg').value = p.boxKg;
-    showPage('pallet', document.querySelectorAll('.nav-btn')[0]);
-    calcPallet();
-  }
-}
-
-function clearHistory() {
-  if (!confirm('Svuotare lo storico?')) return;
-  localStorage.removeItem(HIST_KEY);
-  renderHistory();
-}
-
-// Hook into calcPallet to auto-save
-const _origCalcPallet = calcPallet;
-function calcPallet() {
-  _origCalcPallet.apply(this, arguments);
-  try {
-    const l = document.getElementById('boxL')?.value;
-    const w = document.getElementById('boxW')?.value;
-    const h = document.getElementById('boxH')?.value;
-    const kg = document.getElementById('boxKg')?.value;
-    if (l && w && h && kg) {
-      saveToHistory('pallet', `Scatola ${l}×${w}×${h}mm · ${kg}kg`, {boxL:l, boxW:w, boxH:h, boxKg:kg});
-    }
-  } catch(e){}
-}
-
-// --- Condivisione link ---
-function getShareParams() {
-  const sec = document.getElementById('sh-section').value;
-  const params = {};
-  if (sec === 'pallet') {
-    ['boxL','boxW','boxH','boxKg'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) params[id] = el.value;
-    });
-  } else if (sec === 'container') {
-    ['cboxL','cboxW','cboxH','cboxKg'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) params[id] = el.value;
-    });
-  } else if (sec === 'truck') {
-    ['tboxL','tboxW','tboxH','tboxKg'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) params[id] = el.value;
-    });
-  }
-  return {sec, params};
-}
-
-function generateShareLink() {
-  const {sec, params} = getShareParams();
-  const qs = new URLSearchParams({sec, ...params}).toString();
-  const url = `${location.origin}${location.pathname}?${qs}`;
-  const box = document.getElementById('share-box');
-  box.classList.add('show');
-  box.textContent = url;
-  document.getElementById('share-copy-btn').style.display = 'block';
-}
-
-function copyShareLink() {
-  const url = document.getElementById('share-box').textContent;
-  navigator.clipboard.writeText(url).then(() => {
-    const btn = document.getElementById('share-copy-btn');
-    btn.textContent = '✅ Copiato!';
-    setTimeout(() => btn.textContent = '📋 Copia link', 1800);
-  });
-}
-
-function applyShareParams() {
-  const sp = new URLSearchParams(location.search);
-  if (!sp.has('sec')) return;
-  const sec = sp.get('sec');
-  sp.forEach((v,k) => {
-    if (k === 'sec') return;
-    const el = document.getElementById(k);
-    if (el) el.value = v;
-  });
-  const navBtns = document.querySelectorAll('.nav-btn');
-  const secIdx = {pallet:0, container:1, truck:2};
-  if (sec in secIdx) {
-    showPage(sec, navBtns[secIdx[sec]]);
-    if (sec === 'pallet') calcPallet();
-  }
-}
-
-// --- Cambio Valuta ---
-let cxRates = null;
-let cxBase = 'EUR';
-
-async function loadExchangeRates() {
-  try {
-    const res = await fetch('https://api.frankfurter.app/latest?from=EUR');
-    const data = await res.json();
-    cxRates = data.rates;
-    cxRates['EUR'] = 1;
-    document.getElementById('cx-ts').textContent = `Aggiornato: ${data.date}`;
-    convertCurrency();
-  } catch(e) {
-    // fallback static rates
-    cxRates = {EUR:1, USD:1.085, GBP:0.857, CNY:7.86, JPY:161.2, CHF:0.975};
-    document.getElementById('cx-ts').textContent = 'Tariffe di riserva (offline)';
-    convertCurrency();
-  }
-}
-
-function convertCurrency() {
-  if (!cxRates) return;
-  const amount = parseFloat(document.getElementById('cx-amount').value)||0;
-  const from = document.getElementById('cx-from').value;
-  const targets = [{code:'USD',flag:'🇺🇸'},{code:'EUR',flag:'🇪🇺'},{code:'GBP',flag:'🇬🇧'},{code:'CNY',flag:'🇨🇳'},{code:'JPY',flag:'🇯🇵'},{code:'CHF',flag:'🇨🇭'}].filter(t=>t.code!==from);
-  const fromRate = cxRates[from] || 1;
-  const grid = document.getElementById('cx-grid');
-  grid.innerHTML = targets.map(t => {
-    const rate = cxRates[t.code] || 1;
-    const converted = (amount / fromRate) * rate;
-    const fmt = new Intl.NumberFormat('it-IT',{minimumFractionDigits: t.code==='JPY'?0:2, maximumFractionDigits: t.code==='JPY'?0:2});
-    return `<div class="cur-card">
-      <div class="cur-flag">${t.flag}</div>
-      <div class="cur-rate">${fmt.format(converted)}</div>
-      <div class="cur-label">${t.code} · 1${from}=${(rate/fromRate).toFixed(4)}${t.code}</div>
-    </div>`;
-  }).join('');
-}
-
-function refreshRates() {
-  document.getElementById('cx-grid').innerHTML = '<div class="cur-card" style="grid-column:1/-1"><div class="cur-flag">⏳</div><div class="cur-rate">—</div><div class="cur-label">Caricamento…</div></div>';
-  cxRates = null;
-  loadExchangeRates();
-}
-
-// --- Glossario ---
-const GLOSSARY = [
-  {term:`TEU`, def:`Twenty-foot Equivalent Unit — unità di misura container standard da 20 piedi (6.1m). Un container 40ft = 2 TEU.`},
-  {term:`FEU`, def:`Forty-foot Equivalent Unit — container standard da 40 piedi. Capacità ~67.7m³, portata ~27.6t.`},
-  {term:`Demurrage`, def:`Penale per mancata riconsegna del container vuoto al terminal entro i giorni di franchigia (free days). Si calcola per giorno di ritardo.`},
-  {term:`Detention`, def:`Penale per mancata restituzione del container vuoto al depot/vettore. Diverso dal demurrage che riguarda il terminal.`},
-  {term:`FCL`, def:`Full Container Load — il carico occupa un container intero. Più economico per volumi elevati rispetto all'LCL.`},
-  {term:`LCL`, def:`Less than Container Load — groupage: merci di più speditori condividono lo stesso container. Tariffe al m³ o tonnellata.`},
-  {term:`LTL`, def:`Less Than Truckload — trasporto stradale in groupage. Il costo si ripartisce tra più speditori sullo stesso camion.`},
-  {term:`FTL`, def:`Full Truck Load — un solo spedizioniere occupa l'intero veicolo. Più rapido e sicuro rispetto all'LTL.`},
-  {term:`ETA`, def:`Estimated Time of Arrival — data/ora stimata di arrivo della merce a destinazione.`},
-  {term:`ETD`, def:`Estimated Time of Departure — data/ora stimata di partenza dal porto/magazzino di origine.`},
-  {term:`B/L`, def:`Bill of Lading — polizza di carico. Documento che attesta il contratto di trasporto marittimo e la proprietà della merce.`},
-  {term:`CMR`, def:`Convention Marchandise Routière — lettera di vettura internazionale per trasporto stradale. Obbligatoria nei trasporti UE.`},
-  {term:`Incoterms`, def:`International Commercial Terms — regole ICC che definiscono chi paga il trasporto, le assicurazioni e chi assume i rischi (EXW, FOB, CIF, DDP…).`},
-  {term:`FOB`, def:`Free On Board — il venditore consegna la merce a bordo nave. Da quel momento i rischi passano all'acquirente.`},
-  {term:`CIF`, def:`Cost Insurance Freight — il venditore copre costo, assicurazione e nolo fino al porto di destinazione.`},
-  {term:`DDP`, def:`Delivered Duty Paid — il venditore si fa carico di tutto incluse dogana e tasse nel paese dell'acquirente.`},
-  {term:`EXW`, def:`Ex Works — il venditore mette la merce a disposizione in fabbrica. Tutti i costi e rischi sono dell'acquirente.`},
-  {term:`HS Code`, def:`Harmonized System Code — codice doganale internazionale a 6-10 cifre che classifica le merci. Obbligatorio per l'export.`},
-  {term:`Peso volumetrico`, def:`Peso calcolato in base alle dimensioni: L×W×H (cm) ÷ divisore (5000 standard). Il corriere fattura il maggiore tra peso reale e volumetrico.`},
-  {term:`Overhang`, def:`Sporgenza delle scatole oltre il bordo del pallet. Tollerabile entro 20-30mm per lato, oltre si rischia instabilità e rifiuto del carico.`},
-  {term:`Packing List`, def:`Documento che elenca dettagliatamente il contenuto di ogni collo/pallet: descrizione, quantità, peso, volume. Accompagna sempre la fattura commerciale.`},
-  {term:`ADR`, def:`Accord Dangereux Routier — normativa europea per il trasporto stradale di merci pericolose. Richiede formazione specifica e veicoli certificati.`},
-  {term:`Free Days`, def:`Giorni di franchigia concessi dalla shipping line per caricare/scaricare il container senza pagare demurrage o detention.`},
-  {term:`THC`, def:`Terminal Handling Charge — diritti portuali per la movimentazione del container nel terminal. Addebitati sia al porto di origine che destinazione.`},
-  {term:`BAF`, def:`Bunker Adjustment Factor — sovrattassa carburante applicata dalle compagnie di navigazione. Varia con il prezzo del bunker.`},
-  {term:`CAF`, def:`Currency Adjustment Factor — sovrattassa valutaria applicata sulle tariffe di nolo per coprire le fluttuazioni di cambio.`},
-];
-
-function renderGlossary(filter='') {
-  const el = document.getElementById('glos-list');
-  const f = filter.toLowerCase().trim();
-  const items = f ? GLOSSARY.filter(g => g.term.toLowerCase().includes(f) || g.def.toLowerCase().includes(f)) : GLOSSARY;
-  if (!items.length) { el.innerHTML = '<div class="hist-empty">Nessun termine trovato.</div>'; return; }
-  el.innerHTML = items.map((g,i) => `
-    <div class="glos-item">
-      <div class="glos-term" onclick="toggleGlos(this)">
-        <span>${g.term}</span><span style="color:var(--muted);font-size:.8rem;">▾</span>
-      </div>
-      <div class="glos-def">${g.def}</div>
-    </div>`).join('');
-}
-
-function toggleGlos(el) {
-  const def = el.nextElementSibling;
-  def.classList.toggle('open');
-  el.style.color = def.classList.contains('open') ? '#6366f1' : '';
-}
-
-function filterGlossary() {
-  renderGlossary(document.getElementById('glos-search').value);
-}
-
-function initTools() {
-  renderHistory();
-  renderGlossary();
-  if (!cxRates) loadExchangeRates();
-}
-
 // Init
 toggleOvhField();
 calcPallet();
@@ -3784,8 +3256,337 @@ routeDefaultDates();
 // Auto-load fuel data in background on page open (silent, non-blocking)
 loadFuelData(false);
 applyShareParams();
-calcVolWeight();
+calcVW();
 
+// ══════ STRUMENTI ══════
+
+// Peso volumetrico
+function calcVW() {
+  const l=parseFloat(document.getElementById('vl').value)||0;
+  const w=parseFloat(document.getElementById('vw').value)||0;
+  const h=parseFloat(document.getElementById('vh').value)||0;
+  const kg=parseFloat(document.getElementById('vkg').value)||0;
+  const div=parseInt(document.getElementById('vdiv').value)||5000;
+  const vol=(l*w*h)/div;
+  const ch=Math.max(kg,vol);
+  const isV=vol>kg;
+  const el=document.getElementById('vres');
+  el.classList.add('show');
+  el.innerHTML=`<div class="rg3">
+    <div class="rkc"><div class="tkpi a">${kg.toFixed(1)}</div><div class="slb">Reale (kg)</div></div>
+    <div class="rkc"><div class="tkpi ${isV?'g':'a'}">${vol.toFixed(1)}</div><div class="slb">Volumetrico (kg)</div></div>
+    <div class="rkc"><div class="tkpi" style="color:#6366f1">${ch.toFixed(1)}</div><div class="slb">Fatturato (kg)</div></div>
+  </div>
+  <div style="margin-top:10px;font-size:.72rem;color:var(--muted);line-height:1.9;">
+    Volume: <b style="color:var(--text)">${(l*w*h/1e6).toFixed(4)} m³</b><br>
+    Peso fatturato: <b style="color:#6366f1">${isV?'Volumetrico (+'+((vol-kg).toFixed(1))+'kg)':'Reale (-'+((kg-vol).toFixed(1))+'kg vol.)'}</b>
+  </div>`;
+}
+
+// Costo stradale
+function calcRoad() {
+  const km=parseFloat(document.getElementById('rtkm').value)||0;
+  const veh=parseInt(document.getElementById('rtveh').value)||1;
+  const cons=parseFloat(document.getElementById('rtcons').value)||32;
+  const fp=parseFloat(document.getElementById('rtfuel').value)||1.65;
+  const drv=parseFloat(document.getElementById('rtdrv').value)||0;
+  const spd=parseFloat(document.getElementById('rtspd').value)||80;
+  const toll=parseFloat(document.getElementById('rttoll').value)||0;
+  const hrs=km/spd;
+  const days=Math.ceil(hrs/9);
+  const fuel=(km/100)*cons*fp;
+  const drvC=days*drv;
+  const tot=(fuel+drvC+toll)*veh;
+  const fmt=v=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(v);
+  const el=document.getElementById('rtres');
+  el.classList.add('show');
+  el.innerHTML=`<div class="rg2">
+    <div class="rkc"><div class="tkpi g">${fmt(tot)}</div><div class="slb">Costo totale</div></div>
+    <div class="rkc"><div class="tkpi a">${fmt(tot/km)}/km</div><div class="slb">Costo per km</div></div>
+    <div class="rkc"><div class="tkpi b">${fmt(fuel*veh)}</div><div class="slb">Carburante</div></div>
+    <div class="rkc"><div class="tkpi" style="color:var(--muted)">${fmt(drvC*veh)}</div><div class="slb">Autista (${days}gg)</div></div>
+  </div>
+  <div style="margin-top:10px;font-size:.72rem;color:var(--muted);line-height:1.9;">
+    Percorso: <b style="color:var(--text)">${km.toLocaleString('it-IT')} km</b> · Tempo: <b style="color:var(--text)">${hrs.toFixed(1)}h</b> · Pedaggi: <b style="color:var(--text)">${fmt(toll*veh)}</b>
+  </div>`;
+}
+
+// Storico
+const HKEY='chepallet_history';
+function saveHist(type,label,params) {
+  let h=[];try{h=JSON.parse(localStorage.getItem(HKEY)||'[]');}catch(e){}
+  h.unshift({type,label,params,ts:Date.now()});
+  if(h.length>30) h=h.slice(0,30);
+  localStorage.setItem(HKEY,JSON.stringify(h));
+  renderHist();
+}
+function renderHist() {
+  const el=document.getElementById('histlist');if(!el)return;
+  let h=[];try{h=JSON.parse(localStorage.getItem(HKEY)||'[]');}catch(e){}
+  if(!h.length){el.innerHTML='<div class="hempty">Nessun calcolo salvato ancora.<br>I calcoli pallet vengono salvati automaticamente.</div>';return;}
+  const ic={pallet:'📦',container:'🚢',truck:'🚛'};
+  el.innerHTML=h.map((x,i)=>`<div class="hi" onclick="restoreH(${i})">
+    <span style="font-size:1.1rem">${ic[x.type]||'📋'}</span>
+    <div style="flex:1;min-width:0;"><div style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${x.label}</div>
+    <div style="font-size:.63rem;color:var(--muted);">${new Date(x.ts).toLocaleString('it-IT')}</div></div>
+    <span class="hbadge">${x.type}</span>
+  </div>`).join('');
+}
+function restoreH(i) {
+  let h=[];try{h=JSON.parse(localStorage.getItem(HKEY)||'[]');}catch(e){}
+  const x=h[i];if(!x)return;
+  if(x.type==='pallet') {
+    Object.entries(x.params).forEach(([k,v])=>{const e=document.getElementById(k);if(e)e.value=v;});
+    showPage('pallet',document.querySelectorAll('.nav-btn')[0]);
+    calcPallet();
+  }
+}
+function clearHist() {
+  if(!confirm('Svuotare lo storico?'))return;
+  localStorage.removeItem(HKEY);renderHist();
+}
+// Hook calcPallet for history
+const _cp=calcPallet;
+function calcPallet() {
+  _cp.apply(this,arguments);
+  try {
+    const l=document.getElementById('boxL')?.value;
+    const w=document.getElementById('boxW')?.value;
+    const h=document.getElementById('boxH')?.value;
+    const kg=document.getElementById('boxKg')?.value;
+    if(l&&w&&h&&kg) saveHist('pallet',`Scatola ${l}×${w}×${h}mm · ${kg}kg`,{boxL:l,boxW:w,boxH:h,boxKg:kg});
+  }catch(e){}
+}
+
+// Condivisione link
+function genLink() {
+  const sec=document.getElementById('shsec').value;
+  const map={pallet:['boxL','boxW','boxH','boxKg'],container:['cboxL','cboxW','cboxH','cboxKg'],truck:['tboxL','tboxW','tboxH','tboxKg']};
+  const params={sec};
+  (map[sec]||[]).forEach(id=>{const e=document.getElementById(id);if(e)params[id]=e.value;});
+  const url=`${location.origin}${location.pathname}?${new URLSearchParams(params)}`;
+  const box=document.getElementById('sbox');box.classList.add('show');box.textContent=url;
+  document.getElementById('copybtn').style.display='block';
+}
+function copyLink() {
+  navigator.clipboard.writeText(document.getElementById('sbox').textContent).then(()=>{
+    const b=document.getElementById('copybtn');b.textContent='✅ Copiato!';
+    setTimeout(()=>b.textContent='📋 Copia link',1800);
+  });
+}
+function applyShareParams() {
+  const sp=new URLSearchParams(location.search);
+  if(!sp.has('sec'))return;
+  sp.forEach((v,k)=>{if(k==='sec')return;const e=document.getElementById(k);if(e)e.value=v;});
+  const sec=sp.get('sec');
+  const idx={pallet:0,container:1,truck:2};
+  if(sec in idx){showPage(sec,document.querySelectorAll('.nav-btn')[idx[sec]]);if(sec==='pallet')calcPallet();}
+}
+
+// Cambio valuta
+let cxR=null;
+async function loadCX() {
+  try {
+    const r=await fetch('https://api.frankfurter.app/latest?from=EUR');
+    const d=await r.json();
+    cxR=d.rates;cxR['EUR']=1;
+    document.getElementById('cxts').textContent='Aggiornato: '+d.date;
+    convCX();
+  }catch(e){
+    cxR={EUR:1,USD:1.085,GBP:0.857,CNY:7.86,JPY:161.2,CHF:0.975};
+    document.getElementById('cxts').textContent='Tariffe offline';
+    convCX();
+  }
+}
+function convCX() {
+  if(!cxR)return;
+  const amt=parseFloat(document.getElementById('cxamt').value)||0;
+  const from=document.getElementById('cxfrom').value;
+  const targets=[{c:'USD',f:'🇺🇸'},{c:'EUR',f:'🇪🇺'},{c:'GBP',f:'🇬🇧'},{c:'CNY',f:'🇨🇳'},{c:'JPY',f:'🇯🇵'},{c:'CHF',f:'🇨🇭'}].filter(t=>t.c!==from);
+  const fr=cxR[from]||1;
+  document.getElementById('cxgrid').innerHTML=targets.map(t=>{
+    const r=cxR[t.c]||1;
+    const cv=(amt/fr)*r;
+    const fm=new Intl.NumberFormat('it-IT',{minimumFractionDigits:t.c==='JPY'?0:2,maximumFractionDigits:t.c==='JPY'?0:2});
+    return `<div class="cxc"><div style="font-size:1.2rem">${t.f}</div><div class="cxr">${fm.format(cv)}</div><div style="font-size:.6rem;color:var(--muted);margin-top:2px;">${t.c}</div></div>`;
+  }).join('');
+}
+function refreshCX(){cxR=null;document.getElementById('cxgrid').innerHTML='<div class="cxc" style="grid-column:1/-1;color:var(--muted);font-size:.75rem;">⏳</div>';loadCX();}
+
+// Glossario
+const GLOS=[
+  ['TEU','Twenty-foot Equivalent Unit — unità di misura container standard da 20 piedi (6.1m). Un container 40ft = 2 TEU.'],
+  ['FEU','Forty-foot Equivalent Unit — container da 40 piedi. Capacità ~67.7m³, portata ~27.6t.'],
+  ['Demurrage','Penale per mancata riconsegna del container vuoto al terminal entro i giorni di franchigia. Si calcola per giorno.'],
+  ['Detention','Penale per mancata restituzione del container vuoto al depot. Diverso dal demurrage che riguarda il terminal.'],
+  ['FCL','Full Container Load — il carico occupa un container intero. Più economico per grandi volumi rispetto a LCL.'],
+  ['LCL','Less than Container Load — groupage: merci di più speditori nello stesso container. Tariffe a m³ o tonnellata.'],
+  ['LTL','Less Than Truckload — trasporto stradale in groupage. Il costo si divide tra più speditori sullo stesso camion.'],
+  ['FTL','Full Truck Load — un solo spedizioniere occupa il veicolo intero. Più rapido e sicuro rispetto a LTL.'],
+  ['ETA','Estimated Time of Arrival — data/ora stimata di arrivo a destinazione.'],
+  ['ETD','Estimated Time of Departure — data/ora stimata di partenza dal porto/magazzino.'],
+  ['B/L','Bill of Lading — polizza di carico. Contratto di trasporto marittimo e titolo di proprietà della merce.'],
+  ['CMR','Convention Marchandise Routière — lettera di vettura internazionale per trasporto stradale. Obbligatoria in UE.'],
+  ['Incoterms','Regole ICC che definiscono chi paga trasporto, assicurazioni e chi assume i rischi (EXW, FOB, CIF, DDP…).'],
+  ['FOB','Free On Board — il venditore consegna la merce a bordo nave. I rischi passano poi al compratore.'],
+  ['CIF','Cost Insurance Freight — il venditore copre costo, assicurazione e nolo fino al porto di destinazione.'],
+  ['DDP','Delivered Duty Paid — il venditore si fa carico di tutto, incluse dogana e tasse nel paese del compratore.'],
+  ['EXW','Ex Works — la merce è disponibile in fabbrica. Tutti i costi e rischi sono del compratore.'],
+  ['HS Code','Harmonized System Code — codice doganale a 6-10 cifre che classifica le merci. Obbligatorio per export.'],
+  ['Peso volumetrico','Peso calcolato in base alle dimensioni: L×W×H (cm) ÷ divisore. Il corriere fattura il maggiore tra reale e volumetrico.'],
+  ['Overhang','Sporgenza delle scatole oltre il bordo pallet. Tollerabile entro 20-30mm, oltre si rischia instabilità.'],
+  ['Packing List','Documento che elenca il contenuto di ogni collo: descrizione, quantità, peso, volume. Accompagna la fattura.'],
+  ['ADR','Accord Dangereux Routier — normativa per trasporto stradale di merci pericolose. Richiede veicoli certificati.'],
+  ['Free Days','Giorni di franchigia concessi dalla shipping line senza pagare demurrage o detention.'],
+  ['THC','Terminal Handling Charge — diritti portuali per la movimentazione del container. Applicati a origine e destinazione.'],
+  ['BAF','Bunker Adjustment Factor — sovrattassa carburante delle compagnie di navigazione. Varia con il prezzo del bunker.'],
+  ['CAF','Currency Adjustment Factor — sovrattassa valutaria sulle tariffe di nolo per le fluttuazioni di cambio.'],
+];
+function renderGlos(f='') {
+  const el=document.getElementById('glist');if(!el)return;
+  const fl=f.toLowerCase();
+  const items=fl?GLOS.filter(g=>g[0].toLowerCase().includes(fl)||g[1].toLowerCase().includes(fl)):GLOS;
+  if(!items.length){el.innerHTML='<div class="hempty">Nessun termine trovato.</div>';return;}
+  el.innerHTML=items.map(g=>`<div class="gitem">
+    <div class="gterm" onclick="togGlos(this)"><span>${g[0]}</span><span style="color:var(--muted);font-size:.8rem;">▾</span></div>
+    <div class="gdef">${g[1]}</div>
+  </div>`).join('');
+}
+function togGlos(el){const d=el.nextElementSibling;d.classList.toggle('open');el.style.color=d.classList.contains('open')?'#6366f1':'';}
+function filterGlos(){renderGlos(document.getElementById('gsearch').value);}
+
+function initTools(){
+  renderHist();
+  renderGlos();
+  if(!cxR)loadCX();
+  calcVW();
+}
+
+// ══════ QUOTAZIONI ══════
+const QTOK='shippo_live_40db4861be86c7e77555c38b397633bbf400c0a6';
+let qRes=[],qSrc={sh:true,pk:true,sp:true,sb:true};
+
+function qToggle(s){
+  qSrc[s]=!qSrc[s];
+  const p=document.getElementById('qp'+s);if(!p)return;
+  const on={sh:'border-color:#8b5cf6;color:#8b5cf6;background:rgba(139,92,246,.08)',pk:'border-color:var(--accent);color:var(--accent);background:rgba(240,165,0,.08)',sp:'border-color:var(--teal);color:var(--teal);background:rgba(20,184,166,.08)',sb:'border-color:#f97316;color:#f97316;background:rgba(249,115,22,.08)'};
+  p.style.cssText=qSrc[s]?on[s]:'border-color:var(--border);color:var(--muted);background:var(--surface2)';
+}
+
+function qImport(){
+  const m={qlen:'boxL',qwid:'boxW',qhei:'boxH',qwei:'boxKg'};
+  Object.entries(m).forEach(([to,from])=>{
+    const v=parseFloat(document.getElementById(from)?.value||0);
+    if(v>0){const e=document.getElementById(to);if(e){e.value=from==='boxKg'?v:Math.round(v/10);e.style.borderColor='var(--green)';setTimeout(()=>e.style.borderColor='',900);}}
+  });
+}
+
+function qStatus(html,color='var(--muted)'){document.getElementById('qsbar').innerHTML=`<div class="qsdot" style="background:${color};"></div>${html}`;}
+function qErr(msg){const e=document.getElementById('qerr');e.style.display=msg?'block':'none';if(msg)e.textContent=msg;}
+
+function qEmoji(n){
+  const u=(n||'').toUpperCase();
+  if(u.includes('DHL'))return'🟡';if(u.includes('UPS'))return'🟤';
+  if(u.includes('FEDEX'))return'🟣';if(u.includes('TNT'))return'🟠';
+  if(u.includes('GLS'))return'🔴';if(u.includes('BRT'))return'🔵';
+  if(u.includes('SDA'))return'🟢';return'📦';
+}
+
+function renderQ(){
+  const grid=document.getElementById('qgrid');
+  const sort=document.getElementById('qsort')?.value||'pa';
+  let r=[...qRes];
+  if(sort==='pa')r.sort((a,b)=>a.rate-b.rate);
+  else if(sort==='pd')r.sort((a,b)=>b.rate-a.rate);
+  else if(sort==='da')r.sort((a,b)=>(a.days||999)-(b.days||999));
+  else r.sort((a,b)=>a.carrier.localeCompare(b.carrier));
+  if(!r.length){grid.innerHTML='<div class="qempty"><div style="font-size:2rem;margin-bottom:8px;">🔍</div>Nessuna tariffa trovata.</div>';return;}
+  document.getElementById('qcnt').textContent=r.length+' opzion'+(r.length===1?'e':'i');
+  const ps=r.map(x=>x.rate),mn=Math.min(...ps),mx=Math.max(...ps);
+  const fmt=(v,c)=>new Intl.NumberFormat('it-IT',{style:'currency',currency:c||'EUR',minimumFractionDigits:2}).format(v);
+  document.getElementById('qsn').textContent=r.length;
+  document.getElementById('qsmin').textContent=fmt(mn,r[0].currency);
+  document.getElementById('qsmax').textContent=fmt(mx,r[0].currency);
+  document.getElementById('qsum').style.display='grid';
+  document.getElementById('qsortbar').style.display='flex';
+  grid.innerHTML=r.map((x,i)=>{
+    const best=x.rate===mn;const col=best?'var(--green)':'var(--text)';
+    const days=x.days?`<span class="qmp hi">🕐 ${x.days===1?'1 giorno':x.days+' giorni'}</span>`:'';
+    return `<div class="qcard" style="animation-delay:${i*.04}s${best?';border-color:var(--green)':''}">
+      <div class="qch">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">${qEmoji(x.carrier)}</div>
+        <div><div class="qcn">${x.carrier}</div><div class="qcs">${x.service||'—'}</div></div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          ${best?'<span style="font-size:.6rem;color:var(--green);font-weight:700;">✅ BEST</span>':''}
+          <span style="font-size:.58rem;padding:2px 7px;border-radius:4px;background:rgba(139,92,246,.1);color:#8b5cf6;">Shippo</span>
+        </div>
+      </div>
+      <div class="qcb">
+        <div class="qpr"><span style="font-size:.9rem;font-weight:600;color:${col}">${x.currency||'EUR'}</span><span class="qprice" style="color:${col}">${parseFloat(x.rate).toFixed(2)}</span></div>
+        <div class="qmr">${days}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function fetchShippo(p){
+  qStatus('<span class="qspin" style="color:#8b5cf6;"></span>Shippo: richiesta tariffe…','#8b5cf6');
+  try{
+    const body={
+      address_from:{name:'Mittente',street1:'Via Roma 1',city:p.fc,zip:p.fz,country:p.fco},
+      address_to:{name:'Destinatario',street1:'1 Main St',city:p.tc,zip:p.tz,country:p.tco},
+      parcels:[{length:String(p.l),width:String(p.w),height:String(p.h),distance_unit:'cm',weight:String(p.kg),mass_unit:'kg'}],
+      async:false
+    };
+    const res=await fetch('https://api.goshippo.com/shipments/',{method:'POST',headers:{'Authorization':'ShippoToken '+QTOK,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+res.status);}
+    const d=await res.json();
+    console.log('Shippo rates:',d.rates?.length,'msgs:',d.messages);
+    return(d.rates||[]).map(r=>{
+      const amt=parseFloat(r.amount_local||r.amount);
+      return {carrier:r.provider||'?',service:r.servicelevel?.name||'?',rate:amt,currency:r.currency_local||r.currency||'EUR',days:r.estimated_days};
+    }).filter(r=>!isNaN(r.rate)&&r.rate>0);
+  }catch(e){console.warn('Shippo:',e);qErr('Shippo: '+e.message);return[];}
+}
+
+function qRedir(p){
+  const wg=Math.max(1,Math.round(p.kg));
+  const lc=Math.round(p.l),wc=Math.round(p.w),hc=Math.round(p.h);
+  const links=[];
+  if(qSrc.pk)links.push({n:'Packlink',e:'🟡',c:'var(--accent)',bg:'rgba(240,165,0,.08)',url:`https://www.packlink.it/it-IT/prezzi/?origin_country=${p.fco}&destination_country=${p.tco}&weight=${wg}&length=${lc}&width=${wc}&height=${hc}`});
+  if(qSrc.sp)links.push({n:'Spedire.com',e:'🟢',c:'var(--teal)',bg:'rgba(20,184,166,.08)',url:`https://www.spedire.com/${p.fco!==p.tco?'spedizioni-internazionali/':''}?peso=${wg}&lunghezza=${lc}&larghezza=${wc}&altezza=${hc}${p.fz?'&cap_mittente='+p.fz:''}${p.tz?'&cap_destinatario='+p.tz:''}`});
+  if(qSrc.sb)links.push({n:'Sendabox',e:'🟠',c:'#f97316',bg:'rgba(249,115,22,.08)',url:`https://www.sendabox.it/preventivo/?weight=${wg*1000}&length=${lc}&width=${wc}&height=${hc}&from_country=${p.fco}&to_country=${p.tco}`});
+  const panel=document.getElementById('qredir');
+  if(!links.length){panel.style.display='none';return;}
+  panel.style.display='block';
+  document.getElementById('qrcards').innerHTML=links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener" style="text-decoration:none;"><div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:5px;transition:border-color .2s,transform .2s;" onmouseover="this.style.borderColor='${l.c}';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:1.1rem">${l.e}</span><span style="font-family:'Syne',sans-serif;font-size:.86rem;font-weight:700;color:var(--text)">${l.n}</span><span style="margin-left:auto;font-size:.6rem;padding:2px 8px;border-radius:4px;background:${l.bg};color:${l.c};">↗ Apri</span></div></div></a>`).join('');
+}
+
+async function runQ(){
+  qErr('');qRes=[];
+  const fco=document.getElementById('qfc').value;
+  const fz=document.getElementById('qfz').value.trim();
+  const fc=document.getElementById('qfcity').value.trim();
+  const tco=document.getElementById('qtc').value;
+  const tz=document.getElementById('qtz').value.trim();
+  const tc=document.getElementById('qtcity').value.trim();
+  const l=parseFloat(document.getElementById('qlen').value)||60;
+  const w=parseFloat(document.getElementById('qwid').value)||40;
+  const h=parseFloat(document.getElementById('qhei').value)||40;
+  const kg=parseFloat(document.getElementById('qwei').value)||1;
+  if(!fz||!tz){qErr('Inserisci CAP mittente e destinatario.');return;}
+  const p={fco,fz,fc,tco,tz,tc,l,w,h,kg:kg.toFixed(3)};
+  document.getElementById('qrsec').style.display='block';
+  document.getElementById('qsum').style.display='none';
+  document.getElementById('qsortbar').style.display='none';
+  document.getElementById('qredir').style.display='none';
+  document.getElementById('qgrid').innerHTML='<div class="qempty"><div class="qspin" style="width:26px;height:26px;border-width:3px;color:var(--green);margin:0 auto 12px;"></div><div>Richiesta tariffe…</div></div>';
+  const sh=qSrc.sh?await fetchShippo(p):[];
+  qRes=[...sh];
+  if(qRes.length>0){qStatus('✅ '+qRes.length+' tariffe trovate','var(--green)');renderQ();}
+  else{qStatus('Nessuna tariffa per questa rotta','#f87171');document.getElementById('qgrid').innerHTML='<div class="qempty"><div style="font-size:2rem;margin-bottom:8px;">⚠️</div>Nessuna tariffa trovata.<br>Usa i link esterni per un preventivo.</div>';}
+  qRedir(p);
+}
 
 </script>
 </body>
