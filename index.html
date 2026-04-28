@@ -237,6 +237,54 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .fuel-note{font-size:.65rem;color:var(--muted);padding:0 32px 20px;max-width:1440px;margin:0 auto;line-height:1.6;}
 @media(max-width:960px){.fuel-grid{padding:12px;}.fuel-kpi-grid{grid-template-columns:repeat(2,1fr);padding:0 12px 12px;}.fuel-filter-bar{padding:0 12px 12px;}.fuel-note{padding:0 12px 16px;}}
 
+/* QUOTES */
+.nav-btn.nq{background:rgba(34,197,94,0.08);}
+.nav-btn.nq.active{background:var(--green);color:#000;}
+.hero.qh::before{background:radial-gradient(ellipse,rgba(34,197,94,0.1) 0%,transparent 70%);}
+.hero h1 em.q{color:var(--green);}
+.quotes-wrap{max-width:1100px;margin:0 auto;padding:0 32px 56px;display:flex;flex-direction:column;gap:20px;}
+.q-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.q-route-row{display:grid;grid-template-columns:1fr 40px 1fr;gap:8px;align-items:end;}
+.q-arrow{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.2rem;padding-bottom:6px;}
+.q-sources{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.q-source-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:.7rem;color:var(--muted);cursor:pointer;transition:all .2s;user-select:none;}
+.q-source-pill input{display:none;}
+.q-source-pill.active-ep{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.08);}
+.q-source-pill.active-sh{border-color:#8b5cf6;color:#a78bfa;background:rgba(139,92,246,.08);}
+.q-source-pill.active-pk{border-color:var(--accent);color:var(--accent);background:rgba(240,165,0,.08);}
+.q-results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-top:4px;}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .25s,transform .2s;animation:fadeUp .3s ease both;}
+.q-card:hover{border-color:var(--green);transform:translateY(-2px);}
+.q-card-head{padding:11px 14px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.q-carrier-logo{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.q-carrier-name{font-family:'Syne',sans-serif;font-size:.84rem;font-weight:700;color:var(--text);}
+.q-service-name{font-size:.65rem;color:var(--muted);margin-top:1px;}
+.q-source-badge{margin-left:auto;font-size:.58rem;padding:2px 7px;border-radius:4px;}
+.q-card-body{padding:13px 14px;display:flex;flex-direction:column;gap:8px;}
+.q-price-row{display:flex;align-items:baseline;gap:6px;}
+.q-price{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--green);line-height:1;}
+.q-currency{font-size:.9rem;font-weight:600;color:var(--green);}
+.q-price-note{font-size:.64rem;color:var(--muted);}
+.q-meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;}
+.q-meta-pill{padding:3px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;font-size:.63rem;color:var(--muted);}
+.q-meta-pill.hi{border-color:rgba(34,197,94,.3);color:var(--green);}
+.q-empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:.84rem;grid-column:1/-1;}
+.q-empty-icon{font-size:2.5rem;margin-bottom:10px;}
+.q-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.q-status-bar{display:flex;align-items:center;gap:10px;font-size:.72rem;color:var(--muted);padding:10px 0 4px;}
+.q-status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.q-error-banner{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;font-size:.74rem;color:#f87171;display:none;}
+.q-summary-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
+.q-summary-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center;}
+.q-summary-card .sv{font-size:1.3rem;}
+.q-sort-bar{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.q-sort-bar select{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:.72rem;outline:none;}
+.q-sort-bar select:focus{border-color:var(--green);}
+.q-count{font-size:.7rem;color:var(--muted);margin-left:auto;}
+@media(max-width:760px){.q-form-grid{grid-template-columns:1fr;}.q-route-row{grid-template-columns:1fr;}.q-arrow{display:none;}.q-summary-bar{grid-template-columns:1fr 1fr;}}
+
+
 </style>
 </head>
 <body>
@@ -249,6 +297,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <button class="nav-btn nt" onclick="showPage('truck',this)">🚛 Truck</button>
     <button class="nav-btn nr" onclick="showPage('routes',this);initRoutes()">🌍 Routes</button>
     <button class="nav-btn nf" onclick="showPage('fuel',this);initFuel()">⛽ Carburanti</button>
+    <button class="nav-btn nq" onclick="showPage('quotes',this)">💸 Quotazioni</button>
   </nav>
   <div class="header-badge">v4.5</div>
 </header>
@@ -740,6 +789,189 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 <div class="fuel-note" id="fuelNote"></div>
 </div>
 
+<div id="page-quotes" class="page">
+<section class="hero qh">
+  <h1>Confronta <br><em class="q">quotazioni</em> di spedizione</h1>
+  <p>Inserisci rotta e misure del collo — ottieni tariffe reali da più corrieri in tempo reale.</p>
+</section>
+
+<div class="quotes-wrap">
+
+  <!-- FORM -->
+  <div class="panel">
+    <div class="ph">
+      <div class="pi">📋</div><h3>Parametri spedizione</h3>
+      <button class="be" style="margin-left:auto;font-size:.65rem;" onclick="importFromPallet()">📦 Importa da Pallet</button>
+    </div>
+    <div class="pb">
+      <div class="sl">Rotta</div>
+      <div class="q-route-row">
+        <div>
+          <div class="fg" style="margin-bottom:8px;">
+            <label>Paese mittente</label>
+            <select id="q-from-country">
+              <option value="IT">🇮🇹 Italia</option>
+              <option value="DE">🇩🇪 Germania</option>
+              <option value="FR">🇫🇷 Francia</option>
+              <option value="ES">🇪🇸 Spagna</option>
+              <option value="GB">🇬🇧 Regno Unito</option>
+              <option value="US">🇺🇸 USA</option>
+              <option value="CN">🇨🇳 Cina</option>
+              <option value="NL">🇳🇱 Paesi Bassi</option>
+              <option value="PL">🇵🇱 Polonia</option>
+              <option value="BE">🇧🇪 Belgio</option>
+              <option value="CH">🇨🇭 Svizzera</option>
+              <option value="AT">🇦🇹 Austria</option>
+              <option value="SE">🇸🇪 Svezia</option>
+              <option value="NO">🇳🇴 Norvegia</option>
+              <option value="DK">🇩🇰 Danimarca</option>
+              <option value="JP">🇯🇵 Giappone</option>
+              <option value="AU">🇦🇺 Australia</option>
+              <option value="CA">🇨🇦 Canada</option>
+              <option value="BR">🇧🇷 Brasile</option>
+              <option value="AE">🇦🇪 Emirati Arabi</option>
+            </select>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>CAP mittente</label><input type="text" id="q-from-zip" value="20100" placeholder="CAP / ZIP"></div>
+            <div class="fg"><label>Città</label><input type="text" id="q-from-city" value="Milano" placeholder="Città"></div>
+          </div>
+        </div>
+        <div class="q-arrow">→</div>
+        <div>
+          <div class="fg" style="margin-bottom:8px;">
+            <label>Paese destinatario</label>
+            <select id="q-to-country">
+              <option value="IT">🇮🇹 Italia</option>
+              <option value="DE">🇩🇪 Germania</option>
+              <option value="FR">🇫🇷 Francia</option>
+              <option value="ES">🇪🇸 Spagna</option>
+              <option value="GB">🇬🇧 Regno Unito</option>
+              <option value="US">🇺🇸 USA</option>
+              <option value="CN">🇨🇳 Cina</option>
+              <option value="NL">🇳🇱 Paesi Bassi</option>
+              <option value="PL">🇵🇱 Polonia</option>
+              <option value="BE">🇧🇪 Belgio</option>
+              <option value="CH">🇨🇭 Svizzera</option>
+              <option value="AT">🇦🇹 Austria</option>
+              <option value="SE">🇸🇪 Svezia</option>
+              <option value="NO">🇳🇴 Norvegia</option>
+              <option value="DK">🇩🇰 Danimarca</option>
+              <option value="JP">🇯🇵 Giappone</option>
+              <option value="AU">🇦🇺 Australia</option>
+              <option value="CA">🇨🇦 Canada</option>
+              <option value="BR">🇧🇷 Brasile</option>
+              <option value="AE">🇦🇪 Emirati Arabi</option>
+            </select>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>CAP destinatario</label><input type="text" id="q-to-zip" value="10115" placeholder="CAP / ZIP"></div>
+            <div class="fg"><label>Città</label><input type="text" id="q-to-city" value="Berlino" placeholder="Città"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sl" style="margin-top:18px;">Misure collo</div>
+      <div class="q-form-grid">
+        <div>
+          <div class="fr">
+            <div class="fg"><label>Lunghezza (cm)</label><input type="number" id="q-len" value="60" min="1"></div>
+            <div class="fg"><label>Larghezza (cm)</label><input type="number" id="q-wid" value="40" min="1"></div>
+          </div>
+          <div class="fr" style="margin-top:8px;">
+            <div class="fg"><label>Altezza (cm)</label><input type="number" id="q-hei" value="40" min="1"></div>
+            <div class="fg"><label>Peso (kg)</label><input type="number" id="q-wei" value="10" min="0.1" step="0.1"></div>
+          </div>
+        </div>
+        <div>
+          <div class="fg" style="margin-bottom:8px;">
+            <label>Tipo spedizione</label>
+            <select id="q-shiptype">
+              <option value="PACKAGE">📦 Pacco / Collo singolo</option>
+              <option value="PALLET">🪵 Pallet (LTL)</option>
+              <option value="FREIGHT">🚛 Freight / Groupage</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Valore dichiarato (€) — opzionale</label>
+            <input type="number" id="q-value" value="" placeholder="es. 500" min="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="sl" style="margin-top:16px;">Corrieri</div>
+      <div class="q-sources" id="q-sources-bar">
+        <label class="q-source-pill active-sh" id="pill-sh" onclick="toggleSource('sh')">
+          <input type="checkbox" id="src-sh" checked> 🟣 Shippo
+        </label>
+        <label class="q-source-pill active-pk" id="pill-pk" onclick="toggleSource('pk')">
+          <input type="checkbox" id="src-pk" checked> 🟡 Packlink
+        </label>
+        <label class="q-source-pill" id="pill-sp" onclick="toggleSource('sp')" style="border-color:var(--teal);color:var(--teal);background:rgba(20,184,166,.08);">
+          <input type="checkbox" id="src-sp" checked> 🟢 Spedire.com
+        </label>
+        <label class="q-source-pill" id="pill-sb" onclick="toggleSource('sb')" style="border-color:#f97316;color:#f97316;background:rgba(249,115,22,.08);">
+          <input type="checkbox" id="src-sb" checked> 🟠 Sendabox
+        </label>
+      </div>
+
+      <button class="bc" style="background:var(--green);color:#000;margin-top:16px;" onclick="runQuotes()">
+        ▶ CONFRONTA CORRIERI
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="q-results-section" style="display:none;">
+    <div class="q-status-bar" id="q-status-bar"></div>
+    <div class="q-error-banner" id="q-error-banner"></div>
+
+    <div class="q-summary-bar" id="q-summary-bar" style="display:none;">
+      <div class="q-summary-card">
+        <div class="sv" id="qs-count" style="color:var(--green);">—</div>
+        <div class="slb">Quotazioni trovate</div>
+      </div>
+      <div class="q-summary-card">
+        <div class="sv" id="qs-min" style="color:var(--green);">—</div>
+        <div class="slb">Prezzo minimo</div>
+      </div>
+      <div class="q-summary-card">
+        <div class="sv" id="qs-max" style="color:var(--muted);">—</div>
+        <div class="slb">Prezzo massimo</div>
+      </div>
+    </div>
+
+    <div class="q-sort-bar" id="q-sort-bar" style="display:none;">
+      <span style="font-size:.7rem;color:var(--muted);">Ordina per:</span>
+      <select id="q-sort-sel" onchange="renderQuoteCards()">
+        <option value="price_asc">Prezzo ↑</option>
+        <option value="price_desc">Prezzo ↓</option>
+        <option value="days_asc">Consegna ↑</option>
+        <option value="carrier">Corriere A-Z</option>
+      </select>
+      <span class="q-count" id="q-count-label"></span>
+    </div>
+
+    <div class="q-results-grid" id="q-results-grid">
+      <div class="q-empty">
+        <div class="q-empty-icon">📭</div>
+        <div>Imposta i parametri e premi <b>Confronta corrieri</b>.</div>
+      </div>
+    </div>
+
+    <!-- REDIRECT PANEL -->
+    <div id="q-redirect-panel" style="display:none;margin-top:20px;">
+      <div class="sl" style="margin-bottom:10px;">🔗 Preventivi su siti esterni</div>
+      <div id="q-redirect-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;"></div>
+    </div>
+
+    <div style="font-size:.64rem;color:var(--muted);margin-top:14px;line-height:1.7;opacity:.7;">
+      Prezzi indicativi. IVA e sovrattasse escluse. Contatta il corriere per tariffe contrattuali.
+    </div>
+  </div>
+
+</div>
+</div>
 <script>
 // ══════ PAGE SWITCHER ══════
 function showPage(n,btn){
@@ -2987,6 +3219,304 @@ syncContainerUnitsType();
 routeDefaultDates();
 // Auto-load fuel data in background on page open (silent, non-blocking)
 loadFuelData(false);
+
+// ══════ QUOTAZIONI ══════
+const SHIPPO_TOKEN = 'shippo_test_fdefb21ec1f80d31889702e896d6ccdc9e266670';
+let qAllResults = [];
+let qSourceState = {sh: true, pk: true, sp: true, sb: true};
+
+function toggleSource(src) {
+  qSourceState[src] = !qSourceState[src];
+  const pill = document.getElementById('pill-' + src);
+  if (!pill) return;
+  const styles = {
+    sh: {cls:'active-sh', border:'#8b5cf6', color:'#a78bfa', bg:'rgba(139,92,246,.08)'},
+    pk: {cls:'active-pk', border:'var(--accent)', color:'var(--accent)', bg:'rgba(240,165,0,.08)'},
+    sp: {border:'var(--teal)', color:'var(--teal)', bg:'rgba(20,184,166,.08)'},
+    sb: {border:'#f97316', color:'#f97316', bg:'rgba(249,115,22,.08)'}
+  };
+  const s = styles[src];
+  if (qSourceState[src]) {
+    if (s.cls) pill.classList.add(s.cls);
+    else { pill.style.borderColor=s.border; pill.style.color=s.color; pill.style.background=s.bg; }
+  } else {
+    if (s.cls) pill.classList.remove(s.cls);
+    pill.style.borderColor='var(--border)'; pill.style.color='var(--muted)'; pill.style.background='transparent';
+  }
+}
+
+function importFromPallet() {
+  const lmm = parseFloat(document.getElementById('boxL')?.value || 0);
+  const wmm = parseFloat(document.getElementById('boxW')?.value || 0);
+  const hmm = parseFloat(document.getElementById('boxH')?.value || 0);
+  const wkg = parseFloat(document.getElementById('boxKg')?.value || 0);
+  if (lmm > 0) document.getElementById('q-len').value = Math.round(lmm / 10);
+  if (wmm > 0) document.getElementById('q-wid').value = Math.round(wmm / 10);
+  if (hmm > 0) document.getElementById('q-hei').value = Math.round(hmm / 10);
+  if (wkg > 0) document.getElementById('q-wei').value = wkg;
+  ['q-len','q-wid','q-hei','q-wei'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.borderColor='var(--green)'; setTimeout(()=>el.style.borderColor='',900); }
+  });
+}
+
+function setQuoteStatus(html, color='var(--muted)') {
+  document.getElementById('q-status-bar').innerHTML =
+    `<div class="q-status-dot" style="background:${color};"></div>${html}`;
+}
+
+function showQuoteError(msg) {
+  const el = document.getElementById('q-error-banner');
+  el.style.display = 'block'; el.textContent = msg;
+}
+
+function hideQuoteError() {
+  document.getElementById('q-error-banner').style.display = 'none';
+}
+
+const CARRIER_COLORS = {
+  DHL:'#FFCC00', UPS:'#8B4513', FEDEX:'#4D148C', TNT:'#FF6200',
+  GLS:'#CC0000', BRT:'#003DA5', SDA:'#009944', USPS:'#004B97'
+};
+
+function carrierColor(name) {
+  const u = (name||'').toUpperCase();
+  for (const [k,v] of Object.entries(CARRIER_COLORS)) if (u.includes(k)) return v;
+  return '#4b5563';
+}
+
+function carrierEmoji(name) {
+  const u = (name||'').toUpperCase();
+  if (u.includes('DHL')) return '🟡';
+  if (u.includes('UPS')) return '🟤';
+  if (u.includes('FEDEX')) return '🟣';
+  if (u.includes('TNT')) return '🟠';
+  if (u.includes('GLS')) return '🔴';
+  if (u.includes('BRT')) return '🔵';
+  if (u.includes('SDA')) return '🟢';
+  if (u.includes('USPS')) return '🔵';
+  return '📦';
+}
+
+function fmtDays(d) {
+  if (!d && d!==0) return null;
+  const n = parseInt(d);
+  return isNaN(n) ? null : n===1 ? '1 giorno' : `${n} giorni`;
+}
+
+function renderQuoteCards() {
+  const grid = document.getElementById('q-results-grid');
+  const sort = document.getElementById('q-sort-sel')?.value || 'price_asc';
+  let results = [...qAllResults];
+
+  if (sort==='price_asc') results.sort((a,b)=>a.rate-b.rate);
+  else if (sort==='price_desc') results.sort((a,b)=>b.rate-a.rate);
+  else if (sort==='days_asc') results.sort((a,b)=>(a.days||999)-(b.days||999));
+  else results.sort((a,b)=>a.carrier.localeCompare(b.carrier));
+
+  if (!results.length) {
+    grid.innerHTML=`<div class="q-empty"><div class="q-empty-icon">🔍</div><div>Nessuna tariffa trovata per questa rotta.</div></div>`;
+    return;
+  }
+
+  document.getElementById('q-count-label').textContent = `${results.length} opzion${results.length===1?'e':'i'}`;
+  const prices = results.map(r=>r.rate);
+  const minP = Math.min(...prices), maxP = Math.max(...prices);
+  document.getElementById('qs-count').textContent = results.length;
+
+  const fmt = (v,c) => new Intl.NumberFormat('it-IT',{style:'currency',currency:c||'EUR',minimumFractionDigits:2}).format(v);
+  document.getElementById('qs-min').textContent = fmt(minP, results[0].currency);
+  document.getElementById('qs-max').textContent = fmt(maxP, results[0].currency);
+  document.getElementById('q-summary-bar').style.display = 'grid';
+  document.getElementById('q-sort-bar').style.display = 'flex';
+
+  grid.innerHTML = results.map((r,i) => {
+    const isBest = r.rate === minP;
+    const days = fmtDays(r.days);
+    const srcColor = r.source==='Shippo' ? '#8b5cf6' : 'var(--accent)';
+    const srcBg = r.source==='Shippo' ? 'rgba(139,92,246,.12)' : 'rgba(240,165,0,.12)';
+    const cColor = carrierColor(r.carrier);
+    return `
+    <div class="q-card" style="animation-delay:${i*0.04}s${isBest?';border-color:var(--green)':''}">
+      <div class="q-card-head">
+        <div class="q-carrier-logo" style="background:${cColor}22;border:1px solid ${cColor}44;">${carrierEmoji(r.carrier)}</div>
+        <div>
+          <div class="q-carrier-name">${r.carrier}</div>
+          <div class="q-service-name">${r.service||'—'}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          ${isBest?'<span style="font-size:.6rem;color:var(--green);font-weight:700;letter-spacing:.06em;">✅ BEST</span>':''}
+          <span style="font-size:.58rem;padding:2px 7px;border-radius:4px;background:${srcBg};color:${srcColor};">${r.source}</span>
+        </div>
+      </div>
+      <div class="q-card-body">
+        <div class="q-price-row">
+          <span class="q-currency" style="color:${isBest?'var(--green)':'var(--text)'}">${r.currency||'EUR'}</span>
+          <span class="q-price" style="color:${isBest?'var(--green)':'var(--text)'}">${parseFloat(r.rate).toFixed(2)}</span>
+        </div>
+        <div class="q-meta-row">
+          ${days?`<span class="q-meta-pill hi">🕐 ${days}</span>`:''}
+          ${r.deliveryDate?`<span class="q-meta-pill">📅 ${r.deliveryDate}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function fetchShippo(params) {
+  setQuoteStatus('<span class="q-spinner"></span>Shippo: richiesta tariffe…', '#8b5cf6');
+  try {
+    const payload = {
+      address_from: {
+        name:'Mittente', street1:'Via Roma 1',
+        city: params.fromCity, zip: params.fromZip, country: params.fromCountry
+      },
+      address_to: {
+        name:'Destinatario', street1:'1 Main St',
+        city: params.toCity, zip: params.toZip, country: params.toCountry
+      },
+      parcels: [{
+        length: String(params.lengthCm),
+        width: String(params.widthCm),
+        height: String(params.heightCm),
+        distance_unit: 'cm',
+        weight: String(params.weightKg),
+        mass_unit: 'kg'
+      }],
+      async: false
+    };
+
+    const res = await fetch('https://api.goshippo.com/shipments/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `ShippoToken ${SHIPPO_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({}));
+      throw new Error(err.detail || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    return (data.rates||[]).map(r => ({
+      source: 'Shippo',
+      carrier: r.provider || '?',
+      service: r.servicelevel?.name || r.servicelevel_name || '?',
+      rate: parseFloat(r.amount),
+      currency: r.currency || 'USD',
+      days: r.estimated_days,
+      deliveryDate: r.arrives_by ? r.arrives_by.slice(0,10) : null
+    }));
+  } catch(e) {
+    console.warn('Shippo error:', e.message);
+    showQuoteError(`Shippo: ${e.message}`);
+    return [];
+  }
+}
+
+function buildRedirectLinks(params) {
+  const wg = Math.max(1, Math.round(parseFloat(params.weightKg)));
+  const lcm = Math.round(params.lengthCm);
+  const wcm = Math.round(params.widthCm);
+  const hcm = Math.round(params.heightCm);
+  const fc = params.fromCountry, tc = params.toCountry;
+  const fz = params.fromZip, tz = params.toZip;
+  const links = [];
+
+  if (qSourceState.pk) links.push({
+    name:'Packlink', emoji:'🟡', color:'var(--accent)', bg:'rgba(240,165,0,.08)',
+    url:`https://www.packlink.it/it-IT/prezzi/?origin_country=${fc}&destination_country=${tc}&weight=${wg}&length=${lcm}&width=${wcm}&height=${hcm}`,
+    note:'DHL, UPS, GLS, BRT'
+  });
+  if (qSourceState.sp) links.push({
+    name:'Spedire.com', emoji:'🟢', color:'var(--teal)', bg:'rgba(20,184,166,.08)',
+    url:`https://www.spedire.com/${fc!==tc?'spedizioni-internazionali/':''}?peso=${wg}&lunghezza=${lcm}&larghezza=${wcm}&altezza=${hcm}${fz?'&cap_mittente='+fz:''}${tz?'&cap_destinatario='+tz:''}`,
+    note:'Nazionale + internazionale'
+  });
+  if (qSourceState.sb) links.push({
+    name:'Sendabox', emoji:'🟠', color:'#f97316', bg:'rgba(249,115,22,.08)',
+    url:`https://www.sendabox.it/preventivo/?weight=${wg*1000}&length=${lcm}&width=${wcm}&height=${hcm}&from_country=${fc}&to_country=${tc}`,
+    note:'DHL, UPS, FedEx, GLS'
+  });
+  return links;
+}
+
+function renderRedirectPanel(params) {
+  const links = buildRedirectLinks(params);
+  const panel = document.getElementById('q-redirect-panel');
+  const cards = document.getElementById('q-redirect-cards');
+  if (!links.length) { panel.style.display='none'; return; }
+  panel.style.display = 'block';
+  cards.innerHTML = links.map(l => `
+    <a href="${l.url}" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;display:flex;flex-direction:column;gap:6px;transition:border-color .2s,transform .2s;"
+           onmouseover="this.style.borderColor='${l.color}';this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:1.2rem;">${l.emoji}</span>
+          <span style="font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--text);">${l.name}</span>
+          <span style="margin-left:auto;font-size:.6rem;padding:2px 8px;border-radius:4px;background:${l.bg};color:${l.color};border:1px solid ${l.color}55;">↗ Apri</span>
+        </div>
+        <div style="font-size:.65rem;color:${l.color};opacity:.85;">${l.note}</div>
+      </div>
+    </a>`).join('');
+}
+
+async function runQuotes() {
+  hideQuoteError();
+  qAllResults = [];
+
+  const fromCountry = document.getElementById('q-from-country').value;
+  const fromZip = document.getElementById('q-from-zip').value.trim();
+  const fromCity = document.getElementById('q-from-city').value.trim();
+  const toCountry = document.getElementById('q-to-country').value;
+  const toZip = document.getElementById('q-to-zip').value.trim();
+  const toCity = document.getElementById('q-to-city').value.trim();
+  const lenCm = parseFloat(document.getElementById('q-len').value) || 60;
+  const widCm = parseFloat(document.getElementById('q-wid').value) || 40;
+  const heiCm = parseFloat(document.getElementById('q-hei').value) || 40;
+  const weightKg = parseFloat(document.getElementById('q-wei').value) || 1;
+
+  if (!fromZip || !toZip) { showQuoteError('Inserisci CAP mittente e destinatario.'); return; }
+
+  const params = {
+    fromCountry, fromZip, fromCity,
+    toCountry, toZip, toCity,
+    lengthCm: lenCm, widthCm: widCm, heightCm: heiCm,
+    weightKg: weightKg.toFixed(3)
+  };
+
+  document.getElementById('q-results-section').style.display = 'block';
+  document.getElementById('q-summary-bar').style.display = 'none';
+  document.getElementById('q-sort-bar').style.display = 'none';
+  document.getElementById('q-redirect-panel').style.display = 'none';
+  document.getElementById('q-results-grid').innerHTML =
+    `<div class="q-empty"><div class="q-spinner" style="width:26px;height:26px;border-width:3px;color:var(--green);margin:0 auto 12px;"></div><div>Richiesta tariffe in corso…</div></div>`;
+
+  // Fetch Shippo rates
+  const shResults = qSourceState.sh ? await fetchShippo(params) : [];
+  qAllResults = [...shResults];
+
+  if (qAllResults.length > 0) {
+    setQuoteStatus(`✅ ${qAllResults.length} tariffe trovate`, 'var(--green)');
+    renderQuoteCards();
+  } else if (!qSourceState.sh) {
+    setQuoteStatus('Shippo disabilitato — usa i link esterni', 'var(--muted)');
+    document.getElementById('q-results-grid').innerHTML =
+      `<div class="q-empty"><div class="q-empty-icon">📭</div><div>Abilita Shippo per ottenere tariffe.</div></div>`;
+  } else {
+    setQuoteStatus('Nessuna tariffa disponibile per questa rotta', '#f87171');
+    document.getElementById('q-results-grid').innerHTML =
+      `<div class="q-empty"><div class="q-empty-icon">⚠️</div><div>Nessuna tariffa trovata.<br>Prova a modificare i parametri o usa i link esterni.</div></div>`;
+  }
+
+  // Always render redirect links
+  renderRedirectPanel(params);
+}
+
 </script>
 </body>
 </html>
