@@ -9,7 +9,10 @@
 <style>
 :root{--bg:#0a0c10;--surface:#111318;--surface2:#181b22;--border:#252932;--accent:#f0a500;--accent2:#e05c2a;--blue:#3b82f6;--teal:#14b8a6;--fuel:#e11d48;--text:#eef0f4;--muted:#6b7280;--green:#22c55e;--radius:12px;}
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;background-size:cover;background-position:center;background-attachment:fixed;}
+body.bg-soft{background-image:radial-gradient(circle at 20% 10%,rgba(59,130,246,.16),transparent 30%),radial-gradient(circle at 80% 20%,rgba(240,165,0,.12),transparent 28%);}
+body.bg-grid{background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:32px 32px;}
+body.bg-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd5e1;--text:#101827;--muted:#64748b;}
 header{display:flex;align-items:center;justify-content:space-between;padding:13px 32px;border-bottom:1px solid var(--border);background:rgba(10,12,16,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;gap:10px;flex-wrap:wrap;}
 .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:-0.03em;white-space:nowrap;}.logo span{color:var(--accent);}
 .main-nav{display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;}
@@ -129,6 +132,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .plan-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.7rem;color:var(--muted);margin-bottom:6px;flex-wrap:wrap;}
 .plan-box{position:relative;background:var(--surface2);border-radius:10px;border:1px solid var(--border);min-height:210px;overflow:visible;touch-action:none;user-select:none;}
 .plan-svg{display:block;width:100%;height:auto;pointer-events:none;overflow:visible;}
+#cschema{overflow:hidden;}
 .plan-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
 .plan-pill{display:flex;align-items:center;gap:6px;font-size:.64rem;color:var(--muted);}
 .plan-dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
@@ -197,6 +201,15 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .plan-tab:hover{border-color:var(--blue);color:var(--blue);}
 
 /* PLAN DIM ROW */
+.weight-report{margin-top:10px;border:1px solid var(--border);background:rgba(59,130,246,.05);border-radius:10px;padding:10px;font-size:.70rem;line-height:1.8;color:var(--muted);}
+.weight-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
+.weight-cell{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px;text-align:center;}
+.weight-cell b{color:var(--text);}
+.load-sim{margin-top:10px;border:1px solid var(--border);background:rgba(34,197,94,.045);border-radius:10px;padding:10px;font-size:.70rem;line-height:1.75;color:var(--muted);}
+.load-sim.warn{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.35);}
+.load-sim.danger{background:rgba(220,38,38,.07);border-color:rgba(220,38,38,.42);}
+.load-bars{display:grid;grid-template-columns:1fr;gap:6px;margin-top:7px;}
+.load-bar-label{display:flex;justify-content:space-between;font-size:.64rem;color:var(--muted);margin-bottom:2px;}
 .plan-dimrow{display:flex;justify-content:space-between;font-size:.63rem;color:var(--muted);padding:3px 2px;}
 .plan-dimrow.top{margin-bottom:2px;}
 .plan-dimrow.bottom{margin-top:2px;}
@@ -235,6 +248,22 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .fuel-refresh-btn:hover{filter:brightness(1.15);}
 .fuel-refresh-btn:disabled{opacity:.5;cursor:not-allowed;}
 .fuel-note{font-size:.65rem;color:var(--muted);padding:0 32px 20px;max-width:1440px;margin:0 auto;line-height:1.6;}
+.theme-ctl{display:flex;gap:6px;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:4px 8px;font-size:.62rem;color:var(--muted);}
+.theme-ctl select{background:transparent;border:none;color:var(--text);font-family:'DM Mono',monospace;font-size:.66rem;outline:none;cursor:pointer;}
+body.theme-ocean{--accent:#38bdf8;--accent2:#0ea5e9;--blue:#2563eb;--teal:#06b6d4;}
+body.theme-redblue{--accent:#ef4444;--accent2:#1d4ed8;--blue:#1d4ed8;--teal:#111827;}
+body.theme-green{--accent:#22c55e;--accent2:#84cc16;--blue:#16a34a;--teal:#14b8a6;}
+body.theme-purple{--accent:#a855f7;--accent2:#ec4899;--blue:#7c3aed;--teal:#06b6d4;}
+body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd5e1;--text:#101827;--muted:#64748b;}
+.formation-panel{margin:8px 0 12px;display:none!important;}
+.formation-title{font-size:.64rem;color:var(--muted);margin:0 0 7px;display:flex;justify-content:space-between;gap:8px;align-items:center;}
+.formation-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:7px;max-height:230px;overflow:auto;padding:2px;}
+.form-btn{height:76px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'DM Mono',monospace;font-size:.62rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:.18s;}
+.form-btn:hover,.form-btn.on{border-color:var(--accent);color:var(--accent);background:rgba(240,165,0,.06);}
+.form-btn.bb:hover,.form-btn.bb.on{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.08);}
+.form-icon{width:34px;height:34px;display:grid;gap:1px;padding:2px;border:1px solid currentColor;}
+.form-icon span{border:1px solid currentColor;min-width:3px;min-height:3px;opacity:.9;}
+
 @media(max-width:960px){.fuel-grid{padding:12px;}.fuel-kpi-grid{grid-template-columns:repeat(2,1fr);padding:0 12px 12px;}.fuel-filter-bar{padding:0 12px 12px;}.fuel-note{padding:0 12px 16px;}}
 
 /* TOOLS */
@@ -325,7 +354,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <button class="nav-btn nf" onclick="showPage('fuel',this);initFuel()">⛽ Carburanti</button>
     <button class="nav-btn ns" onclick="showPage('tools',this);initTools()">🛠 Strumenti</button>
   </nav>
-  <div class="header-badge">v4.5</div>
+  <div class="header-badge">v4.6</div><div class="theme-ctl">Tema <select id="siteTheme" onchange="setSiteTheme(this.value)"><option value="dark">Dark</option><option value="light">Light</option><option value="ocean">Ocean</option><option value="redblue">Rosso/Blu</option><option value="green">Green</option><option value="purple">Purple</option></select> Sfondo <select id="siteBg" onchange="setSiteBackground(this.value)"><option value="none">Base</option><option value="soft">Soft</option><option value="grid">Griglia</option></select></div>
 </header>
 
 <!-- ═══════════════════ PALLET PAGE ═══════════════════ -->
@@ -463,6 +492,10 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
             <button class="be" id="btnTogglePalletGuide" onclick="togglePalletGuideVisibility()">🧱 Pallet ON</button>
             <button class="be" onclick="resetPalletPlan()">↺ Reset layout</button>
           </div>
+          <div class="formation-panel">
+            <div class="formation-title"><span>Formazioni vista dall'alto</span><span id="palletFormationLabel">Auto</span></div>
+            <div class="formation-grid" id="palletFormationGrid"></div>
+          </div>
           <div class="plan-addbar">
             <div class="fg wide"><label>Aggiungi scatola allo strato</label><select id="palletPlanPreset" onchange="applyPalletPlanPreset()"><option value="current" selected>Scatola corrente</option><option value="half">Mezza scatola</option><option value="quarter">1/4 scatola</option><option value="custom">Custom</option></select></div>
             <div class="fg"><label>Lung. scatola (mm)</label><input type="number" id="planBoxL" value="400" min="50"></div>
@@ -504,6 +537,13 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <button class="ctb" onclick="selCont('40dry',this)"><em>🚛</em><strong>40' Dry</strong><span>12032×2352×2393mm · 26.7t</span></button>
           <button class="ctb" onclick="selCont('40hc',this)"><em>📐</em><strong>40' High Cube</strong><span>12032×2352×2698mm · 26.5t</span></button>
           <button class="ctb" onclick="selCont('40ref',this)"><em>❄️</em><strong>40' Reefer</strong><span>11580×2286×2400mm · 27.7t</span></button>
+          <button class="ctb" onclick="selCont('custom',this)"><em>⚙️</em><strong>Custom</strong><span>misure libere + porta</span></button>
+        </div>
+        <div id="customContBox" style="display:none;">
+          <div class="sl b">Container personalizzato</div>
+          <div class="fr"><div class="fg"><label>Lunghezza interna (mm)</label><input type="number" id="ccL" value="12032" min="1"></div><div class="fg"><label>Larghezza interna (mm)</label><input type="number" id="ccW" value="2352" min="1"></div></div>
+          <div class="fr"><div class="fg"><label>Altezza interna (mm)</label><input type="number" id="ccH" value="2698" min="1"></div><div class="fg"><label>Altezza porta max (mm)</label><input type="number" id="ccDoorH" value="2585" min="1"></div></div>
+          <div class="fr"><div class="fg"><label>Payload max (kg)</label><input type="number" id="ccMaxP" value="26000" min="1"></div><div class="fg"><label>Tare (kg)</label><input type="number" id="ccTare" value="4000" min="0"></div></div>
         </div>
         <div class="sl b">Modalità carico</div>
         <div class="mt">
@@ -531,6 +571,10 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <div class="fr"><div class="fg"><label>Spessore pallet (mm)</label><input type="number" id="cpT" value="144" min="1"></div><div class="fg"><label>H carico (mm)</label><input type="number" id="cpCH" value="1200" min="1"></div></div>
           <div class="fr"><div class="fg"><label>Peso per pallet (kg)</label><input type="number" id="cpKg" value="500" min="0"></div><div class="fg"><label>Layout ottimizzazione</label><input type="text" id="cpRows" value="AUTO MIX" readonly></div></div>
           <div class="tr"><span>Doppio strato (impilabili)</span><label class="tg"><input type="checkbox" id="cpStack"><span class="ts"></span></label></div>
+          <div class="sl b">Vincoli logistici reali</div>
+          <div class="fr"><div class="fg"><label>Peso max zona anteriore (kg)</label><input type="number" id="cFrontMaxKg" value="14000" min="0"></div><div class="fg"><label>Peso max zona posteriore (kg)</label><input type="number" id="cRearMaxKg" value="14000" min="0"></div></div>
+          <div class="fr"><div class="fg"><label>Sbilanciamento max SX/DX (%)</label><input type="number" id="cSideImbalance" value="20" min="0" max="100"></div><div class="fg"><label>Sbilanciamento max ant/post (%)</label><input type="number" id="cLongImbalance" value="20" min="0" max="100"></div></div>
+          <div class="fr"><div class="fg"><label>Rapporto stabilità H/base max</label><input type="number" id="cStabRatio" value="1.8" step="0.1" min="0.5"></div><div class="fg"><label>Peso max per pallet (kg)</label><input type="number" id="cPalletMaxKg" value="1000" min="0"></div></div>
         </div>
         <div class="sl b">Margini sicurezza</div>
         <div class="fr"><div class="fg"><label>Margine lato (mm)</label><input type="number" id="cMSide" value="20" min="0"></div><div class="fg"><label>Margine alto (mm)</label><input type="number" id="cMTop" value="50" min="0"></div></div>
@@ -546,7 +590,9 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         </div>
 
         <button class="bc bb" onclick="calcContainer()">▶ CALCOLA CONTAINER 3D</button>
+        <button class="bc bb" style="margin-top:6px;background:linear-gradient(90deg,var(--blue),var(--teal));color:#fff;" onclick="optimizeContainerAndPalletTogether()">🤖 OTTIMIZZA PALLET + CONTAINER</button>
         <button class="bc bb" style="margin-top:6px;background:transparent;border:1px solid var(--blue);color:var(--blue);" onclick="balanceContainer()">⚖️ BILANCIA CARICO</button>
+        <button class="bc bb" style="margin-top:6px;background:transparent;border:1px solid var(--teal);color:var(--teal);" onclick="simulateRealLoad()">🧪 SIMULA VINCOLI REALI</button>
         <div class="alert" id="al-c">✓ Calcolo container completato!</div>
       </div>
     </div>
@@ -580,7 +626,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div class="panel"><div class="ph"><div class="pi">📊</div><h3>Dettagli container</h3></div><div class="pb" id="cdet" style="font-size:0.74rem;line-height:2;color:var(--muted);">Esegui un calcolo.</div></div>
-      <div class="panel"><div class="ph"><div class="pi">⚖️</div><h3>Peso &amp; limiti</h3></div><div class="pb" id="cwgt" style="font-size:0.74rem;color:var(--muted);">Esegui un calcolo.</div></div>
+      <div class="panel"><div class="ph"><div class="pi">⚖️</div><h3>Peso, assi &amp; stabilità</h3></div><div class="pb" id="cwgt" style="font-size:0.74rem;color:var(--muted);">Esegui un calcolo.</div></div>
     </div>
     <div class="panel">
       <div class="ph"><div class="pi">🗺️</div><h3>Vista dall'alto</h3></div>
@@ -590,15 +636,16 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
           <button class="be bb" onclick="rotateSelectedPlanItem()">🔄 Ruota pallet</button>
           <button class="be bb" onclick="resetContainerPlan()">↺ Reset layout</button>
           <button class="be bb" onclick="balanceContainer()">⚖️ Bilancia</button>
-          <button class="be bb" onclick="addContainerPlan()">➕ Aggiungi container</button>
-          <button class="be bb" onclick="removeActiveContainerPlan()">➖ Rimuovi container</button>
+          <button class="be bb" onclick="compactContainerLayout()">🧲 Attacca pallet</button>
+          <button class="be bb" onclick="cycleContainerLayout()">🔀 Layout alternativi</button>
+          <button class="be bb" onclick="rebalanceContainerLayout()">⚖️ Bilancia peso</button>
         </div>
         <div class="multi-plan-bar">
           <div class="multi-plan-tabs" id="containerPlanTabs"></div>
           <div class="multi-plan-meta" id="containerPlanSummary">1 container</div>
         </div>
         <div class="plan-addbar">
-          <div class="fg wide"><label>Aggiungi pallet al container attivo</label><select id="planPalletPreset" onchange="applyPlanPalletPreset()"><option value="custom">Custom</option><option value="1200x800" selected>EUR 1200 × 800</option><option value="1200x1000">Industrial 1200 × 1000</option><option value="1140x1140">CP1 1140 × 1140</option><option value="1100x1100">1100 × 1100</option><option value="800x600">Half pallet 800 × 600</option></select></div>
+          <div class="fg wide"><label>Aggiungi pallet al container attivo</label><select id="planPalletPreset" onchange="applyPlanPalletPreset()"><option value="calculated" selected>Uguale al pallet calcolato</option><option value="custom">Custom</option><option value="1200x800">EUR 1200 × 800</option><option value="1200x1000">Industrial 1200 × 1000</option><option value="1140x1140">CP1 1140 × 1140</option><option value="1100x1100">1100 × 1100</option><option value="800x600">Half pallet 800 × 600</option></select></div>
           <div class="fg"><label>Lung. pallet (mm)</label><input type="number" id="planNewPL" value="1200" min="100"></div>
           <div class="fg"><label>Larg. pallet (mm)</label><input type="number" id="planNewPW" value="800" min="100"></div>
           <button class="be bb" onclick="addCustomPlanPallet()">＋ Inserisci</button>
@@ -1020,10 +1067,10 @@ function showPage(n,btn){
 
 // ══════ SPECS ══════
 const CONTS={
-  '20dry':{name:"20' Dry",iL:5898,iW:2352,iH:2393,maxP:28200,tare:2300,structLossL:0,structLossW:0,practicalSide:35,practicalTop:40},
-  '40dry':{name:"40' Dry",iL:12032,iW:2352,iH:2393,maxP:26680,tare:3800,structLossL:350,structLossW:0,practicalSide:35,practicalTop:40},
-  '40hc':{name:"40' HC",iL:12032,iW:2352,iH:2698,maxP:26460,tare:4020,structLossL:350,structLossW:0,practicalSide:35,practicalTop:50},
-  '40ref':{name:"40' Reefer",iL:11580,iW:2286,iH:2400,maxP:27700,tare:4400,structLossL:1000,structLossW:20,practicalSide:40,practicalTop:50}
+  '20dry':{name:"20' Dry",iL:5898,iW:2352,iH:2393,doorH:2280,maxP:28200,tare:2300,structLossL:0,structLossW:0,practicalSide:35,practicalTop:40},
+  '40dry':{name:"40' Dry",iL:12032,iW:2352,iH:2393,doorH:2280,maxP:26680,tare:3800,structLossL:350,structLossW:0,practicalSide:35,practicalTop:40},
+  '40hc':{name:"40' HC",iL:12032,iW:2352,iH:2698,doorH:2585,maxP:26460,tare:4020,structLossL:350,structLossW:0,practicalSide:35,practicalTop:50},
+  '40ref':{name:"40' Reefer",iL:11580,iW:2286,iH:2400,doorH:2260,maxP:27700,tare:4400,structLossL:1000,structLossW:20,practicalSide:40,practicalTop:50}
 };
 const TRUCKS={
   'std':{name:"Semirimorchio",iL:13620,iW:2480,iH:2700,maxP:24000,tare:6800,structLossL:0,structLossW:0,practicalSide:30,practicalTop:40},
@@ -1032,6 +1079,153 @@ const TRUCKS={
   'ref':{name:"Reefer Truck",iL:13360,iW:2460,iH:2500,maxP:22000,tare:8000,structLossL:0,structLossW:40,practicalSide:35,practicalTop:45}
 };
 let selectedCont='20dry',selectedTruck='std',cMode='boxes',tMode='boxes';
+
+
+
+// ══════ THEME + FORMATION PRESETS ══════
+const FORMATION_LABELS=['Auto','20C','18A','16D','15A','14A','13A','13B','12A','12B','11A','10A','10C','10J','9A','9B','9D','8A','8C','8D','7A','6A','6B','6D','5A','4A','4B','3A'];
+let palletFormation='Auto', containerFormation='Auto';
+function setSiteTheme(v){
+  document.body.classList.remove('theme-light','theme-ocean','theme-redblue','theme-green','theme-purple');
+  if(v&&v!=='dark') document.body.classList.add('theme-'+v);
+  try{localStorage.setItem('chepallet-theme',v||'dark')}catch(e){}
+}
+function initSiteTheme(){
+  let v='dark', bg='none';try{v=localStorage.getItem('chepallet-theme')||'dark';bg=localStorage.getItem('chepallet-bg')||'none'}catch(e){}
+  const el=document.getElementById('siteTheme'); if(el) el.value=v;
+  const bgEl=document.getElementById('siteBg'); if(bgEl) bgEl.value=bg;
+  setSiteTheme(v); setSiteBackground(bg);
+}
+function formationCount(label){return label==='Auto'?0:(parseInt(label,10)||0);}
+function formationVariant(label){const m=String(label).match(/[A-Z]$/);return m?m[0]:'A';}
+function makeFormationIcon(label){
+  const n=formationCount(label)||9;
+  const cols=Math.max(2,Math.min(5,Math.ceil(Math.sqrt(n))));
+  const rows=Math.max(2,Math.ceil(n/cols));
+  let cells=''; for(let i=0;i<Math.min(n,20);i++) cells+='<span></span>';
+  const style=`grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${Math.min(rows,5)},1fr);`;
+  return `<div class="form-icon" style="${style}">${label==='Auto'?'↖ ↗<br>↙ ↘':cells}</div>`;
+}
+function renderFormationGrids(){
+  const pg=document.getElementById('palletFormationGrid');
+  if(pg) pg.innerHTML=FORMATION_LABELS.map(l=>`<button class="form-btn ${palletFormation===l?'on':''}" onclick="setPalletFormation('${l}')">${makeFormationIcon(l)}<strong>${l}</strong></button>`).join('');
+  const cg=document.getElementById('containerFormationGrid');
+  if(cg) cg.innerHTML=FORMATION_LABELS.map(l=>`<button class="form-btn bb ${containerFormation===l?'on':''}" onclick="setContainerFormation('${l}')">${makeFormationIcon(l)}<strong>${l}</strong></button>`).join('');
+}
+function setPalletFormation(label){
+  palletFormation=label||'Auto';
+  const el=document.getElementById('palletFormationLabel'); if(el) el.textContent=palletFormation;
+  renderFormationGrids();
+  if(palletFormation==='Auto'){ calcPallet(); return; }
+  applyPalletFormationToCurrent();
+}
+function setContainerFormation(label){
+  containerFormation=label||'Auto';
+  const el=document.getElementById('containerFormationLabel'); if(el) el.textContent=containerFormation;
+  renderFormationGrids();
+  if(lastC && cMode==='pallets') calcContainer();
+}
+function layoutByFormation(binL,binW,itemL,itemW,label,maxItems=1000,startX=0,startZ=0){
+  if(label==='Auto') return buildVehiclePalletLayout({iL:binL,iW:binW,structLossL:0,structLossW:0},itemL,itemW,0).positions.map(p=>({...p,x:p.x+startX,z:p.z+startZ}));
+  const target=formationCount(label), variant=formationVariant(label);
+  const candidates=[];
+  const pushPack=(arr,name,priority=0)=>{
+    if(!arr||!arr.length) return;
+    const clean=arr.slice(0,target||arr.length);
+    const usedArea=clean.length*itemL*itemW;
+    const fill=binL*binW>0?usedArea/(binL*binW):0;
+    candidates.push({positions:clean,name,priority,fill});
+  };
+  const addGrid=(cols,rows,rotFirst=false,name='Griglia')=>{
+    const w=rotFirst?itemW:itemL, h=rotFirst?itemL:itemW;
+    if(cols*w<=binL && rows*h<=binW){
+      const ox=startX+(binL-cols*w)/2, oz=startZ+(binW-rows*h)/2;
+      const arr=[];
+      for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+        if(arr.length<target) arr.push({x:ox+c*w,z:oz+r*h,pw:w,pl:h,rot:rotFirst});
+      }
+      pushPack(arr,`${name} ${cols}×${rows}`,1);
+    }
+  };
+  const addRingD=(rotBase=false)=>{
+    // Schema D industriale: file sopra/sotto + due pezzi ruotati laterali.
+    // Per 8D con scatola 400×300 su pallet 1200×1000 crea il classico 3+2+3, che prima non veniva considerato.
+    if(!target || target<6 || target%2!==0) return;
+    const baseL=rotBase?itemW:itemL, baseW=rotBase?itemL:itemW;
+    const sideL=baseW, sideW=baseL;
+    const perRow=(target-2)/2;
+    const totalL=Math.max(perRow*baseL, sideL*2);
+    const totalW=baseW*2+sideW;
+    if(totalL>binL || totalW>binW) return;
+    const ox=startX+(binL-totalL)/2, oz=startZ+(binW-totalW)/2;
+    const arr=[];
+    for(let c=0;c<perRow;c++) arr.push({x:ox+c*baseL,z:oz,pw:baseL,pl:baseW,rot:rotBase});
+    arr.push({x:ox,z:oz+baseW,pw:sideL,pl:sideW,rot:!rotBase});
+    arr.push({x:ox+totalL-sideL,z:oz+baseW,pw:sideL,pl:sideW,rot:!rotBase});
+    for(let c=0;c<perRow;c++) arr.push({x:ox+c*baseL,z:oz+baseW+sideW,pw:baseL,pl:baseW,rot:rotBase});
+    pushPack(arr,`Schema ${target}D perimetrale`,4);
+  };
+  const addSplitRows=()=>{
+    if(!target) return;
+    for(let r1=0;r1<=target;r1++){
+      const r2=target-r1;
+      if(r1===0||r2===0) continue;
+      const l1=r1*itemL, w1=itemW;
+      const l2=r2*itemW, w2=itemL;
+      const totalL=Math.max(l1,l2), totalW=w1+w2;
+      if(totalL<=binL && totalW<=binW){
+        const ox=startX+(binL-totalL)/2, oz=startZ+(binW-totalW)/2, arr=[];
+        for(let c=0;c<r1;c++) arr.push({x:ox+c*itemL,z:oz,pw:itemL,pl:itemW,rot:false});
+        for(let c=0;c<r2;c++) arr.push({x:ox+c*itemW,z:oz+itemW,pw:itemW,pl:itemL,rot:true});
+        pushPack(arr,`Schema misto ${r1}+${r2}`,2);
+      }
+    }
+  };
+
+  if(variant==='D'){ addRingD(false); addRingD(true); }
+  if(['B','C','J','D'].includes(variant)) addSplitRows();
+  const base=packRectanglesMaxRects(binL,binW,itemL,itemW,true,maxItems).map(r=>({x:startX+r.x,z:startZ+r.y,pw:r.w,pl:r.h,rot:r.rot}));
+  pushPack(base,'MaxRects',0);
+  const stripe=buildStripedLayout(binL,binW,itemL,itemW,startX,startZ).positions;
+  pushPack(stripe,'Righe',0);
+  const stripe2=buildStripedLayout(binL,binW,itemW,itemL,startX,startZ).positions.map(p=>({...p,rot:!p.rot}));
+  pushPack(stripe2,'Righe ruotate',0);
+  for(let cols=1;cols<=Math.max(1,target);cols++){
+    const rows=Math.ceil(target/cols);
+    addGrid(cols,rows,false,'Griglia');
+    addGrid(cols,rows,true,'Griglia ruotata');
+  }
+  candidates.sort((a,b)=>{
+    const da=Math.abs((target||a.positions.length)-a.positions.length);
+    const db=Math.abs((target||b.positions.length)-b.positions.length);
+    if(da!==db) return da-db;
+    if(a.priority!==b.priority) return b.priority-a.priority;
+    if(a.fill!==b.fill) return b.fill-a.fill;
+    return a.name.localeCompare(b.name);
+  });
+  return (candidates[0]?.positions||[]).slice(0,target||undefined);
+}
+function applyPalletFormationToCurrent(){
+  if(!palletPlanState.spec){ calcPallet(); return; }
+  if(palletFormation==='Auto') return;
+  const spec=palletPlanState.spec;
+  const bL=+document.getElementById('bL').value||400, bW=+document.getElementById('bW').value||300;
+  const pos=layoutByFormation(spec.areaL,spec.areaW,bL,bW,palletFormation,2000,0,0);
+  const items=pos.map((p,i)=>({x:p.x,z:p.z,w:p.pw,l:p.pl,rot:!!p.rot,manual:false,id:`formation-${palletFormation}-${i}`}));
+  palletPlanState.items=items.map(it=>clampPalletPlanItemToSpec(it,spec));
+  palletPlanState.manual=true;
+  palletPlanState.layoutLabel=`formazione ${palletFormation}`;
+  renderPalletPlan(spec,palletPlanState.items,{layout:palletPlanState.layoutLabel,originalItems:palletPlanState.originalItems,manual:true});
+  updatePalletPlanResults();
+}
+function syncCalculatedPalletPreset(){
+  if(!lastP) return;
+  const sel=document.getElementById('planPalletPreset');
+  if(sel && sel.value==='calculated'){
+    document.getElementById('planNewPL').value=Math.round(lastP.areaL||lastP.pL||1200);
+    document.getElementById('planNewPW').value=Math.round(lastP.areaW||lastP.pW||800);
+  }
+}
 
 // ══════ THREE.JS RENDERERS ══════
 function makeRenderer(containerId){
@@ -1305,9 +1499,12 @@ function buildPSceneMulti(res){
   RP.r.setClearColor(h2t(cb),1);SP.g.visible=document.getElementById('showG').checked;
   if(showBase){
     const pm=new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.8});
-    const baseMesh=new THREE.Mesh(new THREE.BoxGeometry(areaL,pT,areaW),pm);
+    const baseMesh=new THREE.Mesh(new THREE.BoxGeometry(pL,pT,pW),pm);
     baseMesh.position.set(0,pT/2,0);baseMesh.receiveShadow=true;GRP_P.add(baseMesh);
     if(overhang>0){
+      const ohGeo=new THREE.BoxGeometry(areaL,4,areaW);
+      const ohMesh=new THREE.Mesh(ohGeo,new THREE.MeshStandardMaterial({color:0xdc2626,transparent:true,opacity:.12,roughness:.8}));
+      ohMesh.position.set(0,pT+3,0);GRP_P.add(ohMesh);
       const fpGeo=new THREE.BoxGeometry(pL,6,pW);
       const fpEdge=new THREE.LineSegments(new THREE.EdgesGeometry(fpGeo),new THREE.LineBasicMaterial({color:0x475569,transparent:true,opacity:0.9}));
       fpEdge.position.set(0,pT+4,0);GRP_P.add(fpEdge);
@@ -1381,14 +1578,22 @@ function calcPallet(){
 
   const areaL=pL+oh*2, areaW=pW+oh*2;
   const best=buildBestBoxLayer(areaL,areaW,bL,bW,false,oh);
-  const autoLayerItems=buildPalletAutoItems(best.positions,bL,bW,oh);
+  let autoLayerItems=buildPalletAutoItems(best.positions,bL,bW,oh);
+  let autoLayoutLabel=best.layout;
+  if(palletFormation && palletFormation!=='Auto'){
+    const fpos=layoutByFormation(areaL,areaW,bL,bW,palletFormation,2000,0,0);
+    if(fpos.length){
+      autoLayerItems=fpos.map((p,i)=>({x:p.x,z:p.z,w:p.pw,l:p.pl,rot:!!p.rot,manual:false,id:`formation-${palletFormation}-${i}`}));
+      autoLayoutLabel=`formazione ${palletFormation}`;
+    }
+  }
   const spec={baseL:pL,baseW:pW,areaL,areaW,overhang:oh,pT,maxH,maxKg,bH,bKg,requestedLayers:nL,alternate:doRot};
   const sameSpec=palletPlanState.spec && palletPlanState.spec.baseL===pL && palletPlanState.spec.baseW===pW && palletPlanState.spec.overhang===oh;
-  const keepManual=!!(palletPlanState.manual && sameSpec && palletPlanState.items.length);
+  const keepManual=!!(palletPlanState.manual && sameSpec && palletPlanState.items.length && (!palletFormation || palletFormation==='Auto'));
   const items=keepManual?clonePlanItems(palletPlanState.items):clonePlanItems(autoLayerItems);
-  const layoutLabel=keepManual?'manuale personalizzato':best.layout;
+  const layoutLabel=keepManual?'manuale personalizzato':autoLayoutLabel;
 
-  renderPalletPlan(spec,items,{layout:layoutLabel,originalItems:autoLayerItems,manual:keepManual});
+  renderPalletPlan(spec,items,{layout:layoutLabel,originalItems:autoLayerItems,manual:keepManual || (palletFormation&&palletFormation!=='Auto')});
   updatePalletPlanResults();
   applyPalletPlanPreset();
   showAlert('al-p');
@@ -1438,6 +1643,7 @@ function updatePalletPlanResults(){
   buildPScene(lastP);
   setupLightsP();
   calcHowManyPallets();
+  syncCalculatedPalletPreset();
 }
 
 function renderPalletPlan(spec,items,meta={}){
@@ -1813,13 +2019,18 @@ function buildPScene(res){
   RP.r.setClearColor(h2t(cb),1);SP.g.visible=document.getElementById('showG').checked;
   if(showBase){
     const pm=new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.8});
-    const baseMesh=new THREE.Mesh(new THREE.BoxGeometry(areaL,pT,areaW),pm);
+    const baseMesh=new THREE.Mesh(new THREE.BoxGeometry(pL,pT,pW),pm);
     baseMesh.position.set(0,pT/2,0);baseMesh.receiveShadow=true;GRP_P.add(baseMesh);
 
     if(overhang>0){
-      const footprintGeo=new THREE.BoxGeometry(pL,6,pW);
-      const footprintEdge=new THREE.LineSegments(new THREE.EdgesGeometry(footprintGeo),new THREE.LineBasicMaterial({color:0x475569,transparent:true,opacity:0.9}));
-      footprintEdge.position.set(0,pT+4,0); GRP_P.add(footprintEdge);
+      const ohGeo=new THREE.BoxGeometry(areaL,4,areaW);
+      const ohMat=new THREE.MeshStandardMaterial({color:0xdc2626,transparent:true,opacity:0.12,roughness:.8});
+      const ohMesh=new THREE.Mesh(ohGeo,ohMat);ohMesh.position.set(0,pT+3,0);GRP_P.add(ohMesh);
+      const footprintGeo=new THREE.BoxGeometry(pL,8,pW);
+      const footprintEdge=new THREE.LineSegments(new THREE.EdgesGeometry(footprintGeo),new THREE.LineBasicMaterial({color:0x22c55e,transparent:true,opacity:0.95}));
+      footprintEdge.position.set(0,pT+7,0); GRP_P.add(footprintEdge);
+      const allowedEdge=new THREE.LineSegments(new THREE.EdgesGeometry(ohGeo),new THREE.LineBasicMaterial({color:0xdc2626,transparent:true,opacity:0.9}));
+      allowedEdge.position.copy(ohMesh.position);GRP_P.add(allowedEdge);
     }else{
       for(let i=0;i<3;i++){const bg=new THREE.BoxGeometry(areaL,pT*0.38,areaW*0.17);const bm=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:h2t(cp),roughness:0.9}));bm.position.set(0,pT*0.69,(i-1)*areaW*0.34);GRP_P.add(bm);}
     }
@@ -1940,30 +2151,57 @@ function buildStripedLayout(binL,binW,pL,pW,startX=0,startZ=0){
   return best;
 }
 
-function buildVehiclePalletLayout(spec,pL,pW,marginSide=0){
+function buildContainerMixedPalletLayout(spec,pL,pW,marginSide=0){
   const binL=Math.max(0,spec.iL-(spec.structLossL||0)-marginSide*2);
   const binW=Math.max(0,spec.iW-(spec.structLossW||0)-marginSide*2);
   const startX=Math.max(0,Math.round((spec.iL-binL)/2));
   const startZ=Math.max(0,Math.round((spec.iW-binW)/2));
-
-  const stripe=buildStripedLayout(binL,binW,pL,pW,startX,startZ);
-  const packed=packRectanglesMaxRects(binL,binW,pL,pW,true,600).map(r=>({
-    x:startX+r.x,
-    z:startZ+r.y,
-    pw:r.w,
-    pl:r.h,
-    rot:r.rot
-  }));
-  const packArea=packed.length*pL*pW;
-  const stripeArea=stripe.count*pL*pW;
-  const maxRect={
-    count:packed.length,
-    fill:binL*binW>0?packArea/(binL*binW):0,
-    positions:packed,
-    layout:'automatico misto'
+  const candidates=[];
+  const push=(positions,layout)=>{
+    const used=positions.length*pL*pW;
+    candidates.push({count:positions.length,fill:binL*binW>0?used/(binL*binW):0,positions,layout,binL,binW,startX,startZ});
   };
-  const chosen=(maxRect.count>stripe.count || (maxRect.count===stripe.count && maxRect.fill>stripe.fill))?maxRect:stripe;
-  return{...chosen,binL,binW,startX,startZ};
+
+  // 1) Colonne miste affiancate: es. EUR 1200×800 in 40' = una corsia 1200 larga con pallet ruotati + una corsia 800 larga.
+  const colTypes=[
+    {colW:pW,itemL:pL,itemW:pW,rot:false,label:`${pL}×${pW}`},
+    {colW:pL,itemL:pW,itemW:pL,rot:true,label:`${pW}×${pL}`}
+  ];
+  function genCols(z,seq){
+    const usedW=seq.reduce((a,c)=>a+c.colW,0);
+    if(usedW>binW) return;
+    if(seq.length){
+      let zz=startZ, pos=[];
+      seq.forEach(col=>{
+        const per=Math.floor(binL/col.itemL);
+        for(let i=0;i<per;i++) pos.push({x:startX+i*col.itemL,z:zz,pw:col.itemL,pl:col.itemW,rot:col.rot});
+        zz+=col.colW;
+      });
+      push(pos,'misto colonne/corsie');
+    }
+    if(seq.length>8) return;
+    colTypes.forEach(t=>genCols(z+t.colW,[...seq,t]));
+  }
+  genCols(0,[]);
+
+  // 2) Strisce classiche + 3) MaxRects, per non perdere casi in cui la griglia è migliore.
+  const stripe=buildStripedLayout(binL,binW,pL,pW,startX,startZ);
+  push(stripe.positions,'righe alternate');
+  const packed=packRectanglesMaxRects(binL,binW,pL,pW,true,800).map(r=>({x:startX+r.x,z:startZ+r.y,pw:r.w,pl:r.h,rot:r.rot}));
+  push(packed,'max-rects misto');
+
+  candidates.sort((a,b)=>{
+    if(b.count!==a.count) return b.count-a.count;
+    if(b.fill!==a.fill) return b.fill-a.fill;
+    // Prefer layout con corsie miste a parità di risultato perché più leggibile e replicabile in magazzino.
+    const pa=a.layout.includes('colonne')?1:0, pb=b.layout.includes('colonne')?1:0;
+    return pb-pa;
+  });
+  return candidates[0]||{count:0,fill:0,positions:[],layout:'nessuno',binL,binW,startX,startZ};
+}
+
+function buildVehiclePalletLayout(spec,pL,pW,marginSide=0){
+  return buildContainerMixedPalletLayout(spec,pL,pW,marginSide);
 }
 
 function buildVolumeBarHTML(usedVol,totalVol,ve,prefixColor){
@@ -2042,9 +2280,9 @@ function getPracticalMargins(spec,userSide,userTop){
 
 function calcPalletCapacityModes(spec,pL,pW,pT,pCH,stack,userSide,userTop){
   const theoreticalLayout=buildVehiclePalletLayout({...spec,structLossL:0,structLossW:0},pL,pW,0);
-  const theoreticalHeight=Math.max(0,spec.iH);
+  const theoreticalHeight=Math.max(0,Math.min(spec.iH,spec.doorH||spec.iH));
   const palletH=Math.max(1,pT+pCH);
-  const theoreticalStacks=stack?Math.max(1,Math.floor(theoreticalHeight/palletH)):1;
+  const theoreticalStacks=stack?Math.max(0,Math.floor(theoreticalHeight/palletH)):(palletH<=theoreticalHeight?1:0);
   const theoretical={
     perLayer: theoreticalLayout.count,
     stacks: theoreticalStacks,
@@ -2059,8 +2297,8 @@ function calcPalletCapacityModes(spec,pL,pW,pT,pCH,stack,userSide,userTop){
   const practicalMargins=getPracticalMargins(spec,userSide,userTop);
   const practicalSpec={...spec};
   const practicalLayout=buildVehiclePalletLayout(practicalSpec,pL,pW,practicalMargins.side);
-  const practicalHeight=Math.max(0,spec.iH-practicalMargins.top);
-  const practicalStacks=stack?Math.max(1,Math.floor(practicalHeight/palletH)):1;
+  const practicalHeight=Math.max(0,Math.min(spec.iH,spec.doorH||spec.iH)-practicalMargins.top);
+  const practicalStacks=stack?Math.max(0,Math.floor(practicalHeight/palletH)):(palletH<=practicalHeight?1:0);
   const practical={
     perLayer: practicalLayout.count,
     stacks: practicalStacks,
@@ -2079,12 +2317,276 @@ function buildCapacityModeHTML(kind,modes){
   return `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:0.72rem;line-height:1.9;color:var(--muted);"><div><b style="color:var(--text)">Capacità teorica</b>: ${modes.theoretical.total} ${kind} · ${modes.theoretical.perLayer}/layer · ${modes.theoretical.stacks} layer · ${(modes.theoretical.binL/1000).toFixed(2)}×${(modes.theoretical.binW/1000).toFixed(3)}m</div><div><b style="color:var(--text)">Capacità pratica reale</b>: ${modes.practical.total} ${kind} · ${modes.practical.perLayer}/layer · ${modes.practical.stacks} layer · ${(modes.practical.binL/1000).toFixed(2)}×${(modes.practical.binW/1000).toFixed(3)}m · margini ${modes.practical.side}mm lato / ${modes.practical.top}mm top</div></div>`;
 }
 
+function buildPalletContainerPlans(floorPositions,totalPallets,perLayer,stacks,tPH,pT,pCH){
+  // Versione single-container: non crea più container 1/2/3.
+  // Se i pallet richiesti superano la capacità, visualizza solo quelli che entrano nel container attivo.
+  const take=Math.min(Math.max(0,totalPallets),Math.max(1,perLayer*stacks));
+  const arr=[];
+  let placed=0;
+  for(let sl=0;sl<stacks && placed<take;sl++){
+    for(const pos of floorPositions){
+      if(placed>=take) break;
+      arr.push({x:pos.x,y:sl*tPH,z:pos.z,pw:pos.pw,pt:pT,pl:pos.pl,ch:pCH,type:'pallet',rot:!!pos.rot});
+      placed++;
+    }
+  }
+  return [{items:arr,originalItems:clonePlanItems(arr),layout:'single container ottimizzato'}];
+}
+
+function packPalletsFreeRectangles(binL,binW,pL,pW,maxItems,startX=0,startZ=0){
+  // Algoritmo libero stile Tetris: prova rotazione 0/90 e sceglie il punto che lascia meno scarto.
+  const free=[{x:0,y:0,w:binL,h:binW}];
+  const out=[];
+  function score(fr,w,h){
+    if(w>fr.w||h>fr.h) return Infinity;
+    return (fr.w-w)*(fr.h-h) + fr.y*0.01 + fr.x*0.001;
+  }
+  function splitFree(used){
+    for(let i=free.length-1;i>=0;i--){
+      const fr=free[i];
+      if(used.x>=fr.x+fr.w||used.x+used.w<=fr.x||used.y>=fr.y+fr.h||used.y+used.h<=fr.y) continue;
+      free.splice(i,1);
+      const right={x:used.x+used.w,y:fr.y,w:fr.x+fr.w-(used.x+used.w),h:fr.h};
+      const bottom={x:fr.x,y:used.y+used.h,w:fr.w,h:fr.y+fr.h-(used.y+used.h)};
+      const left={x:fr.x,y:fr.y,w:used.x-fr.x,h:fr.h};
+      const top={x:fr.x,y:fr.y,w:fr.w,h:used.y-fr.y};
+      [right,bottom,left,top].forEach(r=>{if(r.w>5&&r.h>5) free.push(r);});
+    }
+    // rimuove rettangoli liberi contenuti in altri
+    for(let i=free.length-1;i>=0;i--){
+      for(let j=0;j<free.length;j++){
+        if(i===j) continue;
+        const a=free[i],b=free[j];
+        if(a.x>=b.x&&a.y>=b.y&&a.x+a.w<=b.x+b.w&&a.y+a.h<=b.y+b.h){free.splice(i,1);break;}
+      }
+    }
+    free.sort((a,b)=>(a.y-b.y)||(a.x-b.x));
+  }
+  for(let n=0;n<maxItems;n++){
+    let best=null;
+    free.forEach((fr,fi)=>{
+      [[pL,pW,false],[pW,pL,true]].forEach(([w,h,rot])=>{
+        const sc=score(fr,w,h);
+        if(sc!==Infinity && (!best||sc<best.sc)) best={fi,fr,w,h,rot,sc};
+      });
+    });
+    if(!best) break;
+    const used={x:best.fr.x,y:best.fr.y,w:best.w,h:best.h};
+    out.push({x:startX+used.x,z:startZ+used.y,pw:used.w,pl:used.h,rot:best.rot});
+    splitFree(used);
+  }
+  return out;
+}
+
+
+function getContainerLoadConstraints(){
+  return {
+    frontMax:+document.getElementById('cFrontMaxKg')?.value||0,
+    rearMax:+document.getElementById('cRearMaxKg')?.value||0,
+    sideImb:+document.getElementById('cSideImbalance')?.value||20,
+    longImb:+document.getElementById('cLongImbalance')?.value||20,
+    stabRatio:+document.getElementById('cStabRatio')?.value||1.8,
+    palletMax:+document.getElementById('cPalletMaxKg')?.value||0
+  };
+}
+function loadBar(label,pct,limitPct=100){
+  const warn=pct>limitPct;
+  return `<div><div class="load-bar-label"><span>${label}</span><b style="color:${warn?'var(--accent2)':'var(--text)'}">${Math.round(pct)}%</b></div><div class="wbt"><div class="wbf${warn?' d':''}" style="width:${Math.min(100,Math.max(0,pct))}%"></div></div></div>`;
+}
+function computeRealLoadSimulation(items,spec,unitKg){
+  const constraints=getContainerLoadConstraints();
+  const all=(items||[]).filter(it=>it.type==='pallet');
+  const kg=+unitKg||0;
+  const total=all.length*kg;
+  let sx=0,sy=0,sz=0,front=0,rear=0,left=0,right=0;
+  let maxH=0, worstRatio=0, palletOverKg=0;
+  all.forEach(it=>{
+    const l=it.pw||it.w||0, w=it.pl||it.l||0, h=(it.pt||0)+(it.ch||0);
+    const cx=it.x+l/2, cy=(it.y||0)+h/2, cz=it.z+w/2;
+    sx+=cx*kg; sy+=cy*kg; sz+=cz*kg;
+    if(cx<spec.iL/2) front+=kg; else rear+=kg;
+    if(cz<spec.iW/2) left+=kg; else right+=kg;
+    maxH=Math.max(maxH,h);
+    const base=Math.max(1,Math.min(l,w));
+    worstRatio=Math.max(worstRatio,h/base);
+    if(constraints.palletMax && kg>constraints.palletMax) palletOverKg++;
+  });
+  const cg={x:total?sx/total:0,y:total?sy/total:0,z:total?sz/total:0};
+  const frontPct=total?front/total*100:0, rearPct=total?rear/total*100:0, leftPct=total?left/total*100:0, rightPct=total?right/total*100:0;
+  const longImb=Math.abs(frontPct-rearPct), sideImb=Math.abs(leftPct-rightPct);
+  const payloadPct=spec.maxP?total/spec.maxP*100:0;
+  const frontLimitPct=(constraints.frontMax&&total)?constraints.frontMax/total*100:100;
+  const rearLimitPct=(constraints.rearMax&&total)?constraints.rearMax/total*100:100;
+  const floorArea=(spec.iL*spec.iW)/1e6;
+  const kgM2=floorArea?total/floorArea:0;
+  const doorOk=maxH<=Math.min(spec.iH,spec.doorH||spec.iH);
+  const payloadOk=total<=spec.maxP;
+  const axleOk=(!constraints.frontMax||front<=constraints.frontMax)&&(!constraints.rearMax||rear<=constraints.rearMax);
+  const balanceOk=longImb<=constraints.longImb && sideImb<=constraints.sideImb;
+  const stabilityOk=worstRatio<=constraints.stabRatio;
+  const palletKgOk=!constraints.palletMax || palletOverKg===0;
+  const ok=payloadOk&&axleOk&&balanceOk&&stabilityOk&&doorOk&&palletKgOk;
+  return {ok,total,cg,front,rear,left,right,frontPct,rearPct,leftPct,rightPct,longImb,sideImb,payloadPct,frontLimitPct,rearLimitPct,kgM2,maxH,worstRatio,doorOk,payloadOk,axleOk,balanceOk,stabilityOk,palletKgOk,palletOverKg,constraints};
+}
+function renderRealLoadSimulation(){
+  const spec=containerPlanState.spec;
+  const target=document.getElementById('realLoadSim');
+  if(!target || !spec || containerPlanState.mode!=='pallets') return;
+  const kg=+document.getElementById('cpKg')?.value||0;
+  const sim=computeRealLoadSimulation(lastC?.items||containerPlanState.items,spec,kg);
+  const cls=sim.ok?'load-sim':(sim.payloadOk&&sim.axleOk&&sim.stabilityOk?'load-sim warn':'load-sim danger');
+  const issues=[];
+  if(!sim.payloadOk) issues.push('payload superato');
+  if(!sim.axleOk) issues.push('limite asse/zona superato');
+  if(!sim.balanceOk) issues.push('carico sbilanciato');
+  if(!sim.stabilityOk) issues.push('rapporto H/base instabile');
+  if(!sim.doorOk) issues.push('altezza oltre porta');
+  if(!sim.palletKgOk) issues.push(`${sim.palletOverKg} pallet oltre peso max`);
+  target.className=cls;
+  target.style.display='block';
+  target.innerHTML=`<div><b style="color:var(--text)">🧪 Simulazione carico reale</b> · ${sim.ok?'✓ OK operativo':'⚠ '+issues.join(' · ')}</div>
+  <div>Peso netto: <b style="color:var(--text)">${Math.round(sim.total).toLocaleString()} kg</b> · ${Math.round(sim.payloadPct)}% payload · pressione media pavimento ${Math.round(sim.kgM2)} kg/m²</div>
+  <div>Baricentro: X ${(sim.cg.x/1000).toFixed(2)} m / Y ${(sim.cg.y/1000).toFixed(2)} m / Z ${(sim.cg.z/1000).toFixed(2)} m</div>
+  <div>Stabilità: H max ${Math.round(sim.maxH)}mm · rapporto H/base ${sim.worstRatio.toFixed(2)} / max ${sim.constraints.stabRatio}</div>
+  <div class="load-bars">
+    ${loadBar('Payload container',sim.payloadPct,100)}
+    ${loadBar('Zona anteriore',sim.frontPct,sim.frontLimitPct)}
+    ${loadBar('Zona posteriore',sim.rearPct,sim.rearLimitPct)}
+    ${loadBar('Lato sinistro',sim.leftPct,50+sim.constraints.sideImb/2)}
+    ${loadBar('Lato destro',sim.rightPct,50+sim.constraints.sideImb/2)}
+  </div>
+  <div style="margin-top:7px;color:${sim.ok?'var(--green)':'var(--accent2)'}">${sim.ok?'✓ Peso, asse/zona, baricentro e stabilità risultano coerenti con i vincoli inseriti.':'⚠ Usa “Bilancia peso”, ruota/sposta pallet o riduci numero/peso pallet.'}</div>`;
+}
+function simulateRealLoad(){
+  if(!containerPlanState.spec||containerPlanState.mode!=='pallets'||!containerPlanState.items.length){alert('Esegui prima un calcolo container in modalità Su Pallet.');return;}
+  renderRealLoadSimulation();
+  renderRealLoadSimulation();
+  showAlert('al-c');
+}
+
+function analyzeContainerWeight(items,spec,unitKg){
+  const floor=items.filter(it=>it.y===0);
+  const count=floor.length;
+  const total=count*(+unitKg||0);
+  if(!count||!spec) return {html:'',ok:true};
+  let sx=0,sz=0,left=0,right=0,front=0,rear=0;
+  floor.forEach(it=>{
+    const kg=+unitKg||0;
+    const l=it.pw||it.w, w=it.pl||it.l;
+    const cx=it.x+l/2, cz=it.z+w/2;
+    sx+=cx*kg; sz+=cz*kg;
+    if(cz<spec.iW/2) left+=kg; else right+=kg;
+    if(cx<spec.iL/2) front+=kg; else rear+=kg;
+  });
+  const cx=total?sx/total:0, cz=total?sz/total:0;
+  const frontPct=total?Math.round(front/total*100):0, rearPct=100-frontPct, leftPct=total?Math.round(left/total*100):0, rightPct=100-leftPct;
+  const offX=Math.round((cx/spec.iL-.5)*100), offZ=Math.round((cz/spec.iW-.5)*100);
+  const ok=Math.abs(frontPct-rearPct)<=35 && Math.abs(leftPct-rightPct)<=35 && total<=spec.maxP;
+  const html=`<div><b style="color:var(--text)">⚖️ Bilanciamento container</b> · peso stimato ${Math.round(total)} kg / payload ${spec.maxP} kg</div>
+  <div>Baricentro: ${(cx/1000).toFixed(2)}m dalla porta · ${(cz/1000).toFixed(2)}m dal lato · scostamento L ${offX}% / W ${offZ}%</div>
+  <div class="weight-grid"><div class="weight-cell">Anteriore<br><b>${frontPct}%</b></div><div class="weight-cell">Posteriore<br><b>${rearPct}%</b></div><div class="weight-cell">Lato SX<br><b>${leftPct}%</b></div><div class="weight-cell">Lato DX<br><b>${rightPct}%</b></div></div>
+  <div style="color:${ok?'var(--green)':'var(--accent2)'}">${ok?'✓ Distribuzione peso accettabile.':'⚠ Distribuzione/peso da ribilanciare: usa “Bilancia peso” o modifica manualmente.'}</div>`;
+  return {html,ok,cx,cz,total};
+}
+
+function updateContainerWeightReport(){
+  const el=document.getElementById('containerWeightReport');
+  if(!el) return;
+  if(!containerPlanState.spec||containerPlanState.mode!=='pallets'||!containerPlanState.items.length){el.style.display='none';return;}
+  const kg=+document.getElementById('cpKg')?.value||0;
+  const a=analyzeContainerWeight(containerPlanState.items,containerPlanState.spec,kg);
+  el.innerHTML=a.html; el.style.display='block';
+}
+
+function buildPalletDoorAdviceHTML(spec,palletBaseH,loadH,boxH,userTop){
+  const doorLimit=Math.max(0,Math.min(spec.iH,spec.doorH||spec.iH));
+  const topMargin=Math.max(+userTop||0,spec.practicalTop||0);
+  const usefulH=Math.max(0,doorLimit-topMargin);
+  const maxLoadH=Math.max(0,usefulH-palletBaseH);
+  const recLayers=boxH>0?Math.max(0,Math.floor(maxLoadH/boxH)):null;
+  const recLoadH=recLayers!==null?recLayers*boxH:maxLoadH;
+  const totalH=palletBaseH+loadH;
+  const ok=totalH<=usefulH;
+  return `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;border:1px solid ${ok?'rgba(34,197,94,.35)':'rgba(220,38,38,.45)'};background:${ok?'rgba(34,197,94,.07)':'rgba(220,38,38,.08)'};line-height:1.9;">
+    <div>🚪 <b style="color:var(--text)">Altezza porta container</b>: ${doorLimit}mm · margine sicurezza top: ${topMargin}mm</div>
+    <div>✅ <b style="color:var(--text)">Altezza pallet consigliata max</b>: ${usefulH}mm totali</div>
+    <div>📦 <b style="color:var(--text)">Carico consigliato sopra pallet</b>: ${Math.floor(maxLoadH)}mm max${recLayers!==null?` · strati consigliati: ${recLayers} · carico consigliato: ${recLoadH}mm`:''}</div>
+    ${ok?`<div style="color:var(--green)">✓ Il pallet passa dalla porta.</div>`:`<div style="color:var(--accent2)">⚠ Il pallet è alto ${totalH}mm: riduci il carico a max ${Math.floor(maxLoadH)}mm${recLayers!==null?` (${recLayers} strati)`:''}, altrimenti non passa dalla porta.</div>`}
+  </div>`;
+}
+
+
+
+function setContainerModePalletsUI(){
+  cMode='pallets';
+  const page=document.getElementById('page-container');
+  if(page){
+    page.querySelectorAll('.mb').forEach(b=>b.classList.remove('on'));
+    const btn=[...page.querySelectorAll('.mb')].find(b=>/Pallet/i.test(b.textContent||''));
+    if(btn) btn.classList.add('on');
+  }
+  const boxes=document.getElementById('cm-boxes'), pallets=document.getElementById('cm-pallets');
+  if(boxes) boxes.style.display='none';
+  if(pallets) pallets.style.display='block';
+  const type=document.getElementById('cNType'); if(type) type.value='pallets';
+}
+
+function optimizeContainerAndPalletTogether(){
+  // Ottimizzazione PRO: scatola → schema pallet dinamico → numero strati consigliato dalla porta → saturazione container.
+  const spec=getSelectedContainerSpec();
+  const bL=+document.getElementById('bL')?.value||+document.getElementById('cbL')?.value||400;
+  const bW=+document.getElementById('bW')?.value||+document.getElementById('cbW')?.value||300;
+  const bH=+document.getElementById('bH')?.value||+document.getElementById('cbH')?.value||250;
+  const pL=+document.getElementById('pL')?.value||+document.getElementById('cpL')?.value||1200;
+  const pW=+document.getElementById('pW')?.value||+document.getElementById('cpW')?.value||800;
+  const pT=+document.getElementById('pT')?.value||+document.getElementById('cpT')?.value||144;
+  const maxH=+document.getElementById('maxH')?.value||1800;
+  const requestedLayers=+document.getElementById('layers')?.value||999;
+  const ovhAllowed=document.getElementById('ovhFlag')?.checked;
+  const ovh=ovhAllowed?(+document.getElementById('ovh')?.value||0):0;
+  const areaL=pL+ovh*2, areaW=pW+ovh*2;
+  const mT=+document.getElementById('cMTop')?.value||0;
+  const doorUseful=Math.max(0,Math.min(spec.iH,spec.doorH||spec.iH)-mT);
+  const layersByDoor=Math.max(0,Math.floor((doorUseful-pT)/Math.max(1,bH)));
+  const layersByMaxH=Math.max(0,Math.floor((maxH-pT)/Math.max(1,bH)));
+  const layersRecommended=Math.max(0,Math.min(requestedLayers,layersByDoor,layersByMaxH));
+  if(layersRecommended<=0){
+    alert('Il pallet non passa dalla porta/container con queste altezze. Riduci altezza scatola/carico o scegli un container più alto.');
+    return;
+  }
+  const layer=buildBestBoxLayer(areaL,areaW,bL,bW,false,ovh);
+  const boxesPerPallet=layer.count*layersRecommended;
+  if(!layer.count){ alert('Nessuno schema pallet valido con queste dimensioni.'); return; }
+
+  setContainerModePalletsUI();
+  document.getElementById('cpL').value=Math.round(areaL);
+  document.getElementById('cpW').value=Math.round(areaW);
+  document.getElementById('cpT').value=Math.round(pT);
+  document.getElementById('cpCH').value=Math.round(layersRecommended*bH);
+  const rows=document.getElementById('cpRows');
+  if(rows) rows.value=`PRO · ${layer.count}/strato × ${layersRecommended} strati · ${layer.layout}`;
+
+  // Calcola il massimo pallet/container con pallet appena ottimizzato.
+  calcContainer();
+
+  const palletCount=(containerPlanState.items||[]).length;
+  const totalBoxes=palletCount*boxesPerPallet;
+  const cdet=document.getElementById('cdet');
+  if(cdet){
+    cdet.innerHTML += `<div style="margin-top:10px;padding:10px;border:1px solid rgba(20,184,166,.35);background:rgba(20,184,166,.08);border-radius:8px;line-height:1.9;">🤖 <b style="color:var(--text)">Ottimizzazione pallet + container</b><br>Schema pallet dinamico: <b style="color:var(--text)">${layer.layout}</b><br>Scatole per strato: <b style="color:var(--text)">${layer.count}</b> · strati consigliati: <b style="color:var(--text)">${layersRecommended}</b><br>Scatole per pallet: <b style="color:var(--text)">${boxesPerPallet}</b><br>Pallet nel container: <b style="color:var(--text)">${palletCount}</b><br>Scatole totali nel container: <b style="color:var(--text)">${totalBoxes.toLocaleString('it-IT')}</b><br>Vincolo porta: <b style="color:var(--text)">${Math.min(spec.iH,spec.doorH||spec.iH)}mm</b> · altezza pallet finale: <b style="color:var(--text)">${pT+layersRecommended*bH}mm</b></div>`;
+  }
+  document.getElementById('cs-tot').textContent=`${palletCount} pal / ${totalBoxes.toLocaleString('it-IT')} sc`;
+  renderPalletPlan({pL:pL,pW:pW,areaL:areaL,areaW:areaW,pT:pT,bH:bH}, layer.positions.map((it,i)=>({x:it.x,z:it.z,w:it.w,l:it.l,rot:!!it.rot,manual:false,id:'pro-'+i})), {layout:'PRO dinamico · '+layer.layout, manual:false});
+  showAlert('al-c');
+}
+
 function calcContainer(){
   syncContainerUnitsType();
-  const spec=CONTS[selectedCont];
+  const spec=getSelectedContainerSpec();
   const mS=+document.getElementById('cMSide').value,mT=+document.getElementById('cMTop').value;
-  const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
-  let items=[],totKg=0,usedVol=0,layers=0,totalVol=spec.iL*spec.iW*spec.iH,layoutLabel='automatico';
+  const doorH=spec.doorH||spec.iH;
+  const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=Math.min(spec.iH,doorH)-mT;
+  let items=[],totKg=0,usedVol=0,layers=0,totalVol=spec.iL*spec.iW*spec.iH,layoutLabel='automatico',multiPlans=null,totalPlannedItems=0;
 
   if(cMode==='boxes'){
     const bL=+document.getElementById('cbL').value,bW=+document.getElementById('cbW').value,bH=+document.getElementById('cbH').value,bKg=+document.getElementById('cbKg').value;
@@ -2108,7 +2610,7 @@ function calcContainer(){
     document.getElementById('cs-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('cs-wgt').textContent=Math.round(totKg);
     document.getElementById('cs-lay').textContent=layers;
-    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout: <b style="color:var(--text)">MaxRects ottimizzato</b></div><div>📐 Per strato: <b style="color:var(--text)">${perFloor}</b> scatole</div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 H utile interna: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
+    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout: <b style="color:var(--text)">MaxRects ottimizzato</b></div><div>📐 Per strato: <b style="color:var(--text)">${perFloor}</b> scatole</div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>🚪 Altezza porta max: <b style="color:var(--text)">${doorH}mm</b></div><div>📏 H utile interna/porta: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
     const perCont=items.length;
     calcHowManyContainers(perCont,bKg,spec);
   } else {
@@ -2118,38 +2620,66 @@ function calcContainer(){
     const requestedType=document.getElementById('cNType').value;
     const tPH=pT+pCH;
     const caps=calcPalletCapacityModes(spec,pL,pW,pT,pCH,stack,mS,mT);
-    const floorLayout=buildVehiclePalletLayout(spec,pL,pW,getPracticalMargins(spec,mS,mT).side);
-    const maxPerLayer=caps.practical.perLayer;
-    const stk=caps.practical.stacks;
-    const maxPallets=caps.practical.total;
-    const palletsToRender=requestedType==='pallets'&&requestedUnits>0?Math.min(requestedUnits,maxPallets):maxPallets;
-    layers=Math.max(1,Math.ceil(palletsToRender/Math.max(1,maxPerLayer)));
-    let placed=0;
-    for(let sl=0;sl<stk && placed<palletsToRender;sl++){
-      for(const pos of floorLayout.positions){
-        if(placed>=palletsToRender) break;
-        items.push({x:pos.x,y:sl*tPH,z:pos.z,pw:pos.pw,pt:pT,pl:pos.pl,ch:pCH,type:'pallet',rot:pos.rot});
-        placed++;
+    const margins=getPracticalMargins(spec,mS,mT);
+    let floorLayout=buildVehiclePalletLayout(spec,pL,pW,margins.side);
+    const freeMixed=packPalletsFreeRectangles(Math.max(0,spec.iL-(spec.structLossL||0)-margins.side*2),Math.max(0,spec.iW-(spec.structLossW||0)-margins.side*2),pL,pW,700,margins.side,margins.side);
+    if(freeMixed.length>=floorLayout.positions.length){
+      floorLayout={...floorLayout,positions:freeMixed,count:freeMixed.length,layout:'Tetris libero · rotazioni automatiche'};
+    }
+    let maxPerLayer=caps.practical.perLayer;
+    let layoutOverride='';
+    if(containerFormation && containerFormation!=='Auto'){
+      const binL=Math.max(0,spec.iL-(spec.structLossL||0)-margins.side*2);
+      const binW=Math.max(0,spec.iW-(spec.structLossW||0)-margins.side*2);
+      const fpos=layoutByFormation(binL,binW,pL,pW,containerFormation,600,margins.side,margins.side);
+      if(fpos.length){
+        floorLayout={...floorLayout,positions:fpos,count:fpos.length,layout:`formazione ${containerFormation}`};
+        maxPerLayer=fpos.length;
+        layoutOverride=`formazione ${containerFormation}`;
       }
     }
-    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;layoutLabel=caps.practical.layout||'automatico';
+    const stk=caps.practical.stacks;
+    const heightAdvice=buildPalletDoorAdviceHTML(spec,pT,pCH,+document.getElementById('bH')?.value||+document.getElementById('cbH')?.value||0,mT);
+    const tooTall=tPH>caps.practical.h;
+    const maxPallets=tooTall?0:maxPerLayer*stk;
+
+    // Precompilazione automatica richiesta: nel calcolo container su pallet
+    // il campo "Numero unità da spedire" viene impostato al massimo numero
+    // di pallet che entrano nel container selezionato.
+    const cUnitsEl=document.getElementById('cNUnits');
+    const cTypeEl=document.getElementById('cNType');
+    if(cTypeEl) cTypeEl.value='pallets';
+    if(cUnitsEl) cUnitsEl.value=maxPallets;
+
+    const totalToPlan=maxPallets;
+    multiPlans=tooTall?null:buildPalletContainerPlans(floorLayout.positions,totalToPlan,maxPerLayer,stk,tPH,pT,pCH);
+    items=multiPlans?clonePlanItems(multiPlans[0].items):[];
+    totalPlannedItems=multiPlans?multiPlans.reduce((sum,c)=>sum+(c.items?.length||0),0):items.length;
+    layers=items.length>0?Math.max(1,Math.ceil(items.length/Math.max(1,maxPerLayer))):0;
+    totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;layoutLabel=layoutOverride||floorLayout.layout||caps.practical.layout||'automatico misto';
     const ve=Math.round(usedVol/totalVol*100);
-    const cappedNote=requestedType==='pallets'&&requestedUnits>maxPallets?`<div>⚠ Limite pratico reale: <b style="color:var(--accent2)">${maxPallets}</b> pallet renderizzati su ${requestedUnits}</div>`:'';
+    const cappedNote=tooTall?`<div>⛔ Nessun pallet renderizzato: altezza ${tPH}mm superiore alla porta utile ${caps.practical.h}mm.</div>`:`<div>✅ Campo “Numero unità da spedire” precompilato automaticamente con il massimo: <b style="color:var(--text)">${maxPallets}</b> pallet.</div>`;
     document.getElementById('cs-tot').textContent=items.length;
     document.getElementById('cs-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('cs-wgt').textContent=Math.round(totKg);
     document.getElementById('cs-lay').textContent=`${maxPerLayer}/lay`;
-    document.getElementById('cdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout pratico usato: <b style="color:var(--text)">${layoutLabel}</b></div><div>📐 Per layer pratico: <b style="color:var(--text)">${maxPerLayer}</b> pallet</div><div>🔢 Stack pratico max: <b style="color:var(--text)">${stk}</b> layer</div><div>📏 H pallet + carico: <b style="color:${tPH>caps.practical.h?'var(--accent2)':'var(--text)'}">${tPH}mm</b></div><div>📏 H utile pratica: <b style="color:var(--text)">${caps.practical.h}mm</b></div><div>📦 Pallet renderizzati: <b style="color:var(--text)">${items.length}</b> / max pratico ${maxPallets}</div><div>📏 Layout utile pratico: <b style="color:var(--text)">${(caps.practical.binL/1000).toFixed(2)}×${(caps.practical.binW/1000).toFixed(3)}m</b></div>${buildCapacityModeHTML('pallet',caps)}${cappedNote}`;
+    document.getElementById('cdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout pratico usato: <b style="color:var(--text)">${layoutLabel}</b></div><div>📐 Per layer pratico: <b style="color:var(--text)">${maxPerLayer}</b> pallet</div><div>🔢 Stack pratico max: <b style="color:var(--text)">${stk}</b> layer</div><div>📏 H pallet + carico: <b style="color:${tPH>caps.practical.h?'var(--accent2)':'var(--text)'}">${tPH}mm</b></div><div>🚪 Altezza porta max: <b style="color:var(--text)">${spec.doorH||spec.iH}mm</b></div><div>📏 H utile pratica/porta: <b style="color:var(--text)">${caps.practical.h}mm</b></div><div>📦 Pallet nel container attivo: <b style="color:var(--text)">${items.length}</b> / max pratico ${maxPallets}</div><div>🚢 Container attivo: <b style="color:var(--text)">1 solo container</b> · pallet renderizzati: <b style="color:var(--text)">${items.length}</b></div><div>📏 Layout utile pratico: <b style="color:var(--text)">${(caps.practical.binL/1000).toFixed(2)}×${(caps.practical.binW/1000).toFixed(3)}m</b></div>${heightAdvice}${buildCapacityModeHTML('pallet',caps)}${cappedNote}`;
     calcHowManyContainers(maxPallets,pKg,spec);
   }
 
   const ve=Math.round(usedVol/totalVol*100);
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
-  document.getElementById('cwgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div><div>Volume usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>Volume totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div><div style="margin-top:6px;color:var(--muted)">Vista calcolata: <b style="color:var(--text)">pratica reale</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${buildVolumeBarHTML(usedVol,totalVol,ve,'var(--blue)')}${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
+  document.getElementById('cwgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div><div>Volume usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>Volume totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div><div style="margin-top:6px;color:var(--muted)">Vista calcolata: <b style="color:var(--text)">pratica reale</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${buildVolumeBarHTML(usedVol,totalVol,ve,'var(--blue)')}${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}<div id="realLoadSim" class="load-sim" style="display:none"></div>`;
   document.querySelectorAll('.csc').forEach(c=>c.classList.add('on'));
   lastC={cL:spec.iL,cW:spec.iW,cH:spec.iH,items:clonePlanItems(items),name:spec.name,mode:cMode};
   buildBoxScene(GRP_C,lastC,0x3b82f6);
   renderContainerPlan(spec,items,cMode,{layout:layoutLabel});
+  if(multiPlans && cMode==='pallets'){
+    containerPlanState.containers=multiPlans.map((pl,i)=>({items:clonePlanItems(pl.items),originalItems:clonePlanItems(pl.originalItems||pl.items),layout:`${layoutLabel} · ${i+1}/${multiPlans.length}`}));
+    containerPlanState.activeContainer=0;
+    renderContainerPlanTabs();
+    renderContainerPlan(spec,containerPlanState.containers[0].items,cMode,{layout:containerPlanState.containers[0].layout,preserveContainers:true,originalItems:containerPlanState.containers[0].originalItems});
+  }
   CAM_C.tgt=new THREE.Vector3(spec.iL/2,spec.iH/2,spec.iW/2);
   CAM_C.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_C.upd();
   showAlert('al-c');
@@ -2223,10 +2753,10 @@ function renderContainerPlanTabs(){
     summary.textContent='Nessun container';
     return;
   }
-  tabs.innerHTML=containerPlanState.containers.map((c,i)=>`<button class="plan-tab ${i===containerPlanState.activeContainer?'active':''}" onclick="setActiveContainerPlan(${i})">Container ${i+1}</button>`).join('');
-  const totalUnits=containerPlanState.containers.reduce((sum,c)=>sum+(c.items?.length||0),0);
-  const label=containerPlanState.mode==='pallets'?'pallet top view':'scatole top view';
-  summary.textContent=`${containerPlanState.containers.length} container · ${totalUnits} ${label}`;
+  tabs.innerHTML='<button class="plan-tab active">Container attivo</button>';
+  const totalUnits=containerPlanState.items?.length||0;
+  const label=containerPlanState.mode==='pallets'?'pallet':'scatole';
+  summary.textContent=`1 container · ${totalUnits} ${label}`;
 }
 function setActiveContainerPlan(idx){
   if(idx<0||idx>=containerPlanState.containers.length) return;
@@ -2309,6 +2839,8 @@ function renderContainerPlan(spec,items,mode,meta={}){
   legend.innerHTML=pills.map(([c,t])=>`<span class="plan-pill"><span class="plan-dot" style="background:${c}"></span>${t}</span>`).join('');
   renderContainerPlanTabs();
   updatePlanButtons();
+  updateContainerWeightReport();
+  renderRealLoadSimulation();
 }
 function syncPlanItemElement(el,item){
   const sx=containerPlanState.scaleX, sy=containerPlanState.scaleY;
@@ -2330,6 +2862,7 @@ function updatePlanButtons(){
 }
 function applyPlanPalletPreset(){
   const v=document.getElementById('planPalletPreset')?.value||'custom';
+  if(v==='calculated'){ syncCalculatedPalletPreset(); return; }
   if(v==='custom') return;
   const parts=v.split('x').map(Number);
   if(parts.length!==2||parts.some(n=>!n)) return;
@@ -2574,8 +3107,9 @@ let lastT=null;
 function calcTruck(){
   const spec=TRUCKS[selectedTruck];
   const mS=+document.getElementById('tMSide').value,mT=+document.getElementById('tMTop').value;
-  const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=spec.iH-mT;
-  let items=[],totKg=0,usedVol=0,layers=0,totalVol=spec.iL*spec.iW*spec.iH,layoutLabel='automatico';
+  const doorH=spec.doorH||spec.iH;
+  const uL=spec.iL-mS*2,uW=spec.iW-mS*2,uH=Math.min(spec.iH,doorH)-mT;
+  let items=[],totKg=0,usedVol=0,layers=0,totalVol=spec.iL*spec.iW*spec.iH,layoutLabel='automatico',multiPlans=null,totalPlannedItems=0;
 
   if(tMode==='boxes'){
     const bL=+document.getElementById('tbL').value,bW=+document.getElementById('tbW').value,bH=+document.getElementById('tbH').value,bKg=+document.getElementById('tbKg').value;
@@ -2597,7 +3131,7 @@ function calcTruck(){
     document.getElementById('ts-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('ts-wgt').textContent=Math.round(totKg);
     document.getElementById('ts-lay').textContent=layers;
-    document.getElementById('tdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout: <b style="color:var(--text)">MaxRects ottimizzato</b></div><div>📐 Per strato: <b style="color:var(--text)">${perFloor}</b> scatole</div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>📏 H utile interna: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
+    document.getElementById('tdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout: <b style="color:var(--text)">MaxRects ottimizzato</b></div><div>📐 Per strato: <b style="color:var(--text)">${perFloor}</b> scatole</div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>🚪 Altezza porta max: <b style="color:var(--text)">${doorH}mm</b></div><div>📏 H utile interna/porta: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
     calcHowManyTrucks(items.length,bKg,spec);
   } else {
     const pL=+document.getElementById('tpL').value,pW=+document.getElementById('tpW').value,pT=+document.getElementById('tpT').value,pCH=+document.getElementById('tpCH').value,pKg=+document.getElementById('tpKg').value;
@@ -2615,7 +3149,7 @@ function calcTruck(){
     document.getElementById('ts-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('ts-wgt').textContent=Math.round(totKg);
     document.getElementById('ts-lay').textContent=`${maxPerLayer}/lay`;
-    document.getElementById('tdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout pratico usato: <b style="color:var(--text)">${layoutLabel}</b></div><div>📐 Per layer pratico: <b style="color:var(--text)">${maxPerLayer}</b> pallet</div><div>🔢 Stack pratico max: <b style="color:var(--text)">${stk}</b> layer</div><div>📏 H pallet + carico: <b style="color:${tPH>caps.practical.h?'var(--accent2)':'var(--text)'}">${tPH}mm</b></div><div>📏 H utile pratica: <b style="color:var(--text)">${caps.practical.h}mm</b></div><div>📏 Layout utile pratico: <b style="color:var(--text)">${(caps.practical.binL/1000).toFixed(2)}×${(caps.practical.binW/1000).toFixed(3)}m</b></div>${buildCapacityModeHTML('pallet',caps)}`;
+    document.getElementById('tdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚛 Truck: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout pratico usato: <b style="color:var(--text)">${layoutLabel}</b></div><div>📐 Per layer pratico: <b style="color:var(--text)">${maxPerLayer}</b> pallet</div><div>🔢 Stack pratico max: <b style="color:var(--text)">${stk}</b> layer</div><div>📏 H pallet + carico: <b style="color:${tPH>caps.practical.h?'var(--accent2)':'var(--text)'}">${tPH}mm</b></div><div>🚪 Altezza porta max: <b style="color:var(--text)">${spec.doorH||spec.iH}mm</b></div><div>📏 H utile pratica/porta: <b style="color:var(--text)">${caps.practical.h}mm</b></div><div>📏 Layout utile pratico: <b style="color:var(--text)">${(caps.practical.binL/1000).toFixed(2)}×${(caps.practical.binW/1000).toFixed(3)}m</b></div>${buildCapacityModeHTML('pallet',caps)}`;
     calcHowManyTrucks(items.length,pKg,spec);
   }
   const ve=Math.round(usedVol/totalVol*100);
@@ -2715,12 +3249,30 @@ function buildBoxScene(grp,res,accentColor){
 // ══════ TRANSFER DATA ══════
 function transferToContainer(){
   if(!lastP){alert('Esegui prima un calcolo pallet.');return;}
-  document.getElementById('cbL').value=document.getElementById('bL').value;
-  document.getElementById('cbW').value=document.getElementById('bW').value;
-  document.getElementById('cbH').value=document.getElementById('bH').value;
-  document.getElementById('cbKg').value=document.getElementById('bKg').value;
   showPage('container',document.querySelectorAll('.nav-btn')[1]);
-  setTimeout(()=>{ const el=document.getElementById('cm-boxes');el.style.background='rgba(59,130,246,0.05)';el.style.borderRadius='8px';el.style.transition='background 1s';setTimeout(()=>el.style.background='',1200);},200);
+  selCMode('pallets',document.querySelector('#page-container .mt .mb:nth-child(2)'));
+  const pH=+document.getElementById('pT').value||lastP.pT||144;
+  const bH=+document.getElementById('bH').value||250;
+  const spec=getSelectedContainerSpec();
+  const topMargin=Math.max(+document.getElementById('cMTop').value||0,spec.practicalTop||0);
+  const doorUseful=Math.max(0,Math.min(spec.iH,spec.doorH||spec.iH)-topMargin);
+  const maxLoadH=Math.max(0,doorUseful-pH);
+  const maxLayers=Math.max(0,Math.floor(maxLoadH/bH));
+  const originalLayers=lastP.layers||1;
+  const safeLayers=Math.min(originalLayers,maxLayers);
+  const loadH=safeLayers*bH;
+  document.getElementById('cpL').value=Math.round(lastP.areaL||lastP.pL);
+  document.getElementById('cpW').value=Math.round(lastP.areaW||lastP.pW);
+  document.getElementById('cpT').value=Math.round(pH);
+  document.getElementById('cpCH').value=Math.round(loadH);
+  document.getElementById('cpKg').value=document.getElementById('sp-wgt').textContent||500;
+  document.getElementById('cNType').value='pallets';
+  document.getElementById('planPalletPreset').value='calculated';
+  syncCalculatedPalletPreset();
+  document.getElementById('cpRows').value=(lastP.overhang>0?'OVERHANG OK · ':'')+`${lastP.pL}×${lastP.pW} base → ${lastP.areaL}×${lastP.areaW} footprint · porta utile ${doorUseful}mm · max ${maxLayers} strati`; 
+  const al=document.getElementById('al-c');
+  if(al){al.textContent=originalLayers>safeLayers?`✓ Pallet trasferito: altezza adattata alla porta (${safeLayers}/${originalLayers} strati)`:'✓ Pallet trasferito nel container'; showAlert('al-c'); setTimeout(()=>{al.textContent='✓ Calcolo container completato!';},2600);}
+  setTimeout(()=>{ const el=document.getElementById('cm-pallets');el.style.background='rgba(59,130,246,0.08)';el.style.borderRadius='8px';el.style.transition='background 1s';setTimeout(()=>el.style.background='',1200);},120);
 }
 function transferToTruck(){
   if(!lastP){alert('Esegui prima un calcolo pallet.');return;}
@@ -2814,9 +3366,9 @@ function exportPDF(page){
     .sub{font-size:11px;color:#64748b;margin-bottom:14px;}
     .img-block{margin:0 0 12px;page-break-inside:avoid;}
     .img-title{font-size:14px;font-weight:700;margin:0 0 6px;}
-    img{width:100%;display:block;border:1px solid #cbd5e1;border-radius:12px;background:#fff;}
+    img{width:100%;display:block;border:1px solid #cbd5e1;border-radius:12px;background:#fff;max-height:105mm;object-fit:contain;}
     .info{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px;}
-    .box{border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;background:#f8fafc;font-size:12px;line-height:1.6;white-space:pre-wrap;}
+    .box{border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;background:#f8fafc;font-size:11px;line-height:1.45;white-space:pre-wrap;break-inside:avoid;}
     .footer{margin-top:10px;font-size:10px;color:#94a3b8;text-align:right;}
   </style></head><body>
     <div class="sheet">
@@ -2828,7 +3380,7 @@ function exportPDF(page){
       </div>
       ${page==='container'&&topImg?`<div class="img-block"><div class="img-title">Vista dall'alto</div><img src="${topImg}" alt="Vista dall'alto"></div>`:''}
       <div class="info">
-        <div class="box"><b>Riepilogo</b><br>${stats}</div>
+        <div class="box"><b>Riepilogo ordinato</b><br>${stats}</div>
         <div class="box"><b>Dettagli</b><br>${details}</div>
         ${extraInfo?`<div class="box"><b>Peso e limiti</b><br>${extraInfo}</div>`:''}
       </div>
@@ -2858,9 +3410,135 @@ function exportJSON(page){
 function showAlert(id){const a=document.getElementById(id);a.style.display='block';setTimeout(()=>a.style.display='none',2500);}
 
 // Form helpers
+
+function setSiteBackground(v){
+  document.body.classList.remove('bg-soft','bg-grid');
+  if(v==='soft') document.body.classList.add('bg-soft');
+  if(v==='grid') document.body.classList.add('bg-grid');
+  try{localStorage.setItem('chepallet-bg',v||'none')}catch(e){}
+}
+function getSelectedContainerSpec(){
+  if(selectedCont!=='custom') return CONTS[selectedCont];
+  return {name:'Custom',iL:+document.getElementById('ccL').value||1,iW:+document.getElementById('ccW').value||1,iH:+document.getElementById('ccH').value||1,doorH:+document.getElementById('ccDoorH').value||(+document.getElementById('ccH').value||1),maxP:+document.getElementById('ccMaxP').value||1,tare:+document.getElementById('ccTare').value||0,structLossL:0,structLossW:0,practicalSide:Math.max(0,+document.getElementById('cMSide').value||0),practicalTop:Math.max(0,+document.getElementById('cMTop').value||0)};
+}
+function compactContainerLayout(){
+  if(!containerPlanState.spec||containerPlanState.mode!=='pallets'){alert('Disponibile dopo un calcolo container in modalità Su Pallet.');return;}
+  // ATTACCA PALLET corretto:
+  // - non cambia ordine, rotazione, misure o tipo di layout
+  // - non crea nuove righe e non spinge pallet fuori container
+  // - avvicina solo i pallet eliminando gli spazi vuoti compatibili con collisioni e bordo container
+  const spec=containerPlanState.spec;
+  const margins=getPracticalMargins(spec,+document.getElementById('cMSide').value||0,+document.getElementById('cMTop').value||0);
+  const side=margins.side;
+  const maxX=Math.max(side,spec.iL-(spec.structLossL||0)-side);
+  const maxZ=Math.max(side,spec.iW-(spec.structLossW||0)-side);
+  const original=clonePlanItems(containerPlanState.items);
+  if(!original.length) return;
+
+  const overlap1D=(a1,a2,b1,b2)=>a1<b2-0.5 && b1<a2-0.5;
+  const placed=[];
+  const ordered=original.map((it,i)=>({...it,_i:i,_ox:it.x,_oz:it.z}))
+    .sort((a,b)=>(a.z-b.z)||(a.x-b.x)||((a._i||0)-(b._i||0)));
+
+  ordered.forEach(it=>{
+    const w=it.pw||it.w||0;
+    const h=it.pl||it.l||0;
+    // 1) mantieni la fascia/posizione generale: prima compatta verso sinistra solo rispetto ai pallet che si sovrappongono verticalmente
+    let x=side;
+    placed.forEach(o=>{
+      const ow=o.pw||o.w||0, oh=o.pl||o.l||0;
+      if(overlap1D(it.z,it.z+h,o.z,o.z+oh) && o.x+ow<=it.x+w+0.5){
+        x=Math.max(x,o.x+ow);
+      }
+    });
+    x=Math.min(Math.max(side,x),Math.max(side,maxX-w));
+
+    // 2) poi compatta verso l'alto senza attraversare pallet già posizionati che occupano la stessa fascia orizzontale
+    let z=side;
+    placed.forEach(o=>{
+      const ow=o.pw||o.w||0, oh=o.pl||o.l||0;
+      if(overlap1D(x,x+w,o.x,o.x+ow) && o.z+oh<=it.z+h+0.5){
+        z=Math.max(z,o.z+oh);
+      }
+    });
+    z=Math.min(Math.max(side,z),Math.max(side,maxZ-h));
+
+    // 3) se il movimento verticale causasse collisione, torna alla quota originale clampata e compatta solo orizzontalmente
+    const collides=(cx,cz)=>placed.some(o=>{
+      const ow=o.pw||o.w||0, oh=o.pl||o.l||0;
+      return overlap1D(cx,cx+w,o.x,o.x+ow) && overlap1D(cz,cz+h,o.z,o.z+oh);
+    });
+    if(collides(x,z)){
+      z=Math.min(Math.max(side,it.z),Math.max(side,maxZ-h));
+      x=side;
+      placed.forEach(o=>{
+        const ow=o.pw||o.w||0, oh=o.pl||o.l||0;
+        if(overlap1D(z,z+h,o.z,o.z+oh)) x=Math.max(x,o.x+ow);
+      });
+      x=Math.min(Math.max(side,x),Math.max(side,maxX-w));
+      if(collides(x,z)){
+        // fallback sicuro: lascia il pallet nella posizione originale ma dentro i bordi
+        x=Math.min(Math.max(side,it.x),Math.max(side,maxX-w));
+        z=Math.min(Math.max(side,it.z),Math.max(side,maxZ-h));
+      }
+    }
+    it.x=x; it.z=z;
+    delete it._i; delete it._ox; delete it._oz;
+    placed.push(it);
+  });
+
+  const items=placed.sort((a,b)=>(a.z-b.z)||(a.x-b.x));
+  containerPlanState.items=items;
+  const cur=getActiveContainerPlan(); if(cur){cur.items=clonePlanItems(items);cur.layout='attaccato senza cambiare layout';}
+  renderContainerPlan(spec,items,containerPlanState.mode,{layout:'attaccato senza cambiare layout',preserveContainers:true,originalItems:containerPlanState.originalItems});
+  syncPlanTo3D();
+  renderRealLoadSimulation();
+  showAlert('al-c');
+}
+
+function rebalanceContainerLayout(){
+  if(!containerPlanState.spec||containerPlanState.mode!=='pallets'){alert('Disponibile dopo un calcolo container in modalità Su Pallet.');return;}
+  const spec=containerPlanState.spec;
+  const side=getPracticalMargins(spec,+document.getElementById('cMSide').value||0,+document.getElementById('cMTop').value||0).side;
+  const pL=+document.getElementById('cpL').value||1200, pW=+document.getElementById('cpW').value||800;
+  const n=containerPlanState.items.length;
+  const positions=packPalletsFreeRectangles(spec.iL-side*2,spec.iW-side*2,pL,pW,n,side,side);
+  // alterna dal fronte/retro per avvicinare il baricentro al centro lunghezza
+  const reordered=[];
+  positions.forEach((pos,i)=>{
+    reordered.push(pos);
+  });
+  reordered.sort((a,b)=>Math.abs((a.x+a.pw/2)-spec.iL/2)-Math.abs((b.x+b.pw/2)-spec.iL/2));
+  const base=containerPlanState.items[0]||{pt:+document.getElementById('cpT').value||144,ch:+document.getElementById('cpCH').value||1200,type:'pallet',y:0};
+  containerPlanState.items=reordered.slice(0,n).map(pos=>({...base,x:pos.x,z:pos.z,pw:pos.pw,pl:pos.pl,rot:pos.rot,type:'pallet',y:0}));
+  const cur=getActiveContainerPlan(); if(cur){cur.items=clonePlanItems(containerPlanState.items);cur.layout='bilanciato peso/baricentro';}
+  renderContainerPlan(spec,containerPlanState.items,containerPlanState.mode,{layout:'bilanciato peso/baricentro',preserveContainers:true,originalItems:containerPlanState.originalItems});
+  syncPlanTo3D();
+  renderRealLoadSimulation();
+}
+
+let containerLayoutCycle=0;
+function cycleContainerLayout(){
+  if(!containerPlanState.spec||containerPlanState.mode!=='pallets'){alert('Disponibile dopo un calcolo container in modalità Su Pallet.');return;}
+  containerLayoutCycle=(containerLayoutCycle+1)%3;
+  const spec=containerPlanState.spec, side=getPracticalMargins(spec,+document.getElementById('cMSide').value||0,+document.getElementById('cMTop').value||0).side;
+  const pL=+document.getElementById('cpL').value||1200, pW=+document.getElementById('cpW').value||800;
+  let positions=[];
+  if(containerLayoutCycle===0) positions=buildVehiclePalletLayout(spec,pL,pW,side).positions;
+  if(containerLayoutCycle===1) positions=buildStripedLayout(spec.iL-side*2,spec.iW-side*2,pL,pW,side,side).positions;
+  if(containerLayoutCycle===2) positions=packRectanglesMaxRects(spec.iL-side*2,spec.iW-side*2,pL,pW,true,600).map(r=>({x:side+r.x,z:side+r.y,pw:r.w,pl:r.h,rot:r.rot}));
+  const base=containerPlanState.items[0]||{pt:+document.getElementById('cpT').value||144,ch:+document.getElementById('cpCH').value||1200,type:'pallet',y:0};
+  containerPlanState.items=positions.slice(0,containerPlanState.items.length||positions.length).map(pos=>({...base,x:pos.x,z:pos.z,pw:pos.pw,pl:pos.pl,rot:pos.rot,type:'pallet',y:0}));
+  const names=['automatico misto','righe alternate','max-rects'];
+  const cur=getActiveContainerPlan(); if(cur){cur.items=clonePlanItems(containerPlanState.items);cur.layout=names[containerLayoutCycle];}
+  renderContainerPlan(spec,containerPlanState.items,containerPlanState.mode,{layout:names[containerLayoutCycle],preserveContainers:true,originalItems:containerPlanState.originalItems});
+  syncPlanTo3D();
+  renderRealLoadSimulation();
+}
+
 function swTab(n,btn){['box','pallet','visual'].forEach(t=>document.getElementById('tab-'+t).style.display=t===n?'block':'none');btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 function setP(l,w,btn){if(l){document.getElementById('pL').value=l;document.getElementById('pW').value=w;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-function selCont(t,btn){selectedCont=t;document.querySelectorAll('.ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('clbl').textContent=CONTS[t].name;}
+function selCont(t,btn){selectedCont=t;document.querySelectorAll('.ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('customContBox').style.display=t==='custom'?'block':'none';document.getElementById('clbl').textContent=(t==='custom'?'Custom':CONTS[t].name);}
 function selTruck(t,btn){selectedTruck=t;document.querySelectorAll('.ttb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tlbl').textContent=TRUCKS[t].name;}
 function selCMode(m,btn){cMode=m;document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('cm-pallets').style.display=m==='pallets'?'block':'none';}
 function selTMode(m,btn){tMode=m;document.querySelectorAll('#page-truck .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('tm-pallets').style.display=m==='pallets'?'block':'none';}
@@ -3588,6 +4266,7 @@ async function runQ(){
   qRedir(p);
 }
 
+try{initSiteTheme();renderFormationGrids();syncCalculatedPalletPreset();}catch(e){console.warn(e);}
 </script>
 </body>
 </html>
