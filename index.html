@@ -340,6 +340,15 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
 .hero h1 em.q{color:var(--green);}
 @media(max-width:700px){.qrrow{grid-template-columns:1fr;}.qarr{display:none;}.qsum{grid-template-columns:1fr 1fr;}}
 
+
+.guided-card{margin:12px 0;padding:12px;border-radius:16px;border:1px solid rgba(34,197,94,.35);background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(59,130,246,.08));}
+.guided-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.guided-sub{font-size:.67rem;color:var(--muted);line-height:1.45;margin-top:4px;}
+.guided-badge{font-size:.62rem;font-weight:800;padding:4px 8px;border-radius:999px;background:rgba(34,197,94,.18);color:#22c55e;border:1px solid rgba(34,197,94,.35);}
+.guided-result{margin-top:10px;padding:10px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08);font-size:.72rem;line-height:1.75;color:var(--muted);}
+.guided-result b{color:var(--text);}
+.guided-result .ok{color:var(--green);font-weight:800}.guided-result .warn{color:var(--accent2);font-weight:800}
+
 </style>
 </head>
 <body>
@@ -550,12 +559,31 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
           <button class="mb on" onclick="selCMode('boxes',this)">📦 Floor Loaded</button>
           <button class="mb" onclick="selCMode('pallets',this)">🪵 Su Pallet</button>
         </div>
+
+        <div class="guided-card">
+          <div class="guided-head">
+            <div>
+              <div class="sl b" style="margin:0;">Simulazione guidata rapida</div>
+              <div class="guided-sub">Inserisci solo il numero scatole e scegli il tipo carico. Usa le dimensioni scatola/pallet già presenti nei campi sotto.</div>
+            </div>
+            <span class="guided-badge">Wizard</span>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Numero scatole da spedire</label><input type="number" id="gBoxes" value="1000" min="1"></div>
+            <div class="fg"><label>Tipo carico</label><select id="gMode"><option value="pallets">Su pallet</option><option value="boxes">Floor loaded</option></select></div>
+          </div>
+          <button class="bc bb" style="margin-top:8px;background:linear-gradient(90deg,#16a34a,#22c55e);color:white;" onclick="guidedContainerSimulation()">🧭 SIMULAZIONE GUIDATA</button>
+          <div id="gResult" class="guided-result" style="display:none;">—</div>
+        </div>
+
         <div id="cm-boxes">
           <div class="sl b">Dimensioni scatola</div>
           <div class="fr"><div class="fg"><label>Lunghezza (mm)</label><div class="iu"><input type="number" id="cbL" value="400" min="1"><span>mm</span></div></div><div class="fg"><label>Larghezza (mm)</label><div class="iu"><input type="number" id="cbW" value="300" min="1"><span>mm</span></div></div></div>
           <div class="fr"><div class="fg"><label>Altezza (mm)</label><div class="iu"><input type="number" id="cbH" value="250" min="1"><span>mm</span></div></div><div class="fg"><label>Peso (kg)</label><div class="iu"><input type="number" id="cbKg" value="5.5" step="0.1"><span>kg</span></div></div></div>
           <div class="tr"><span>Rotazione alternata strati</span><label class="tg"><input type="checkbox" id="cbRot"><span class="ts"></span></label></div>
           <div class="tr"><span>Ottimizza orientamento</span><label class="tg"><input type="checkbox" id="cbOpt" checked><span class="ts"></span></label></div>
+          <div class="tr"><span>Floor loaded: consuma solo bancali interi</span><label class="tg"><input type="checkbox" id="cbFullPalletOnly"><span class="ts"></span></label></div>
+          <div class="fr" id="cbFullPalletBox"><div class="fg"><label>Pezzi per bancale intero</label><input type="number" id="cbPalletPieces" value="24" min="1"></div><div class="fg"><label>Regola</label><input type="text" value="solo multipli interi" readonly></div></div>
         </div>
         <div id="cm-pallets" style="display:none;">
           <div class="sl b">Tipo pallet</div>
@@ -2603,6 +2631,12 @@ function calcContainer(){
         items.push({x:mS+r.x,y:ly*bH,z:mS+r.y,w:r.rot?bW:bL,h:bH,l:r.rot?bL:bW,type:'box'});
       });
     }
+    const rawItemsCount=items.length;
+    const wholePalletRule=applyFullPalletFloorRule(rawItemsCount);
+    if(wholePalletRule.active && wholePalletRule.count<items.length){
+      items=items.slice(0,wholePalletRule.count);
+      layoutLabel+=` · solo bancali interi (${wholePalletRule.pieces} pz)`;
+    }
     const perFloor=floorPacked.length;
     totKg=items.length*bKg;usedVol=items.length*bL*bW*bH;
     const ve=Math.round(usedVol/totalVol*100);
@@ -2610,7 +2644,7 @@ function calcContainer(){
     document.getElementById('cs-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('cs-wgt').textContent=Math.round(totKg);
     document.getElementById('cs-lay').textContent=layers;
-    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout: <b style="color:var(--text)">MaxRects ottimizzato</b></div><div>📐 Per strato: <b style="color:var(--text)">${perFloor}</b> scatole</div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div><div>🚪 Altezza porta max: <b style="color:var(--text)">${doorH}mm</b></div><div>📏 H utile interna/porta: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
+    document.getElementById('cdet').innerHTML=`<div>📦 Scatola: <b style="color:var(--text)">${bL}×${bW}×${bH}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout: <b style="color:var(--text)">MaxRects ottimizzato</b></div><div>📐 Per strato teorico: <b style="color:var(--text)">${perFloor}</b> scatole</div><div>🔢 Strati: <b style="color:var(--text)">${layers}</b></div>${wholePalletRule.active?`<div>🪵 Vincolo bancali interi: <b style="color:var(--text)">${wholePalletRule.pieces}</b> pz/bancale · caricati <b style="color:var(--text)">${items.length.toLocaleString()}</b> pz${wholePalletRule.removed?` · esclusi ${wholePalletRule.removed} pz per non aprire un bancale`:''}</div>`:''}<div>🚪 Altezza porta max: <b style="color:var(--text)">${doorH}mm</b></div><div>📏 H utile interna/porta: <b style="color:var(--text)">${uH}mm</b></div><div>📏 Vol usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>📦 Vol totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div>`;
     const perCont=items.length;
     calcHowManyContainers(perCont,bKg,spec);
   } else {
@@ -2726,16 +2760,106 @@ function calcHowManyPallets(){
   document.getElementById('pNDesc').innerHTML=`Per ${nBoxes.toLocaleString()} scatole · <b style="color:var(--text)">${boxesPerPallet}</b> sc/pallet (${perLayer}/strato × ${actL} strati) · Totale spedibili: <b style="color:var(--text)">${totalBoxes.toLocaleString()}</b>`;
 }
 
+
+function getFullPalletFloorRule(){
+  const active=!!document.getElementById('cbFullPalletOnly')?.checked;
+  const pieces=Math.max(1,+document.getElementById('cbPalletPieces')?.value||1);
+  return {active,pieces};
+}
+function applyFullPalletFloorRule(count){
+  const rule=getFullPalletFloorRule();
+  if(!rule.active) return {count:Math.max(0,Math.floor(count)),removed:0,pieces:rule.pieces,active:false};
+  const adjusted=Math.floor(Math.max(0,count)/rule.pieces)*rule.pieces;
+  return {count:adjusted,removed:Math.max(0,Math.floor(count)-adjusted),pieces:rule.pieces,active:true};
+}
+
+function getBoxLayerCapacityForGuided(pL,pW,bL,bW){
+  const layer=buildBestBoxLayer(pL,pW,bL,bW,false,0);
+  return Math.max(0,layer?.count||0);
+}
+function guidedContainerSimulation(){
+  const n=Math.max(1,+document.getElementById('gBoxes').value||1);
+  const mode=document.getElementById('gMode').value;
+  const spec=getSelectedContainerSpec();
+  const mT=+document.getElementById('cMTop').value||0;
+  const doorUseful=Math.max(0,Math.min(spec.iH,spec.doorH||spec.iH)-mT);
+  const gRes=document.getElementById('gResult');
+  if(mode==='boxes'){
+    cMode='boxes';
+    document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));
+    const btn=[...document.querySelectorAll('#page-container .mb')].find(b=>b.textContent.includes('Floor')); if(btn) btn.classList.add('on');
+    document.getElementById('cm-boxes').style.display='block';
+    document.getElementById('cm-pallets').style.display='none';
+    document.getElementById('cNType').value='boxes';
+    document.getElementById('cNUnits').value=n;
+    calcContainer();
+    const rule=getFullPalletFloorRule();
+    let capacity=lastC?.items?.length||0;
+    let planned=n;
+    let excluded=0;
+    if(rule.active){
+      const capAdj=applyFullPalletFloorRule(capacity);
+      capacity=capAdj.count;
+      const reqAdj=applyFullPalletFloorRule(n);
+      planned=reqAdj.count;
+      excluded=reqAdj.removed;
+    }
+    const needed=capacity?Math.ceil(planned/capacity):0;
+    const lastLoad=capacity? planned%capacity || capacity:0;
+    gRes.style.display='block';
+    gRes.innerHTML=`<div class="ok">✓ Simulazione floor loaded completata</div><div>Scatole richieste: <b>${n.toLocaleString()}</b></div>${rule.active?`<div>🪵 Vincolo bancali interi attivo: <b>${rule.pieces}</b> pz/bancale · scatole considerate: <b>${planned.toLocaleString()}</b>${excluded?` · avanzo non caricato: <b>${excluded}</b> pz`:''}</div>`:''}<div>Capacità stimata per container: <b>${capacity.toLocaleString()}</b> scatole</div><div>Container necessari: <b>${needed}</b></div><div>Ultimo container: <b>${lastLoad.toLocaleString()}</b> scatole</div>`;
+    return;
+  }
+  cMode='pallets';
+  document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));
+  const btn=[...document.querySelectorAll('#page-container .mb')].find(b=>b.textContent.includes('Pallet')); if(btn) btn.classList.add('on');
+  document.getElementById('cm-boxes').style.display='none';
+  document.getElementById('cm-pallets').style.display='block';
+  const bL=+document.getElementById('cbL').value||1,bW=+document.getElementById('cbW').value||1,bH=+document.getElementById('cbH').value||1,bKg=+document.getElementById('cbKg').value||0;
+  const pL=+document.getElementById('cpL').value||1200,pW=+document.getElementById('cpW').value||800,pT=+document.getElementById('cpT').value||144;
+  const perLayer=getBoxLayerCapacityForGuided(pL,pW,bL,bW);
+  const layers=Math.max(0,Math.floor((doorUseful-pT)/bH));
+  const boxesPerPallet=perLayer*layers;
+  if(boxesPerPallet<=0){
+    gRes.style.display='block';
+    gRes.innerHTML=`<div class="warn">⚠ Pallet non caricabile</div><div>Con porta utile <b>${Math.round(doorUseful)}mm</b>, pallet <b>${pT}mm</b> e scatola alta <b>${bH}mm</b>, non entra nemmeno uno strato utile.</div>`;
+    return;
+  }
+  const palletsNeeded=Math.ceil(n/boxesPerPallet);
+  document.getElementById('cpCH').value=layers*bH;
+  document.getElementById('cpKg').value=(boxesPerPallet*bKg).toFixed(1);
+  document.getElementById('cNType').value='pallets';
+  document.getElementById('cNUnits').value=palletsNeeded;
+  calcContainer();
+  const palletCapacity=lastC?.items?.length||0;
+  const boxesPerContainer=palletCapacity*boxesPerPallet;
+  const containersNeeded=boxesPerContainer?Math.ceil(n/boxesPerContainer):0;
+  const remaining=Math.max(0,n-boxesPerContainer);
+  gRes.style.display='block';
+  gRes.innerHTML=`<div class="ok">✓ Simulazione su pallet completata</div><div>Scatole richieste: <b>${n.toLocaleString()}</b></div><div>Schema pallet consigliato: <b>${perLayer}</b> scatole/strato × <b>${layers}</b> strati = <b>${boxesPerPallet}</b> scatole/pallet</div><div>Pallet necessari: <b>${palletsNeeded}</b></div><div>Capacità container: <b>${palletCapacity}</b> pallet · <b>${boxesPerContainer.toLocaleString()}</b> scatole</div><div>Container necessari: <b>${containersNeeded}</b>${remaining>0?` · residuo dopo primo container: <b>${remaining.toLocaleString()}</b> scatole`:''}</div><div>H carico pallet impostata automaticamente a <b>${layers*bH}mm</b> per passare dalla porta utile <b>${Math.round(doorUseful)}mm</b>.</div>`;
+}
+
 function calcHowManyContainers(unitsPerCont,kgPerUnit,spec){
   const n=+document.getElementById('cNUnits').value;
   const type=document.getElementById('cNType').value;
-  const perC=Math.floor(type==='pallets'?unitsPerCont:unitsPerCont);
+  let perC=Math.floor(type==='pallets'?unitsPerCont:unitsPerCont);
+  let effectiveN=n, note='';
+  if(type==='boxes'){
+    const rule=getFullPalletFloorRule();
+    if(rule.active){
+      const adjPer=applyFullPalletFloorRule(perC);
+      const adjN=applyFullPalletFloorRule(n);
+      perC=adjPer.count;
+      effectiveN=adjN.count;
+      note=` · vincolo bancali interi: <b style="color:var(--text)">${rule.pieces}</b> pz/bancale${adjN.removed?` · avanzo non caricato: <b style="color:var(--text)">${adjN.removed}</b> pz`:''}`;
+    }
+  }
   if(perC<=0)return;
-  const needed=Math.ceil(n/perC);
+  const needed=Math.ceil(effectiveN/perC);
   const tot=needed*perC;
   document.getElementById('cNResult').style.display='block';
   document.getElementById('cNVal').textContent=needed+' container';
-  document.getElementById('cNDesc').innerHTML=`Per ${n.toLocaleString()} ${type==='pallets'?'pallet':'scatole'} · <b style="color:var(--text)">${perC}</b> per container · Totale spedibile: <b style="color:var(--text)">${tot.toLocaleString()}</b>`;
+  document.getElementById('cNDesc').innerHTML=`Per ${n.toLocaleString()} ${type==='pallets'?'pallet':'scatole'}${note} · <b style="color:var(--text)">${perC}</b> per container · Totale spedibile: <b style="color:var(--text)">${tot.toLocaleString()}</b>`;
 }
 
 
