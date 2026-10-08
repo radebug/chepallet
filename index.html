@@ -549,6 +549,11 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
           <button class="ctb" onclick="selCont('40ref',this)"><em>❄️</em><strong>40' Reefer</strong><span>11580×2286×2400mm · 27.7t</span></button>
           <button class="ctb" onclick="selCont('custom',this)"><em>⚙️</em><strong>Custom</strong><span>misure libere + porta</span></button>
         </div>
+        <div class="hmb b" style="margin-bottom:12px;font-size:.74rem;line-height:1.8">
+          <div class="sl b">Capacità operative di riferimento · singolo strato</div>
+          <table style="width:100%;text-align:left"><thead><tr><th>Container</th><th>Euro 120×80</th><th>CHEP 120×100</th></tr></thead><tbody><tr><td>40’ Dry</td><td>24 pallet</td><td>21 pallet</td></tr><tr><td>40’ Reefer</td><td>24 pallet</td><td>20 pallet</td></tr></tbody></table>
+          <div style="color:var(--muted)">Valori operativi comunicati. Il layout 3D verifica separatamente le dimensioni e i margini impostati.</div>
+        </div>
         <div id="customContBox" style="display:none;">
           <div class="sl b">Container personalizzato</div>
           <div class="fr"><div class="fg"><label>Lunghezza interna (mm)</label><input type="number" id="ccL" value="12032" min="1"></div><div class="fg"><label>Larghezza interna (mm)</label><input type="number" id="ccW" value="2352" min="1"></div></div>
@@ -1119,9 +1124,9 @@ function showPage(n,btn){
 // ══════ SPECS ══════
 const CONTS={
   '20dry':{name:"20' Dry",iL:5898,iW:2352,iH:2393,doorH:2280,maxP:28200,tare:2300,structLossL:0,structLossW:0,practicalSide:35,practicalTop:40},
-  '40dry':{name:"40' Dry",iL:12032,iW:2352,iH:2393,doorH:2280,maxP:26680,tare:3800,structLossL:350,structLossW:0,practicalSide:35,practicalTop:40},
+  '40dry':{name:"40' Dry",iL:12032,iW:2352,iH:2393,doorH:2280,maxP:26680,tare:3800,structLossL:350,structLossW:0,practicalSide:35,practicalTop:40,operationalPallets:{'1200x800':24,'1200x1000':21}},
   '40hc':{name:"40' HC",iL:12032,iW:2352,iH:2698,doorH:2585,maxP:26460,tare:4020,structLossL:350,structLossW:0,practicalSide:35,practicalTop:50},
-  '40ref':{name:"40' Reefer",iL:11580,iW:2286,iH:2400,doorH:2260,maxP:27700,tare:4400,structLossL:1000,structLossW:20,practicalSide:40,practicalTop:50}
+  '40ref':{name:"40' Reefer",iL:11580,iW:2286,iH:2400,doorH:2260,maxP:27700,tare:4400,structLossL:1000,structLossW:20,practicalSide:40,practicalTop:50,operationalPallets:{'1200x800':24,'1200x1000':20}}
 };
 const TRUCKS={
   'std':{name:"Semirimorchio",iL:13620,iW:2480,iH:2700,maxP:24000,tare:6800,structLossL:0,structLossW:0,practicalSide:30,practicalTop:40},
@@ -2329,6 +2334,15 @@ function getPracticalMargins(spec,userSide,userTop){
   };
 }
 
+function getOperationalPalletsPerLayer(spec,pL,pW){
+  const key=[pL,pW].sort((a,b)=>b-a).join('x');
+  return spec.operationalPallets?.[key]??null;
+}
+function getContainerPlanningCapacity(spec,caps,pKg){
+  const capacity=caps.operational?.total??caps.practical.total;
+  return pKg>0?Math.min(capacity,Math.floor(spec.maxP/pKg)):capacity;
+}
+
 function calcPalletCapacityModes(spec,pL,pW,pT,pCH,stack,userSide,userTop){
   const theoreticalLayout=buildVehiclePalletLayout({...spec,structLossL:0,structLossW:0},pL,pW,0);
   const theoreticalHeight=Math.max(0,Math.min(spec.iH,spec.doorH||spec.iH));
@@ -2361,11 +2375,14 @@ function calcPalletCapacityModes(spec,pL,pW,pT,pCH,stack,userSide,userTop){
     side: practicalMargins.side,
     top: practicalMargins.top
   };
-  return {theoretical, practical};
+  const operationalPerLayer=getOperationalPalletsPerLayer(spec,pL,pW);
+  const operational=operationalPerLayer===null?null:{perLayer:operationalPerLayer,stacks:practicalStacks,total:operationalPerLayer*practicalStacks};
+  return {theoretical, practical, operational};
 }
 
 function buildCapacityModeHTML(kind,modes){
-  return `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:0.72rem;line-height:1.9;color:var(--muted);"><div><b style="color:var(--text)">Capacità teorica</b>: ${modes.theoretical.total} ${kind} · ${modes.theoretical.perLayer}/layer · ${modes.theoretical.stacks} layer · ${(modes.theoretical.binL/1000).toFixed(2)}×${(modes.theoretical.binW/1000).toFixed(3)}m</div><div><b style="color:var(--text)">Capacità pratica reale</b>: ${modes.practical.total} ${kind} · ${modes.practical.perLayer}/layer · ${modes.practical.stacks} layer · ${(modes.practical.binL/1000).toFixed(2)}×${(modes.practical.binW/1000).toFixed(3)}m · margini ${modes.practical.side}mm lato / ${modes.practical.top}mm top</div></div>`;
+  const reference=modes.operational?`<div style="color:var(--blue);margin-top:6px"><b>Capacità operativa di riferimento</b>: ${modes.operational.total} pallet · ${modes.operational.perLayer}/strato × ${modes.operational.stacks} strati</div><div style="color:var(--muted)">Il riferimento operativo è distinto dalla capacità geometrica: il disegno rappresenta solo i pallet collocabili con le misure e i margini impostati.</div>`:'';
+  return `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:0.72rem;line-height:1.9;color:var(--muted);"><div><b style="color:var(--text)">Capacità teorica</b>: ${modes.theoretical.total} ${kind} · ${modes.theoretical.perLayer}/layer · ${modes.theoretical.stacks} layer · ${(modes.theoretical.binL/1000).toFixed(2)}×${(modes.theoretical.binW/1000).toFixed(3)}m</div><div><b style="color:var(--text)">Capacità geometrica del layout</b>: ${modes.practical.total} ${kind} · ${modes.practical.perLayer}/layer · ${modes.practical.stacks} layer · ${(modes.practical.binL/1000).toFixed(2)}×${(modes.practical.binW/1000).toFixed(3)}m · margini ${modes.practical.side}mm lato / ${modes.practical.top}mm top</div>${reference}</div>`;
 }
 
 function buildPalletContainerPlans(floorPositions,totalPallets,perLayer,stacks,tPH,pT,pCH){
@@ -2699,6 +2716,7 @@ function calcContainer(){
     const heightAdvice=buildPalletDoorAdviceHTML(spec,pT,pCH,+document.getElementById('bH')?.value||+document.getElementById('cbH')?.value||0,mT);
     const tooTall=tPH>caps.practical.h;
     const maxPallets=tooTall?0:maxPerLayer*stk;
+    const planningCapacity=getContainerPlanningCapacity(spec,caps,pKg);
 
     // Precompilazione automatica richiesta: nel calcolo container su pallet
     // il campo "Numero unità da spedire" viene impostato al massimo numero
@@ -2706,7 +2724,7 @@ function calcContainer(){
     const cUnitsEl=document.getElementById('cNUnits');
     const cTypeEl=document.getElementById('cNType');
     if(cTypeEl) cTypeEl.value='pallets';
-    if(cUnitsEl) cUnitsEl.value=maxPallets;
+    if(cUnitsEl) cUnitsEl.value=planningCapacity;
 
     const totalToPlan=maxPallets;
     multiPlans=tooTall?null:buildPalletContainerPlans(floorLayout.positions,totalToPlan,maxPerLayer,stk,tPH,pT,pCH);
@@ -2715,13 +2733,16 @@ function calcContainer(){
     layers=items.length>0?Math.max(1,Math.ceil(items.length/Math.max(1,maxPerLayer))):0;
     totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;layoutLabel=layoutOverride||floorLayout.layout||caps.practical.layout||'automatico misto';
     const ve=Math.round(usedVol/totalVol*100);
-    const cappedNote=tooTall?`<div>⛔ Nessun pallet renderizzato: altezza ${tPH}mm superiore alla porta utile ${caps.practical.h}mm.</div>`:`<div>✅ Campo “Numero unità da spedire” precompilato automaticamente con il massimo: <b style="color:var(--text)">${maxPallets}</b> pallet.</div>`;
+    const cappedNote=tooTall?`<div>⛔ Nessun pallet renderizzato: altezza ${tPH}mm superiore alla porta utile ${caps.practical.h}mm.</div>`:`<div>✅ Campo “Numero unità da spedire” precompilato automaticamente con la capacità di pianificazione: <b style="color:var(--text)">${planningCapacity}</b> pallet${caps.operational?' (riferimento operativo, entro la portata)':''}.</div>`;
     document.getElementById('cs-tot').textContent=items.length;
     document.getElementById('cs-vol').textContent=`${formatM3(usedVol)} · ${ve}%`;
     document.getElementById('cs-wgt').textContent=Math.round(totKg);
     document.getElementById('cs-lay').textContent=`${maxPerLayer}/lay`;
     document.getElementById('cdet').innerHTML=`<div>🪵 Pallet: <b style="color:var(--text)">${pL}×${pW}mm</b></div><div>🚢 Container: <b style="color:var(--text)">${spec.name}</b></div><div>🧠 Layout pratico usato: <b style="color:var(--text)">${layoutLabel}</b></div><div>📐 Per layer pratico: <b style="color:var(--text)">${maxPerLayer}</b> pallet</div><div>🔢 Stack pratico max: <b style="color:var(--text)">${stk}</b> layer</div><div>📏 H pallet + carico: <b style="color:${tPH>caps.practical.h?'var(--accent2)':'var(--text)'}">${tPH}mm</b></div><div>🚪 Altezza porta max: <b style="color:var(--text)">${spec.doorH||spec.iH}mm</b></div><div>📏 H utile pratica/porta: <b style="color:var(--text)">${caps.practical.h}mm</b></div><div>📦 Pallet nel container attivo: <b style="color:var(--text)">${items.length}</b> / max pratico ${maxPallets}</div><div>🚢 Container attivo: <b style="color:var(--text)">1 solo container</b> · pallet renderizzati: <b style="color:var(--text)">${items.length}</b></div><div>📏 Layout utile pratico: <b style="color:var(--text)">${(caps.practical.binL/1000).toFixed(2)}×${(caps.practical.binW/1000).toFixed(3)}m</b></div>${heightAdvice}${buildCapacityModeHTML('pallet',caps)}${cappedNote}`;
-    calcHowManyContainers(maxPallets,pKg,spec);
+    if(caps.operational && items.length!==planningCapacity){
+      document.getElementById('cdet').innerHTML+=`<div style="color:var(--accent2);margin-top:8px">⚠ Pianificazione: ${planningCapacity} pallet; layout 3D: ${items.length} pallet. Verificare dimensioni utili e margini prima di confermare il carico.</div>`;
+    }
+    calcHowManyContainers(planningCapacity,pKg,spec);
   }
 
   const ve=Math.round(usedVol/totalVol*100);
@@ -2854,12 +2875,13 @@ function guidedContainerSimulation(){
   document.getElementById('cNType').value='pallets';
   document.getElementById('cNUnits').value=palletsNeeded;
   calcContainer();
-  const palletCapacity=lastC?.items?.length||0;
+  const guidedCaps=calcPalletCapacityModes(spec,pL,pW,pT,layers*bH,document.getElementById('cpStack').checked,+document.getElementById('cMSide').value||0,mT);
+  const palletCapacity=getContainerPlanningCapacity(spec,guidedCaps,boxesPerPallet*bKg);
   const boxesPerContainer=palletCapacity*boxesPerPallet;
   const containersNeeded=boxesPerContainer?Math.ceil(n/boxesPerContainer):0;
   const remaining=Math.max(0,n-boxesPerContainer);
   gRes.style.display='block';
-  gRes.innerHTML=`<div class="ok">✓ Simulazione su pallet completata</div><div>Scatole richieste: <b>${n.toLocaleString()}</b></div><div>Schema pallet consigliato: <b>${perLayer}</b> scatole/strato × <b>${layers}</b> strati = <b>${boxesPerPallet}</b> scatole/pallet</div><div>Pallet necessari: <b>${palletsNeeded}</b></div><div>Capacità container: <b>${palletCapacity}</b> pallet · <b>${boxesPerContainer.toLocaleString()}</b> scatole</div><div>Container necessari: <b>${containersNeeded}</b>${remaining>0?` · residuo dopo primo container: <b>${remaining.toLocaleString()}</b> scatole`:''}</div><div>H carico pallet impostata automaticamente a <b>${layers*bH}mm</b> per passare dalla porta utile <b>${Math.round(doorUseful)}mm</b>.</div>`;
+  gRes.innerHTML=`<div class="ok">✓ Simulazione su pallet completata</div><div>Scatole richieste: <b>${n.toLocaleString()}</b></div><div>Schema pallet consigliato: <b>${perLayer}</b> scatole/strato × <b>${layers}</b> strati = <b>${boxesPerPallet}</b> scatole/pallet</div><div>Pallet necessari: <b>${palletsNeeded}</b></div><div>Capacità di pianificazione container${guidedCaps.operational?' (riferimento operativo)':''}: <b>${palletCapacity}</b> pallet · <b>${boxesPerContainer.toLocaleString()}</b> scatole</div><div>Container necessari: <b>${containersNeeded}</b>${remaining>0?` · residuo dopo primo container: <b>${remaining.toLocaleString()}</b> scatole`:''}</div><div>H carico pallet impostata automaticamente a <b>${layers*bH}mm</b> per passare dalla porta utile <b>${Math.round(doorUseful)}mm</b>.</div>`;
 }
 
 function calcHowManyContainers(unitsPerCont,kgPerUnit,spec){
