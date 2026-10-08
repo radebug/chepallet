@@ -359,6 +359,7 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
     <button class="nav-btn active" onclick="showPage('pallet',this)">📦 Pallet</button>
     <button class="nav-btn nb" onclick="showPage('container',this)">🚢 Container</button>
     <button class="nav-btn nt" onclick="showPage('truck',this)">🚛 Truck</button>
+    <button class="nav-btn nt" onclick="showPage('remaining',this)">🪵 Spazio residuo</button>
     <button class="nav-btn nr" onclick="showPage('routes',this);initRoutes()">🌍 Routes</button>
     <button class="nav-btn nf" onclick="showPage('fuel',this);initFuel()">⛽ Carburanti</button>
     <button class="nav-btn ns" onclick="showPage('tools',this);initTools()">🛠 Strumenti</button>
@@ -788,10 +789,32 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
       <div class="panel"><div class="ph"><div class="pi">📊</div><h3>Dettagli truck</h3></div><div class="pb" id="tdet" style="font-size:0.74rem;line-height:2;color:var(--muted);">Esegui un calcolo.</div></div>
       <div class="panel"><div class="ph"><div class="pi">⚖️</div><h3>Peso &amp; limiti</h3></div><div class="pb" id="twgt" style="font-size:0.74rem;color:var(--muted);">Esegui un calcolo.</div></div>
     </div>
+    <div class="panel"><div class="ph"><h3>Pallet misti · vista dall’alto</h3></div><div class="pb">
+      <p style="font-size:.74rem;color:var(--muted)">Calcola in modalità Su Pallet, oppure inizia da un truck vuoto. Seleziona un pallet per rimuoverlo o ruotarlo.</p>
+      <div class="plan-actions"><button class="be bt" onclick="startEmptyTruck()">＋ Truck vuoto</button><button class="be bt" onclick="rotateTruckPallet()">🔄 Ruota selezionato</button><button class="be bt" onclick="removeTruckPallet()">🗑 Rimuovi selezionato</button></div>
+      <div class="plan-addbar">
+        <div class="fg wide"><label>Formato da aggiungere</label><select id="truckPalletPreset" onchange="applyTruckPalletPreset()"><option value="1200x800">Euro 1200 × 800</option><option value="1200x1000">CHEP 1200 × 1000</option><option value="1219x1016">US 1219 × 1016</option><option value="800x600">Half pallet 800 × 600</option><option value="custom">Custom</option></select></div>
+        <div class="fg"><label>Lunghezza (mm)</label><input id="truckNewPL" type="number" min="100" value="1200"></div><div class="fg"><label>Larghezza (mm)</label><input id="truckNewPW" type="number" min="100" value="800"></div>
+        <button class="be bt" onclick="addTruckPallet()">＋ Inserisci</button>
+      </div>
+      <p style="font-size:.74rem;color:var(--muted)">Altezza e peso del nuovo pallet: campi H carico, spessore e peso in Configurazione Truck.</p>
+      <div class="plan-wrap"><div class="plan-head"><span id="truckPlanSummary">Nessun layout</span></div><div id="truckSchema" class="plan-box"></div></div>
+    </div></div>
   </div>
 </div>
 </div>
 
+
+<div id="page-remaining" class="page">
+<section class="hero th"><h1>Quanto spazio<br><em class="t">rimane?</em></h1><p>Inserisci i pallet da caricare: calcola quanti Euro oppure CHEP puoi aggiungere sul truck.</p></section>
+<div class="app-grid"><div class="panel"><div class="ph"><h3>Spazio residuo truck</h3></div><div class="pb">
+<div class="fg"><label>Veicolo</label><select id="remainingTruck"><option value="std">Semirimorchio</option><option value="mega">Mega Trailer</option><option value="van">Furgone 7.5t</option><option value="ref">Reefer Truck</option></select></div>
+<div class="fr"><div class="fg"><label>Euro pallet 1200 × 800</label><input id="remainingEuro" type="number" min="0" step="1" value="0"></div><div class="fg"><label>CHEP 1200 × 1000</label><input id="remainingChep" type="number" min="0" step="1" value="0"></div></div>
+<div class="fr"><div class="fg"><label>Peso Euro (kg/pallet)</label><input id="remainingEuroKg" type="number" min="0" value="500"></div><div class="fg"><label>Peso CHEP (kg/pallet)</label><input id="remainingChepKg" type="number" min="0" value="500"></div></div>
+<div class="fr"><div class="fg"><label>Altezza totale pallet + carico (mm)</label><input id="remainingHeight" type="number" min="145" value="1344"></div><div class="fg"><label>Margine lato (mm)</label><input id="remainingSide" type="number" min="0" value="20"></div></div>
+<button class="bc bt" onclick="calculateRemainingPallets()">▶ CALCOLA SPAZIO RESIDUO</button>
+<p style="font-size:.74rem;color:var(--muted);line-height:1.7">Singolo strato a terra, con rotazione dei pallet e riordino del carico. Le due quantità aggiuntive sono alternative. Stima con layout a file: il risultato può essere conservativo. CHEP qui indica il formato 120×100 cm.</p>
+</div></div><div class="panel"><div class="ph"><h3>Risultato</h3></div><div class="pb" id="remainingResult" aria-live="polite">Inserisci le quantità e calcola.</div></div></div></div>
 
 <!-- ═══════════════════ ROUTES PAGE ═══════════════════ -->
 <div id="page-routes" class="page">
@@ -3210,8 +3233,18 @@ function balanceContainer(){
 
 function balanceTruck(){
   if(!lastT){ alert('Esegui prima un calcolo truck.'); return; }
-  const spec=TRUCKS[selectedTruck];
+  const spec=lastT.spec;
   const mS=+document.getElementById('tMSide').value||0;
+  if(lastT.mode==='pallets'){
+    if(!lastT.items.length)return;
+    const b=truckBounds(spec,mS);
+    const minX=Math.min(...lastT.items.map(it=>it.x)),maxX=Math.max(...lastT.items.map(it=>it.x+it.pw));
+    const minZ=Math.min(...lastT.items.map(it=>it.z)),maxZ=Math.max(...lastT.items.map(it=>it.z+it.pl));
+    const dx=b.x+b.w/2-(minX+maxX)/2,dz=b.z+b.h/2-(minZ+maxZ)/2;
+    const moved=lastT.items.map(it=>({...it,x:it.x+dx,z:it.z+dz}));
+    if(moved.some((it,i)=>!palletFitsTruck(it,moved.filter((_,j)=>i!==j),spec,mS))){alert('Il layout non può essere centrato con i margini attuali.');return;}
+    lastT.items=moved;refreshMixedTruck();return;
+  }
   lastT.items=balanceItems3D(lastT.items, spec.iL, spec.iW, mS);
   buildBoxScene(GRP_T,lastT,0x14b8a6);
 }
@@ -3280,7 +3313,10 @@ function calcTruck(){
   const pct=Math.min(100,Math.round(totKg/spec.maxP*100)),dng=pct>90;
   document.getElementById('twgt').innerHTML=`<div style="font-size:0.74rem;line-height:2.1;color:var(--muted);"><div>Max payload: <b style="color:var(--text)">${spec.maxP.toLocaleString()}kg</b></div><div>Carico: <b style="color:${dng?'var(--accent2)':'var(--green)'}">${Math.round(totKg).toLocaleString()}kg</b></div><div>Tare: <b style="color:var(--text)">${spec.tare.toLocaleString()}kg</b></div><div>Peso lordo: <b style="color:var(--text)">${(Math.round(totKg)+spec.tare).toLocaleString()}kg</b></div><div>Volume usato: <b style="color:var(--text)">${formatM3(usedVol)}</b></div><div>Volume totale: <b style="color:var(--text)">${formatM3(totalVol)}</b></div><div style="margin-top:6px;color:var(--muted)">Vista calcolata: <b style="color:var(--text)">pratica reale</b></div></div><div style="font-size:0.66rem;color:var(--muted);margin-top:8px;margin-bottom:4px;">${pct}% payload usato</div><div class="wbt"><div class="wbf${dng?' d':''}" style="width:${pct}%"></div></div>${buildVolumeBarHTML(usedVol,totalVol,ve,'var(--teal)')}${dng?'<div style="color:var(--accent2);font-size:0.7rem;margin-top:5px;">⚠ Vicino al limite di peso!</div>':''}`;
   document.querySelectorAll('.csc.tc').forEach(c=>c.classList.add('on'));
-  lastT={cL:spec.iL,cW:spec.iW,cH:spec.iH,items,name:spec.name};
+  lastT={cL:spec.iL,cW:spec.iW,cH:spec.iH,items,name:spec.name,spec,mode:tMode};
+  if(tMode==='pallets') items.forEach(it=>it.kg=+document.getElementById('tpKg').value);
+  truckSelectedIndex=-1;
+  renderTruckPlan();
   buildBoxScene(GRP_T,lastT,0x14b8a6);
   CAM_T.tgt=new THREE.Vector3(spec.iL/2,spec.iH/2,spec.iW/2);
   CAM_T.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_T.upd();
@@ -3295,6 +3331,154 @@ function calcHowManyTrucks(unitsPerTruck,kgPerUnit,spec){
   document.getElementById('tNVal').textContent=needed+' truck';
   document.getElementById('tNDesc').innerHTML=`Per ${n.toLocaleString()} ${type==='pallets'?'pallet':'scatole'} · <b style="color:var(--text)">${unitsPerTruck}</b> per truck · Totale spedibile: <b style="color:var(--text)">${(needed*unitsPerTruck).toLocaleString()}</b>`;
 }
+
+// Mixed truck pallets: edits keep the calculated vehicle and per-pallet weights.
+let truckSelectedIndex=-1;
+function truckBounds(spec,side,top=50){
+  const m=getPracticalMargins(spec,side,0);
+  const w=Math.max(0,spec.iL-(spec.structLossL||0)-2*m.side);
+  const h=Math.max(0,spec.iW-(spec.structLossW||0)-2*m.side);
+  return {x:(spec.iL-w)/2,z:(spec.iW-h)/2,w,h,height:Math.min(spec.iH,spec.doorH||spec.iH)-Math.max(top,m.top)};
+}
+function palletFitsTruck(item,items,spec,side,top=50){
+  const b=truckBounds(spec,side,top);
+  return item.x>=b.x && item.z>=b.z && item.x+item.pw<=b.x+b.w && item.z+item.pl<=b.z+b.h && item.y+item.pt+item.ch<=b.height &&
+    !items.some(it=>item.x<it.x+it.pw && item.x+item.pw>it.x && item.z<it.z+it.pl && item.z+item.pl>it.z && item.y<it.y+it.pt+it.ch && item.y+item.pt+item.ch>it.y);
+}
+function renderTruckPlan(){
+  const box=document.getElementById('truckSchema');
+  box.innerHTML='';
+  if(!lastT || lastT.mode!=='pallets'){document.getElementById('truckPlanSummary').textContent='Esegui un calcolo Su Pallet o inizia da un truck vuoto.';return;}
+  const width=Math.max(320,box.clientWidth||700), height=Math.max(140,width*lastT.cW/lastT.cL);
+  box.style.height=height+'px';
+  const floor=lastT.items.filter(it=>it.y===0);
+  document.getElementById('truckPlanSummary').textContent=`${lastT.name} · ${lastT.items.length} pallet (${floor.length} a terra) · ${lastT.cL} × ${lastT.cW} mm`;
+  lastT.items.forEach((it,idx)=>{
+    if(it.y!==0)return;
+    const el=document.createElement('button');
+    el.style.padding='0';el.style.color='#0f172a';
+    el.className='plan-item pallet'+(idx===truckSelectedIndex?' selected':'');
+    el.style.left=(it.x/lastT.cL*width)+'px';el.style.top=(it.z/lastT.cW*height)+'px';
+    el.style.width=(it.pw/lastT.cL*width)+'px';el.style.height=(it.pl/lastT.cW*height)+'px';
+    el.textContent=String(idx+1);el.title=`Pallet ${idx+1}: ${it.pw} × ${it.pl} mm · ${it.kg} kg`;
+    el.setAttribute('aria-label',el.title);el.onclick=()=>{truckSelectedIndex=idx;renderTruckPlan();};box.appendChild(el);
+  });
+}
+function refreshMixedTruck(){
+  const spec=lastT.spec,items=lastT.items;
+  const kg=items.reduce((n,it)=>n+it.kg,0),vol=items.reduce((n,it)=>n+it.pw*it.pl*(it.pt+it.ch),0),total=spec.iL*spec.iW*spec.iH;
+  document.getElementById('ts-tot').textContent=items.length;
+  document.getElementById('ts-wgt').textContent=Math.round(kg);
+  document.getElementById('ts-vol').textContent=`${formatM3(vol)} · ${Math.round(vol/total*100)}%`;
+  document.getElementById('ts-lay').textContent=`${items.filter(it=>it.y===0).length}/terra`;
+  const formats={};items.forEach(it=>{const k=[it.pw,it.pl].sort((a,b)=>b-a).join(' × ');formats[k]=(formats[k]||0)+1;});
+  document.getElementById('tdet').innerHTML=`<div>🚛 ${spec.name} · carico misto</div>`+Object.entries(formats).map(([k,n])=>`<div>${k} mm: <b>${n} pallet</b></div>`).join('');
+  document.getElementById('twgt').innerHTML=`<div>Carico: <b>${Math.round(kg)} kg</b> / ${spec.maxP} kg</div><div>Portata residua: <b>${Math.round(spec.maxP-kg)} kg</b></div><div>Peso lordo: <b>${Math.round(kg+spec.tare)} kg</b></div>`;
+  document.getElementById('tNResult').style.display='none';
+  document.getElementById('tlbl').textContent=spec.name;
+  renderTruckPlan();buildBoxScene(GRP_T,lastT,0x14b8a6);
+  CAM_T.tgt=new THREE.Vector3(spec.iL/2,spec.iH/2,spec.iW/2);CAM_T.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_T.upd();
+}
+function startEmptyTruck(){
+  const spec=TRUCKS[selectedTruck];
+  selTMode('pallets',document.querySelector('#page-truck .mt .mb:nth-child(2)'));
+  lastT={cL:spec.iL,cW:spec.iW,cH:spec.iH,items:[],name:spec.name,spec,mode:'pallets'};
+  truckSelectedIndex=-1;refreshMixedTruck();
+}
+function applyTruckPalletPreset(){
+  const v=document.getElementById('truckPalletPreset').value;if(v==='custom')return;
+  const [l,w]=v.split('x').map(Number);document.getElementById('truckNewPL').value=l;document.getElementById('truckNewPW').value=w;
+}
+function addTruckPallet(){
+  if(!lastT || lastT.mode!=='pallets'){alert('Inizia da un truck vuoto o calcola in modalità Su Pallet.');return;}
+  const l=+document.getElementById('truckNewPL').value,w=+document.getElementById('truckNewPW').value;
+  const pt=+document.getElementById('tpT').value,ch=+document.getElementById('tpCH').value,kg=+document.getElementById('tpKg').value;
+  if(![l,w,pt,ch,kg].every(Number.isFinite)||l<100||w<100||pt<=0||ch<0||kg<0){alert('Inserisci dimensioni, altezza e peso validi.');return;}
+  if(lastT.items.reduce((n,it)=>n+it.kg,0)+kg>lastT.spec.maxP){alert('Portata massima del truck superata.');return;}
+  const side=Math.max(0,+document.getElementById('tMSide').value||0),b=truckBounds(lastT.spec,side);
+  // Candidate edges find real gaps; never fall back to an overlapping origin.
+  const xs=[b.x,...lastT.items.map(it=>it.x+it.pw)],zs=[b.z,...lastT.items.map(it=>it.z+it.pl)];
+  for(const z of zs.sort((a,b)=>a-b))for(const x of xs.sort((a,b)=>a-b))for(const [pw,pl] of [[l,w],[w,l]]){
+    const it={x,y:0,z,pw,pl,pt,ch,kg,type:'pallet'};
+    if(palletFitsTruck(it,lastT.items,lastT.spec,side,+document.getElementById('tMTop').value||0)){lastT.items.push(it);truckSelectedIndex=lastT.items.length-1;refreshMixedTruck();return;}
+  }
+  alert('Nessuno spazio libero compatibile con questo pallet, i margini e l’altezza. Rimuovi un pallet o calcola un nuovo layout nella scheda Spazio residuo.');
+}
+function removeTruckPallet(){
+  if(!lastT || truckSelectedIndex<0){alert('Seleziona un pallet nella vista dall’alto.');return;}
+  const it=lastT.items[truckSelectedIndex];
+  if(lastT.items.some((p,i)=>i!==truckSelectedIndex&&p.y>it.y&&p.x<it.x+it.pw&&p.x+p.pw>it.x&&p.z<it.z+it.pl&&p.z+p.pl>it.z)){alert('Questo pallet sostiene un pallet impilato: ricalcola senza doppio strato per modificarlo.');return;}
+  lastT.items.splice(truckSelectedIndex,1);truckSelectedIndex=-1;refreshMixedTruck();
+}
+function rotateTruckPallet(){
+  if(!lastT || truckSelectedIndex<0){alert('Seleziona un pallet nella vista dall’alto.');return;}
+  const old=lastT.items[truckSelectedIndex];
+  if(lastT.items.some(p=>p.y>old.y&&p.x<old.x+old.pw&&p.x+p.pw>old.x&&p.z<old.z+old.pl&&p.z+p.pl>old.z)){alert('Ricalcola senza doppio strato per ruotare un pallet che sostiene un altro pallet.');return;}
+  const next={...old,pw:old.pl,pl:old.pw};
+  if(!palletFitsTruck(next,lastT.items.filter((_,i)=>i!==truckSelectedIndex),lastT.spec,+document.getElementById('tMSide').value||0,+document.getElementById('tMTop').value||0)){alert('Rotazione non possibile: spazio insufficiente.');return;}
+  lastT.items[truckSelectedIndex]=next;refreshMixedTruck();
+}
+// Solve a mixed load using rows. DP stores shortest length for every exact Euro/CHEP count.
+// Counts are bounded by usable floor area; results are feasible estimates, not global packing optima.
+function solveMixedRows(spec,e,c,side,height,eKg,cKg){
+  const b=truckBounds(spec,side),area=b.w*b.h;
+  if(height>b.height || e*eKg+c*cKg>spec.maxP || e*960000+c*1200000>area)return null;
+  const maxE=Math.floor(area/960000),maxC=Math.floor(area/1200000);
+  const kinds=[{e:1,c:0,pw:1200,pl:800},{e:1,c:0,pw:800,pl:1200},{e:0,c:1,pw:1200,pl:1000},{e:0,c:1,pw:1000,pl:1200}];
+  const rows=new Map();
+  function generate(seq,width,E,C,length,start){
+    if(seq.length){const key=E+','+C;const old=rows.get(key);if(!old||length<old.length)rows.set(key,{e:E,c:C,length,seq});}
+    for(let i=start;i<kinds.length;i++){const k=kinds[i];if(width+k.pl<=b.h)generate([...seq,k],width+k.pl,E+k.e,C+k.c,Math.max(length,k.pw),i);}
+  }
+  generate([],0,0,0,0,0);
+  const dp=Array.from({length:maxE+1},()=>Array(maxC+1).fill(null));dp[0][0]={length:0};
+  for(let E=0;E<=maxE;E++)for(let C=0;C<=maxC;C++){
+    const cell=dp[E][C];if(!cell)continue;
+    for(const row of rows.values()){
+      const ne=E+row.e,nc=C+row.c,len=cell.length+row.length;
+      if(ne>maxE||nc>maxC||len>b.w||ne*eKg+nc*cKg>spec.maxP)continue;
+      if(!dp[ne][nc]||len<dp[ne][nc].length)dp[ne][nc]={length:len,prev:[E,C],row};
+    }
+  }
+  if(!dp[e]?.[c])return null;
+  function layout(E,C){
+    const list=[];while(E||C){const cell=dp[E][C];list.push(cell.row);[E,C]=cell.prev;}
+    let x=b.x;const items=[];
+    list.reverse().forEach(row=>{let z=b.z;row.seq.forEach(k=>{items.push({x,y:0,z,pw:k.pw,pl:k.pl,pt:144,ch:height-144,kg:k.e?eKg:cKg,type:'pallet'});z+=k.pl;});x+=row.length;});return items;
+  }
+  let extraE=0,extraC=0;
+  for(let E=e;E<=maxE;E++)if(dp[E][c])extraE=E-e;
+  for(let C=c;C<=maxC;C++)if(dp[e][C])extraC=C-c;
+  return {extraE,extraC,base:layout(e,c),euro:layout(e+extraE,c),chep:layout(e,c+extraC)};
+}
+let remainingCalculation=null;
+function invalidateRemaining(){remainingCalculation=null;document.getElementById('remainingResult').textContent='Dati modificati: calcola di nuovo lo spazio residuo.';}
+function calculateRemainingPallets(){
+  remainingCalculation=null;
+  const read=id=>document.getElementById(id).value.trim()===''?NaN:Number(document.getElementById(id).value);
+  const e=read('remainingEuro'),c=read('remainingChep'),eKg=read('remainingEuroKg'),cKg=read('remainingChepKg'),height=read('remainingHeight'),side=read('remainingSide');
+  const target=document.getElementById('remainingResult'),key=document.getElementById('remainingTruck').value,spec=TRUCKS[key];
+  if(![e,c,eKg,cKg,height,side].every(Number.isFinite)||!Number.isInteger(e)||!Number.isInteger(c)||e<0||c<0||eKg<0||cKg<0||height<145||side<0){target.textContent='Inserisci quantità intere non negative e misure/pesi validi.';return;}
+  const result=solveMixedRows(spec,e,c,side,height,eKg,cKg);
+  if(!result){target.textContent='Carico non collocabile nel layout a file con questi margini, altezza e peso. Riduci le quantità o scegli un veicolo più grande.';return;}
+  remainingCalculation={...result,key,side};
+  target.innerHTML=`<p>${spec.name}: <b>${e} Euro + ${c} CHEP</b> da caricare.</p><p>Puoi aggiungere <b style="color:var(--teal)">${result.extraE} Euro pallet</b><br>oppure <b style="color:var(--teal)">${result.extraC} CHEP</b>.</p><p>Portata residua prima delle aggiunte: <b>${Math.round(spec.maxP-e*eKg-c*cKg)} kg</b>.</p><p style="font-size:.74rem;color:var(--muted)">Le quantità sono alternative e prevedono il riordino dei pallet in un singolo strato.</p><div class="plan-actions"><button class="be bt" onclick="applyRemainingTruck('base')">Vedi carico inserito</button><button class="be bt" onclick="applyRemainingTruck('euro')">Vedi con +${result.extraE} Euro</button><button class="be bt" onclick="applyRemainingTruck('chep')">Vedi con +${result.extraC} CHEP</button></div>`;
+}
+function applyRemainingTruck(kind){
+  if(!remainingCalculation)return;
+  const result=remainingCalculation;
+  selectedTruck=result.key;const spec=TRUCKS[selectedTruck];
+  document.querySelectorAll('.ttb').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick').includes("'"+selectedTruck+"'")));
+  document.getElementById('tMSide').value=result.side;document.getElementById('tMTop').value=50;
+  document.getElementById('tpStack').checked=false;
+  document.getElementById('tpCH').value=+document.getElementById('remainingHeight').value-144;document.getElementById('tpT').value=144;
+  selTMode('pallets',document.querySelector('#page-truck .mt .mb:nth-child(2)'));
+  lastT={cL:spec.iL,cW:spec.iW,cH:spec.iH,items:clonePlanItems(result[kind]),name:spec.name,spec,mode:'pallets'};
+  showPage('truck',document.querySelector('.nav-btn[onclick*="showPage(\'truck\'"]'));
+  truckSelectedIndex=-1;refreshMixedTruck();
+}
+window.addEventListener('resize',()=>{if(lastT?.mode==='pallets')renderTruckPlan();});
+document.querySelectorAll('#page-remaining input,#page-remaining select').forEach(el=>el.addEventListener('input',invalidateRemaining));
 
 // ══════ SHARED SCENE BUILDER (Container / Truck) ══════
 function buildWoodPallet(grp,item){
@@ -4265,7 +4449,8 @@ function initTools(){
 }
 
 // ══════ QUOTAZIONI ══════
-const QTOK='shippo_live_40db4861be86c7e77555c38b397633bbf400c0a6';
+// Shippo credentials must be supplied by a server, never embedded in a public page.
+const QTOK='';
 let qRes=[],qSrc={sh:true,pk:true,sp:true,sb:true};
 
 function qToggle(s){
@@ -4332,6 +4517,8 @@ function renderQ(){
 }
 
 async function fetchShippo(p){
+  if(!QTOK){qErr('Shippo non configurato: serve un collegamento sicuro lato server.');return [];}
+
   qStatus('<span class="qspin" style="color:#8b5cf6;"></span>Shippo: richiesta tariffe…','#8b5cf6');
   try{
     const body={
