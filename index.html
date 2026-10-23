@@ -7,6 +7,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
+#page-container [data-pallet-control][hidden]{display:none!important}
+#page-container .app-grid>div{min-width:0}
+#page-container .plan-wrap{overflow-x:auto}
+#mixedFloorInputs table,#mixedFloorInputs tbody{display:block;min-width:0!important}
+#mixedFloorInputs thead{display:none}
+#mixedFloorRows{display:grid!important;gap:10px;margin-top:10px}
+#mixedFloorRows tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--border);border-radius:8px;position:relative;background:var(--surface2)}
+#mixedFloorRows td{min-width:0}
+#mixedFloorRows td::before{content:attr(data-label);display:block;color:var(--muted);font-size:.65rem;margin-bottom:4px}
+#mixedFloorRows td:first-child{grid-column:1/-1;padding-right:36px}
+#mixedFloorRows td:last-child{position:absolute;right:10px;top:25px}
+#mixedFloorRows input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 5px;color:var(--text);font:inherit}
+#mixedFloorRows input:focus{outline:1px solid var(--blue)}
+@media(max-width:700px){#page-container .rc>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}#page-container .csg{grid-template-columns:repeat(2,minmax(0,1fr))}#page-container .plan-dimrow{flex-wrap:wrap;gap:6px}}
 :root{--bg:#0a0c10;--surface:#111318;--surface2:#181b22;--border:#252932;--accent:#f0a500;--accent2:#e05c2a;--blue:#3b82f6;--teal:#14b8a6;--fuel:#e11d48;--text:#eef0f4;--muted:#6b7280;--green:#22c55e;--radius:12px;}
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;background-size:cover;background-position:center;background-attachment:fixed;}
@@ -566,7 +580,7 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
           <button class="mb" onclick="selCMode('pallets',this)">🪵 Su Pallet</button>
         </div>
 
-        <div class="guided-card">
+        <div class="guided-card" data-pallet-control>
           <div class="guided-head">
             <div>
               <div class="sl b" style="margin:0;">Simulazione guidata rapida</div>
@@ -583,6 +597,17 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
         </div>
 
         <div id="cm-boxes">
+          <div class="tr"><span>Carico misto · più formati scatola</span><label class="tg"><input type="checkbox" id="mixedFloorEnabled" onchange="toggleMixedFloor()"><span class="ts"></span></label></div>
+          <div id="mixedFloorInputs" style="display:none">
+            <p style="font-size:.74rem;color:var(--muted);line-height:1.8">Inserisci le quantità da caricare in un container. I pallet equivalenti indicano i bancali di origine da svuotare: nel container le scatole viaggiano sfuse.</p>
+            <div><table style="width:100%;font-size:.72rem;text-align:left"><thead><tr><th>Formato / SKU</th><th>L mm</th><th>W mm</th><th>H mm</th><th>kg/sc</th><th>Scatole</th><th>Sc/pallet</th><th></th></tr></thead><tbody id="mixedFloorRows"></tbody></table></div>
+            <button class="be bb" style="margin-top:8px" onclick="addMixedFloorRow()">＋ Aggiungi formato</button>
+            <div class="tr"><span>Consuma solo pallet di origine interi, per SKU</span><label class="tg"><input type="checkbox" id="mixedFloorWhole" onchange="scheduleMixedFloor()"><span class="ts"></span></label></div>
+            <div class="tr"><span>Consenti rotazione orizzontale</span><label class="tg"><input type="checkbox" id="mixedFloorRotate" checked onchange="scheduleMixedFloor()"><span class="ts"></span></label></div>
+            <p style="font-size:.72rem;color:var(--muted);line-height:1.8">Stima a colonne dello stesso formato, con appoggio completo e scatole mantenute verticali. Le colonne possono avere altezze diverse. Il risultato può lasciare spazio inutilizzato; verifica la resistenza all'impilamento.</p>
+            <div id="mixedFloorStatus" role="status" aria-live="polite" style="font-size:.74rem;line-height:1.8"></div>
+          </div>
+          <div id="singleFloorInputs">
           <div class="sl b">Dimensioni scatola</div>
           <div class="fr"><div class="fg"><label>Lunghezza (mm)</label><div class="iu"><input type="number" id="cbL" value="400" min="1"><span>mm</span></div></div><div class="fg"><label>Larghezza (mm)</label><div class="iu"><input type="number" id="cbW" value="300" min="1"><span>mm</span></div></div></div>
           <div class="fr"><div class="fg"><label>Altezza (mm)</label><div class="iu"><input type="number" id="cbH" value="250" min="1"><span>mm</span></div></div><div class="fg"><label>Peso (kg)</label><div class="iu"><input type="number" id="cbKg" value="5.5" step="0.1"><span>kg</span></div></div></div>
@@ -590,6 +615,7 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
           <div class="tr"><span>Ottimizza orientamento</span><label class="tg"><input type="checkbox" id="cbOpt" checked><span class="ts"></span></label></div>
           <div class="tr"><span>Floor loaded: consuma solo bancali interi</span><label class="tg"><input type="checkbox" id="cbFullPalletOnly"><span class="ts"></span></label></div>
           <div class="fr" id="cbFullPalletBox"><div class="fg"><label>Pezzi per bancale intero</label><input type="number" id="cbPalletPieces" value="24" min="1"></div><div class="fg"><label>Regola</label><input type="text" value="solo multipli interi" readonly></div></div>
+          </div>
         </div>
         <div id="cm-pallets" style="display:none;">
           <div class="sl b">Tipo pallet</div>
@@ -624,9 +650,9 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
         </div>
 
         <button class="bc bb" onclick="calcContainer()">▶ CALCOLA CONTAINER 3D</button>
-        <button class="bc bb" style="margin-top:6px;background:linear-gradient(90deg,var(--blue),var(--teal));color:#fff;" onclick="optimizeContainerAndPalletTogether()">🤖 OTTIMIZZA PALLET + CONTAINER</button>
-        <button class="bc bb" style="margin-top:6px;background:transparent;border:1px solid var(--blue);color:var(--blue);" onclick="balanceContainer()">⚖️ BILANCIA CARICO</button>
-        <button class="bc bb" style="margin-top:6px;background:transparent;border:1px solid var(--teal);color:var(--teal);" onclick="simulateRealLoad()">🧪 SIMULA VINCOLI REALI</button>
+        <button class="bc bb" style="margin-top:6px;background:linear-gradient(90deg,var(--blue),var(--teal));color:#fff;" data-pallet-control onclick="optimizeContainerAndPalletTogether()">🤖 OTTIMIZZA PALLET + CONTAINER</button>
+        <button class="bc bb" style="margin-top:6px;background:transparent;border:1px solid var(--blue);color:var(--blue);" data-pallet-control onclick="balanceContainer()">⚖️ BILANCIA CARICO</button>
+        <button class="bc bb" style="margin-top:6px;background:transparent;border:1px solid var(--teal);color:var(--teal);" data-pallet-control onclick="simulateRealLoad()">🧪 SIMULA VINCOLI REALI</button>
         <div class="alert" id="al-c">✓ Calcolo container completato!</div>
       </div>
     </div>
@@ -665,11 +691,11 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
     <div class="panel">
       <div class="ph"><div class="pi">🗺️</div><h3>Vista dall'alto</h3></div>
       <div class="pb">
-        <div class="plan-actions">
+        <div class="plan-actions" data-pallet-control>
           <button class="be bb" id="btnEditPlan" onclick="toggleContainerPlanEdit()">✏️ Modifica layout</button>
           <button class="be bb" onclick="rotateSelectedPlanItem()">🔄 Ruota pallet</button>
           <button class="be bb" onclick="resetContainerPlan()">↺ Reset layout</button>
-          <button class="be bb" onclick="balanceContainer()">⚖️ Bilancia</button>
+          <button class="be bb" data-pallet-control onclick="balanceContainer()">⚖️ Bilancia</button>
           <button class="be bb" onclick="compactContainerLayout()">🧲 Attacca pallet</button>
           <button class="be bb" onclick="cycleContainerLayout()">🔀 Layout alternativi</button>
           <button class="be bb" onclick="rebalanceContainerLayout()">⚖️ Bilancia peso</button>
@@ -678,7 +704,7 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
           <div class="multi-plan-tabs" id="containerPlanTabs"></div>
           <div class="multi-plan-meta" id="containerPlanSummary">1 container</div>
         </div>
-        <div class="plan-addbar">
+        <div class="plan-addbar" data-pallet-control>
           <div class="fg wide"><label>Aggiungi pallet al container attivo</label><select id="planPalletPreset" onchange="applyPlanPalletPreset()"><option value="calculated" selected>Uguale al pallet calcolato</option><option value="custom">Custom</option><option value="1200x800">EUR 1200 × 800</option><option value="1200x1000">Industrial 1200 × 1000</option><option value="1140x1140">CP1 1140 × 1140</option><option value="1100x1100">1100 × 1100</option><option value="800x600">Half pallet 800 × 600</option></select></div>
           <div class="fg"><label>Lung. pallet (mm)</label><input type="number" id="planNewPL" value="1200" min="100"></div>
           <div class="fg"><label>Larg. pallet (mm)</label><input type="number" id="planNewPW" value="800" min="100"></div>
@@ -1361,7 +1387,11 @@ function togAnimT(){CAM_T.anim=!CAM_T.anim;document.getElementById('abT').textCo
 
 // ══════ HELPERS ══════
 const h2t=hex=>parseInt(hex.replace('#',''),16);
-function clr(grp){while(grp.children.length)grp.remove(grp.children[0]);}
+function clr(grp){
+  const geometries=new Set(),materials=new Set();
+  while(grp.children.length){const child=grp.children[0];child.traverse(obj=>{if(obj.geometry)geometries.add(obj.geometry);if(obj.material)(Array.isArray(obj.material)?obj.material:[obj.material]).forEach(m=>materials.add(m));if(obj.isInstancedMesh)obj.dispose?.();});grp.remove(child);}
+  geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());
+}
 function boxMesh(geo,color,wire=false){const m=new THREE.MeshStandardMaterial({color,roughness:0.55,metalness:0.05});if(wire)m.wireframe=true;return new THREE.Mesh(geo,m);}
 function addEdges(grp,geo,pos){const l=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.2}));l.position.copy(pos);grp.add(l);}
 
@@ -2648,7 +2678,129 @@ function optimizeContainerAndPalletTogether(){
   showAlert('al-c');
 }
 
+// Mixed floor loading. Each footprint supports one vertical column of a single SKU.
+const MIXED_FLOOR_COLORS=['#f0a500','#3b82f6','#22c55e','#e05c2a','#a855f7','#ec4899','#06b6d4','#fbbf24'];
+let mixedFloorNextId=1,mixedFloorTimer=null;
+function escapeFloorText(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function mixedFloorActive(){return cMode==='boxes' && document.getElementById('mixedFloorEnabled').checked;}
+function addMixedFloorRow(){
+  const body=document.getElementById('mixedFloorRows');
+  if(body.children.length>=20){alert('Puoi inserire fino a 20 formati.');return;}
+  const id=mixedFloorNextId++,row=document.createElement('tr');row.dataset.skuId=String(id);
+  const first=body.children.length===0;
+  const fields=[['name','text',`Formato ${id}`],['length','number',document.getElementById('cbL').value],['width','number',document.getElementById('cbW').value],['height','number',document.getElementById('cbH').value],['kg','number',document.getElementById('cbKg').value],['quantity','number',first?document.getElementById('cNUnits').value:100],['perPallet','number',document.getElementById('cbPalletPieces').value]];
+  const labels={name:'Formato / SKU',length:'Lunghezza mm',width:'Larghezza mm',height:'Altezza mm',kg:'kg / scatola',quantity:'Scatole',perPallet:'Sc / pallet'};
+  fields.forEach(([field,type,value])=>{const td=document.createElement('td'),input=document.createElement('input');td.dataset.label=labels[field];input.type=type;input.value=value;input.dataset.field=field;input.setAttribute('aria-label',`${labels[field]} formato ${id}`);if(type==='number'){input.min=field==='kg'||field==='quantity'?'0':'1';input.step=field==='kg'?'0.01':'1';}input.addEventListener('input',scheduleMixedFloor);td.appendChild(input);row.appendChild(td);});
+  const td=document.createElement('td'),remove=document.createElement('button');remove.className='be bb';remove.textContent='×';remove.setAttribute('aria-label',`Rimuovi formato ${id}`);remove.onclick=()=>{row.remove();scheduleMixedFloor();};td.appendChild(remove);row.appendChild(td);body.appendChild(row);scheduleMixedFloor();
+}
+function toggleMixedFloor(){
+  const enabled=document.getElementById('mixedFloorEnabled').checked;
+  document.getElementById('mixedFloorInputs').style.display=enabled?'block':'none';document.getElementById('singleFloorInputs').style.display=enabled?'none':'block';
+  if(enabled&&!document.getElementById('mixedFloorRows').children.length)addMixedFloorRow();
+  if(enabled)scheduleMixedFloor();else calcContainer();
+}
+function scheduleMixedFloor(){
+  clearTimeout(mixedFloorTimer);
+  if(!mixedFloorActive())return;
+  document.getElementById('mixedFloorStatus').textContent='Aggiornamento del carico…';
+  mixedFloorTimer=setTimeout(()=>{if(mixedFloorActive())calcContainer();},250);
+}
+function readMixedFloorRows(){
+  return [...document.getElementById('mixedFloorRows').children].map(row=>{
+    const read=field=>row.querySelector(`[data-field="${field}"]`).value.trim();
+    const number=field=>read(field)===''?NaN:Number(read(field));
+    return {id:row.dataset.skuId,name:read('name')||`Formato ${row.dataset.skuId}`,length:number('length'),width:number('width'),height:number('height'),kg:number('kg'),quantity:number('quantity'),perPallet:number('perPallet')};
+  });
+}
+function packMixedFloor(spec,rows,options={}){
+  if(!rows.length||rows.length>20)throw Error('Inserisci da 1 a 20 formati.');
+  const validPos=n=>Number.isFinite(n)&&n>0;
+  if(![spec.iL,spec.iW,spec.iH,spec.doorH||spec.iH,spec.maxP].every(validPos)||!Number.isFinite(spec.tare)||spec.tare<0)throw Error('Dimensioni, portata o tara container non valide.');
+  if(![options.side,options.top].every(n=>Number.isFinite(n)&&n>=0))throw Error('Inserisci margini non negativi.');
+  rows.forEach(r=>{if(![r.length,r.width,r.height].every(validPos)||!Number.isFinite(r.kg)||r.kg<0||!Number.isSafeInteger(r.quantity)||r.quantity<0||!Number.isSafeInteger(r.perPallet)||r.perPallet<1)throw Error('Verifica misure positive, pesi non negativi, quantità intere e scatole per pallet.');});
+  const requested=rows.reduce((n,r)=>n+r.quantity,0);if(!Number.isSafeInteger(requested))throw Error('Quantità totale troppo elevata.');
+  const margins=getPracticalMargins(spec,options.side,options.top);
+  const binL=Math.max(0,spec.iL-(spec.structLossL||0)-2*margins.side),binW=Math.max(0,spec.iW-(spec.structLossW||0)-2*margins.side),binH=Math.max(0,Math.min(spec.iH,spec.doorH||spec.iH)-margins.top);
+  const originX=(spec.iL-binL)/2,originZ=(spec.iW-binW)/2;
+  let free=binL&&binW?[{x:0,y:0,w:binL,h:binW}]:[],weight=0,boxCount=0,limitReached=false;
+  const columns=[],counts=new Map(rows.map(r=>[r.id,0]));
+  const boxLimit=20000;
+  const takeSpace=used=>{free=pruneFreeRects(free.flatMap(fr=>splitFreeRect(fr,used)));};
+  const ordered=[...rows].sort((a,b)=>b.length*b.width-a.length*a.width||b.height-a.height);
+  for(const r of ordered){
+    const stack=Math.floor(binH/r.height),target=options.whole?Math.floor(r.quantity/r.perPallet)*r.perPallet:r.quantity;
+    if(!stack)continue;
+    let loaded=0;
+    while(loaded<target&&boxCount<boxLimit){
+      const byWeight=r.kg>0?Math.max(0,Math.floor((spec.maxP-weight+1e-7)/r.kg)):target-loaded;
+      const count=Math.min(stack,target-loaded,byWeight,boxLimit-boxCount);if(!count)break;
+      let best=null;
+      for(const fr of free)for(const [w,l] of options.rotate?[[r.length,r.width],[r.width,r.length]]:[[r.length,r.width]]){
+        if(w>fr.w||l>fr.h)continue;
+        const score=[Math.min(fr.w-w,fr.h-l),Math.max(fr.w-w,fr.h-l),fr.y,fr.x];
+        if(!best||score.some((n,i)=>n<best.score[i]&&score.slice(0,i).every((p,j)=>p===best.score[j])))best={x:fr.x,y:fr.y,w,h:l,score};
+      }
+      if(!best)break;
+      const column={...best,sku:r,count};columns.push(column);takeSpace(best);loaded+=count;boxCount+=count;weight+=count*r.kg;
+    }
+    if(boxCount>=boxLimit&&loaded<target)limitReached=true;
+    // Remove boxes from the tops of columns when a complete source pallet cannot be consumed.
+    if(options.whole){
+      let remove=loaded%r.perPallet;loaded-=remove;boxCount-=remove;weight-=remove*r.kg;
+      for(let i=columns.length-1;remove&&i>=0;i--){const col=columns[i];if(col.sku.id!==r.id)continue;const n=Math.min(remove,col.count);col.count-=n;remove-=n;if(!col.count)columns.splice(i,1);}
+      free=binL&&binW?[{x:0,y:0,w:binL,h:binW}]:[];columns.forEach(takeSpace);
+    }
+    counts.set(r.id,loaded);
+  }
+  const items=[];for(const col of columns)for(let layer=0;layer<col.count;layer++)items.push({x:originX+col.x,y:layer*col.sku.height,z:originZ+col.y,w:col.w,h:col.sku.height,l:col.h,type:'box',kg:col.sku.kg,skuId:col.sku.id,skuName:col.sku.name,color:MIXED_FLOOR_COLORS[rows.findIndex(r=>r.id===col.sku.id)%MIXED_FLOOR_COLORS.length]});
+  const summary=rows.map((r,index)=>{const loaded=counts.get(r.id);return {...r,color:MIXED_FLOOR_COLORS[index%MIXED_FLOOR_COLORS.length],loaded,remaining:r.quantity-loaded,pallets:loaded/r.perPallet,sourcePallets:Math.ceil(loaded/r.perPallet)};});
+  return {items,summary,requested,loaded:items.length,remaining:requested-items.length,weight:items.reduce((n,it)=>n+it.kg,0),volume:items.reduce((n,it)=>n+it.w*it.h*it.l,0),pallets:summary.reduce((n,r)=>n+r.pallets,0),sourcePallets:summary.reduce((n,r)=>n+r.sourcePallets,0),columns:columns.length,maxStack:Math.max(0,...columns.map(c=>c.count)),binL,binW,binH,originX,originZ,limited:(limitReached||boxCount>=boxLimit)&&requested>boxCount};
+}
+function setMixedFloorControls(active){
+  document.querySelectorAll('#page-container [data-pallet-control]').forEach(el=>el.hidden=active);
+  const units=document.getElementById('cNUnits');units.readOnly=active;
+  document.getElementById('cNType').disabled=active;
+  if(active)containerPlanState.editing=false;
+}
+function calculateMixedFloorContainer(){
+  clearTimeout(mixedFloorTimer);setMixedFloorControls(true);
+  const spec=getSelectedContainerSpec();let result;
+  try{result=packMixedFloor(spec,readMixedFloorRows(),{side:Number(document.getElementById('cMSide').value),top:Number(document.getElementById('cMTop').value),whole:document.getElementById('mixedFloorWhole').checked,rotate:document.getElementById('mixedFloorRotate').checked});}
+  catch(error){
+    document.getElementById('mixedFloorStatus').textContent=error.message;
+    ['cs-tot','cs-vol','cs-wgt','cs-lay'].forEach(id=>document.getElementById(id).textContent='—');
+    ['cdet','cwgt','cschema','cschemaLegend','containerPlanTabs','containerPlanSummary'].forEach(id=>document.getElementById(id).textContent='Dati da verificare.');
+    document.getElementById('cNResult').style.display='none';document.getElementById('gResult').style.display='none';
+    containerPlanState.spec=null;containerPlanState.items=[];containerPlanState.containers=[];lastC=null;clr(GRP_C);return;
+  }
+  lastC={cL:spec.iL,cW:spec.iW,cH:spec.iH,items:result.items,name:spec.name,mode:'boxes',mixedFloor:true,floorResult:result};
+  document.getElementById('mixedFloorStatus').textContent=`${result.loaded.toLocaleString('it-IT')} scatole caricate · ${result.remaining.toLocaleString('it-IT')} residue${result.limited?' · raggiunto limite simulazione di 20.000 scatole':''}`;
+  document.getElementById('cs-tot').textContent=result.loaded;
+  document.getElementById('cs-vol').textContent=`${formatM3(result.volume)} · ${Math.round(result.volume/(spec.iL*spec.iW*spec.iH)*100)}%`;
+  document.getElementById('cs-wgt').textContent=result.weight.toLocaleString('it-IT',{maximumFractionDigits:2});
+  document.getElementById('cs-lay').textContent=`${result.columns} colonne / ${result.maxStack} max`;
+  const f=n=>n.toLocaleString('it-IT',{maximumFractionDigits:2});
+  document.getElementById('cdet').innerHTML=`<div>🚢 ${escapeFloorText(spec.name)} · floor loaded misto · 1 container</div><div>Spazio utile: ${f(result.binL)} × ${f(result.binW)} × ${f(result.binH)} mm</div><div>Richieste: <b>${f(result.requested)}</b> · caricate: <b>${f(result.loaded)}</b> · residue: <b>${f(result.remaining)}</b></div><div>🪵 Pallet equivalenti consumati: <b>${f(result.pallets)}</b> · bancali di origine da aprire: <b>${f(result.sourcePallets)}</b></div><div style="overflow-x:auto"><table style="width:100%;text-align:left;font-size:.7rem"><thead><tr><th>SKU / mm</th><th>Rich.</th><th>Car.</th><th>Resid.</th><th>Pal. eq.</th></tr></thead><tbody>${result.summary.map(r=>`<tr><td><span style="color:${r.color}">●</span> ${escapeFloorText(r.name)}<br>${r.length}×${r.width}×${r.height} · ${r.kg} kg · ${r.perPallet} sc/pal</td><td>${f(r.quantity)}</td><td>${f(r.loaded)}</td><td>${f(r.remaining)}</td><td>${f(r.pallets)}</td></tr>`).join('')}</tbody></table></div><div>Le quantità residue non sono caricate. La stima a colonne non garantisce il massimo riempimento.</div>`;
+  document.getElementById('cwgt').innerHTML=`<div>Peso caricato: <b>${f(result.weight)} kg</b> / ${f(spec.maxP)} kg</div><div>Portata residua: <b>${f(Math.max(0,spec.maxP-result.weight))} kg</b></div><div>Peso lordo: <b>${f(result.weight+spec.tare)} kg</b></div><div>Volume scatole: <b>${formatM3(result.volume)}</b></div><div>I pallet di origine non sono caricati. Peso e volume si riferiscono alle sole scatole. Verificare distribuzione del peso e resistenza all'impilamento.</div>`;
+  document.getElementById('cNUnits').value=result.requested;document.getElementById('cNType').value='boxes';
+  document.getElementById('cNResult').style.display='block';document.getElementById('cNVal').textContent='1 container visualizzato';
+  document.getElementById('cNDesc').textContent=result.remaining?`${f(result.remaining)} scatole residue da pianificare in altri carichi. Il numero totale di container richiede una nuova simulazione del residuo.`:'Tutte le quantità richieste sono caricate nel container visualizzato.';
+  document.getElementById('gResult').style.display='none';
+  buildBoxScene(GRP_C,lastC,0x3b82f6);
+  renderContainerPlan(spec,result.items,'boxes',{layout:'Floor loaded misto · colonne per SKU'});
+  document.getElementById('containerPlanSummary').textContent=`1 container · ${result.loaded} scatole · ${result.columns} colonne`;
+  document.getElementById('cschemaHintLabel').textContent='Colonne viste da sopra · colore per formato';
+  document.querySelectorAll('#cschema .plan-item').forEach((el,i)=>{const it=containerPlanState.items[i];el.style.background=it.color;el.style.color='#0f172a';el.title=`${it.skuName} · ${it.w}×${it.l} mm`;});
+  document.getElementById('cschemaLegend').innerHTML=result.summary.map(r=>`<span class="plan-pill"><span class="plan-dot" style="background:${r.color}"></span>${escapeFloorText(r.name)} · ${f(r.loaded)} sc</span>`).join('');
+  CAM_C.tgt=new THREE.Vector3(spec.iL/2,spec.iH/2,spec.iW/2);CAM_C.r=Math.max(8000,(spec.iL+spec.iW+spec.iH)*1.3);CAM_C.upd();
+  showAlert('al-c');
+}
+
+['cMSide','cMTop','ccL','ccW','ccH','ccDoorH','ccMaxP','ccTare'].forEach(id=>document.getElementById(id)?.addEventListener('input',scheduleMixedFloor));
+
 function calcContainer(){
+  if(mixedFloorActive()){calculateMixedFloorContainer();return;}
+  setMixedFloorControls(false);
   syncContainerUnitsType();
   const spec=getSelectedContainerSpec();
   const mS=+document.getElementById('cMSide').value,mT=+document.getElementById('cMTop').value;
@@ -2958,7 +3110,7 @@ function removeActiveContainerPlan(){
 function renderContainerPlan(spec,items,mode,meta={}){
   const box=document.getElementById('cschema'), legend=document.getElementById('cschemaLegend');
   if(!box||!legend||!spec) return;
-  const W=Math.max(680, box.clientWidth||900), H=Math.max(180,Math.round((spec.iW/spec.iL)*W));
+  const W=Math.max(lastC?.mixedFloor?240:680, box.clientWidth||900), H=Math.max(180,Math.round((spec.iW/spec.iL)*W));
   containerPlanState.spec=spec;
   containerPlanState.mode=mode;
   containerPlanState.items=clonePlanItems(items.filter(it=>it.y===0));
@@ -3558,6 +3710,18 @@ function buildBoxScene(grp,res,accentColor){
   // Floor
   const fl=new THREE.Mesh(new THREE.BoxGeometry(cL,20,cW),new THREE.MeshStandardMaterial({color:0x1e293b,roughness:0.9}));
   fl.position.set(cL/2,10,cW/2);fl.receiveShadow=true;grp.add(fl);
+  if(res.mixedFloor){
+    // Batch equal boxes into instances: every loaded box is rendered, including large orders.
+    const batches=new Map();items.forEach(it=>{const key=[it.skuId,it.w,it.h,it.l].join(':');if(!batches.has(key))batches.set(key,[]);batches.get(key).push(it);});
+    batches.forEach(list=>{
+      const first=list[0],geometry=new THREE.BoxGeometry(first.w*.985,first.h*.985,first.l*.985);
+      const material=new THREE.MeshStandardMaterial({color:first.color,roughness:.6});
+      const mesh=new THREE.InstancedMesh(geometry,material,list.length),matrix=new THREE.Matrix4();
+      list.forEach((it,i)=>{matrix.makeTranslation(it.x+it.w/2,it.y+it.h/2,it.z+it.l/2);mesh.setMatrixAt(i,matrix);});
+      mesh.castShadow=true;mesh.receiveShadow=true;mesh.instanceMatrix.needsUpdate=true;grp.add(mesh);
+    });
+    return;
+  }
   // Items
   const colors=[0xf0a500,0xe05c2a,0x22c55e,0x3b82f6,0xa855f7,0xec4899,0x06b6d4,0xfbbf24];
   items.forEach((item,idx)=>{
@@ -3629,7 +3793,7 @@ function createContainerTopViewDataURL(){
     const y=item.z*scaleY;
     const w=Math.max(8,len*scaleX-3);
     const h=Math.max(8,wid*scaleY-3);
-    const fill=item.type==='pallet'?(idx%2===0?'#f59e0b':'#fbbf24'):(idx%2===0?'#60a5fa':'#93c5fd');
+    const fill=item.color||(item.type==='pallet'?(idx%2===0?'#f59e0b':'#fbbf24'):(idx%2===0?'#60a5fa':'#93c5fd'));
     const label=(item.type==='pallet'?`${Math.round(item.pw)}×${Math.round(item.pl)}`:`${Math.round(item.w)}×${Math.round(item.l)}`);
     const showLabel=(w>120&&h>30);
     return `<g>
@@ -3710,9 +3874,9 @@ function exportPDF(page){
       </div>
       ${page==='container'&&topImg?`<div class="img-block"><div class="img-title">Vista dall'alto</div><img src="${topImg}" alt="Vista dall'alto"></div>`:''}
       <div class="info">
-        <div class="box"><b>Riepilogo ordinato</b><br>${stats}</div>
-        <div class="box"><b>Dettagli</b><br>${details}</div>
-        ${extraInfo?`<div class="box"><b>Peso e limiti</b><br>${extraInfo}</div>`:''}
+        <div class="box"><b>Riepilogo ordinato</b><br>${escapeFloorText(stats)}</div>
+        <div class="box"><b>Dettagli</b><br>${escapeFloorText(details)}</div>
+        ${extraInfo?`<div class="box"><b>Peso e limiti</b><br>${escapeFloorText(extraInfo)}</div>`:''}
       </div>
       <div class="footer">Chepallet</div>
     </div>
@@ -3868,9 +4032,9 @@ function cycleContainerLayout(){
 
 function swTab(n,btn){['box','pallet','visual'].forEach(t=>document.getElementById('tab-'+t).style.display=t===n?'block':'none');btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 function setP(l,w,btn){if(l){document.getElementById('pL').value=l;document.getElementById('pW').value=w;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-function selCont(t,btn){selectedCont=t;document.querySelectorAll('.ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('customContBox').style.display=t==='custom'?'block':'none';document.getElementById('clbl').textContent=(t==='custom'?'Custom':CONTS[t].name);}
+function selCont(t,btn){selectedCont=t;document.querySelectorAll('.ctb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('customContBox').style.display=t==='custom'?'block':'none';document.getElementById('clbl').textContent=(t==='custom'?'Custom':CONTS[t].name);scheduleMixedFloor();}
 function selTruck(t,btn){selectedTruck=t;document.querySelectorAll('.ttb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tlbl').textContent=TRUCKS[t].name;}
-function selCMode(m,btn){cMode=m;document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('cm-pallets').style.display=m==='pallets'?'block':'none';}
+function selCMode(m,btn){cMode=m;document.querySelectorAll('#page-container .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('cm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('cm-pallets').style.display=m==='pallets'?'block':'none';setMixedFloorControls(mixedFloorActive());if(mixedFloorActive())scheduleMixedFloor();else if(lastC?.mixedFloor)calcContainer();}
 function selTMode(m,btn){tMode=m;document.querySelectorAll('#page-truck .mb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.getElementById('tm-boxes').style.display=m==='boxes'?'block':'none';document.getElementById('tm-pallets').style.display=m==='pallets'?'block':'none';}
 function setCPal(l,w,t,btn){if(l){document.getElementById('cpL').value=l;document.getElementById('cpW').value=w;document.getElementById('cpT').value=t;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
 function setTPal(l,w,t,btn){if(l){document.getElementById('tpL').value=l;document.getElementById('tpW').value=w;document.getElementById('tpT').value=t;}btn.closest('.pg').querySelectorAll('.pb2').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
@@ -4603,3 +4767,4 @@ try{initSiteTheme();renderFormationGrids();syncCalculatedPalletPreset();}catch(e
 </script>
 </body>
 </html>
+
