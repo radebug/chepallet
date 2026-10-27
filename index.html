@@ -822,7 +822,7 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
     </div>
     <div class="panel"><div class="ph"><h3>Pallet misti · vista dall’alto</h3></div><div class="pb">
       <p style="font-size:.74rem;color:var(--muted)">Calcola in modalità Su Pallet, oppure inizia da un truck vuoto. Seleziona un pallet per rimuoverlo o ruotarlo.</p>
-      <div class="plan-actions"><button class="be bt" onclick="startEmptyTruck()">＋ Truck vuoto</button><button class="be bt" onclick="rotateTruckPallet()">🔄 Ruota selezionato</button><button class="be bt" onclick="removeTruckPallet()">🗑 Rimuovi selezionato</button></div>
+      <div class="plan-actions"><button class="be bt" onclick="cycleTruckLayout()">🔀 Layout alternativi</button><button class="be bt" onclick="startEmptyTruck()">＋ Truck vuoto</button><button class="be bt" onclick="rotateTruckPallet()">🔄 Ruota selezionato</button><button class="be bt" onclick="removeTruckPallet()">🗑 Rimuovi selezionato</button></div>
       <div class="plan-addbar">
         <div class="fg wide"><label>Formato da aggiungere</label><select id="truckPalletPreset" onchange="applyTruckPalletPreset()"><option value="1200x800">Euro 1200 × 800</option><option value="1200x1000">CHEP 1200 × 1000</option><option value="1219x1016">US 1219 × 1016</option><option value="800x600">Half pallet 800 × 600</option><option value="custom">Custom</option></select></div>
         <div class="fg"><label>Lunghezza (mm)</label><input id="truckNewPL" type="number" min="100" value="1200"></div><div class="fg"><label>Larghezza (mm)</label><input id="truckNewPW" type="number" min="100" value="800"></div>
@@ -2495,10 +2495,11 @@ function computeRealLoadSimulation(items,spec,unitKg){
   const constraints=getContainerLoadConstraints();
   const all=(items||[]).filter(it=>it.type==='pallet');
   const kg=+unitKg||0;
-  const total=all.length*kg;
+  const total=all.reduce((n,it)=>n+(it.kg??kg),0);
   let sx=0,sy=0,sz=0,front=0,rear=0,left=0,right=0;
   let maxH=0, worstRatio=0, palletOverKg=0;
   all.forEach(it=>{
+    const kg=it.kg??(+unitKg||0);
     const l=it.pw||it.w||0, w=it.pl||it.l||0, h=(it.pt||0)+(it.ch||0);
     const cx=it.x+l/2, cy=(it.y||0)+h/2, cz=it.z+w/2;
     sx+=cx*kg; sy+=cy*kg; sz+=cz*kg;
@@ -2565,11 +2566,11 @@ function simulateRealLoad(){
 function analyzeContainerWeight(items,spec,unitKg){
   const floor=items.filter(it=>it.y===0);
   const count=floor.length;
-  const total=count*(+unitKg||0);
+  const total=floor.reduce((n,it)=>n+(it.kg??(+unitKg||0)),0);
   if(!count||!spec) return {html:'',ok:true};
   let sx=0,sz=0,left=0,right=0,front=0,rear=0;
   floor.forEach(it=>{
-    const kg=+unitKg||0;
+    const kg=it.kg??(+unitKg||0);
     const l=it.pw||it.w, w=it.pl||it.l;
     const cx=it.x+l/2, cz=it.z+w/2;
     sx+=cx*kg; sz+=cz*kg;
@@ -2882,6 +2883,8 @@ function calcContainer(){
     multiPlans=tooTall?null:buildPalletContainerPlans(floorLayout.positions,totalToPlan,maxPerLayer,stk,tPH,pT,pCH);
     items=multiPlans?clonePlanItems(multiPlans[0].items):[];
     totalPlannedItems=multiPlans?multiPlans.reduce((sum,c)=>sum+(c.items?.length||0),0):items.length;
+    multiPlans?.forEach(plan=>[plan.items,plan.originalItems].filter(Boolean).forEach(list=>list.forEach(it=>it.kg=pKg)));
+    items.forEach(it=>it.kg=pKg);
     layers=items.length>0?Math.max(1,Math.ceil(items.length/Math.max(1,maxPerLayer))):0;
     totKg=items.length*pKg;usedVol=items.length*pL*pW*tPH;layoutLabel=layoutOverride||floorLayout.layout||caps.practical.layout||'automatico misto';
     const ve=Math.round(usedVol/totalVol*100);
@@ -3339,7 +3342,17 @@ function syncPlanTo3D(){
       ch:src.ch ?? (+document.getElementById('cpCH')?.value||1200),
       type:'pallet'
     }));
-    document.getElementById('cs-tot').textContent=lastC.items.length;
+    const spec=containerPlanState.spec,items=lastC.items;
+    const kg=items.reduce((n,it)=>n+(it.kg??0),0),vol=items.reduce((n,it)=>n+it.pw*it.pl*(it.pt+it.ch),0);
+    document.getElementById('cs-tot').textContent=items.length;
+    document.getElementById('cs-wgt').textContent=Math.round(kg);
+    document.getElementById('cs-vol').textContent=`${formatM3(vol)} · ${Math.round(vol/(spec.iL*spec.iW*spec.iH)*100)}%`;
+    document.getElementById('cs-lay').textContent=`${items.length}/terra`;
+    const formats={};items.forEach(it=>{const k=[it.pw,it.pl].sort((a,b)=>b-a).join(' × ');formats[k]=(formats[k]||0)+1;});
+    document.getElementById('cdet').innerHTML=Object.entries(formats).map(([k,n])=>`<div>${k} mm: <b>${n} pallet</b></div>`).join('');
+    document.getElementById('cNResult').style.display='none';
+    document.getElementById('cwgt').innerHTML=`<div>Carico: <b>${Math.round(kg)} kg</b> / ${spec.maxP} kg</div><div>Portata residua: <b>${Math.round(spec.maxP-kg)} kg</b></div><div>Volume usato: <b>${formatM3(vol)}</b></div><div id="realLoadSim" class="load-sim"></div>`;
+    updateContainerWeightReport();
   } else {
     let topIndex=0;
     lastC.items=lastC.items.map(it=>{
@@ -3991,43 +4004,96 @@ function compactContainerLayout(){
 }
 
 function rebalanceContainerLayout(){
-  if(!containerPlanState.spec||containerPlanState.mode!=='pallets'){alert('Disponibile dopo un calcolo container in modalità Su Pallet.');return;}
-  const spec=containerPlanState.spec;
-  const side=getPracticalMargins(spec,+document.getElementById('cMSide').value||0,+document.getElementById('cMTop').value||0).side;
-  const pL=+document.getElementById('cpL').value||1200, pW=+document.getElementById('cpW').value||800;
-  const n=containerPlanState.items.length;
-  const positions=packPalletsFreeRectangles(spec.iL-side*2,spec.iW-side*2,pL,pW,n,side,side);
-  // alterna dal fronte/retro per avvicinare il baricentro al centro lunghezza
-  const reordered=[];
-  positions.forEach((pos,i)=>{
-    reordered.push(pos);
-  });
-  reordered.sort((a,b)=>Math.abs((a.x+a.pw/2)-spec.iL/2)-Math.abs((b.x+b.pw/2)-spec.iL/2));
-  const base=containerPlanState.items[0]||{pt:+document.getElementById('cpT').value||144,ch:+document.getElementById('cpCH').value||1200,type:'pallet',y:0};
-  containerPlanState.items=reordered.slice(0,n).map(pos=>({...base,x:pos.x,z:pos.z,pw:pos.pw,pl:pos.pl,rot:pos.rot,type:'pallet',y:0}));
-  const cur=getActiveContainerPlan(); if(cur){cur.items=clonePlanItems(containerPlanState.items);cur.layout='bilanciato peso/baricentro';}
-  renderContainerPlan(spec,containerPlanState.items,containerPlanState.mode,{layout:'bilanciato peso/baricentro',preserveContainers:true,originalItems:containerPlanState.originalItems});
-  syncPlanTo3D();
-  renderRealLoadSimulation();
+  if(!containerPlanState.spec||containerPlanState.mode!=='pallets')return;
+  const items=containerPlanState.items.map(it=>({...it})),spec=containerPlanState.spec;
+  if(!items.length)return;
+  const side=+document.getElementById('cMSide').value||0,top=+document.getElementById('cMTop').value||0;
+  const b=truckBounds(spec,side,top),weight=it=>it.kg??(+document.getElementById('cpKg').value||0);
+  const total=items.reduce((n,it)=>n+weight(it),0);
+  const cx=total?items.reduce((n,it)=>n+(it.x+it.pw/2)*weight(it),0)/total:spec.iL/2;
+  const cz=total?items.reduce((n,it)=>n+(it.z+it.pl/2)*weight(it),0)/total:spec.iW/2;
+  const dx=Math.max(b.x-Math.min(...items.map(it=>it.x)),Math.min(spec.iL/2-cx,b.x+b.w-Math.max(...items.map(it=>it.x+it.pw))));
+  const dz=Math.max(b.z-Math.min(...items.map(it=>it.z)),Math.min(spec.iW/2-cz,b.z+b.h-Math.max(...items.map(it=>it.z+it.pl))));
+  items.forEach(it=>{it.x+=dx;it.z+=dz;});
+  if(items.some((it,i)=>!palletFitsTruck(it,items.filter((_,j)=>i!==j),spec,side,top))){alert('Carico non bilanciabile con i vincoli attuali. Pallet mantenuti.');return;}
+  renderContainerPlan(spec,items,'pallets',{layout:'bilanciato',preserveContainers:true,originalItems:containerPlanState.originalItems});
+  syncPlanTo3D();buildBoxScene(GRP_C,lastC,0x3b82f6);renderRealLoadSimulation();
 }
 
-let containerLayoutCycle=0;
+// Optimise the inventory, never rebuild it from the main pallet input.
+function optimisePalletInventory(items,spec,side,top=0,variant=0){
+  const bounds=truckBounds(spec,side,top);
+  if(!items.length) return [];
+  if(items.reduce((n,it)=>n+(it.kg||0),0)>spec.maxP) return null;
+  if(items.some(it=>![it.pw,it.pl,it.pt,it.ch,it.y].every(Number.isFinite)||it.pw<=0||it.pl<=0||it.pt<=0||it.ch<0||it.y<0||it.y+it.pt+it.ch>bounds.height)) return null;
+  // Move existing stacks as columns, preserving their support and vertical order.
+  const groups=[];
+  for(const [index,it] of items.entries()){
+    let g=groups.find(g=>g.x===it.x&&g.z===it.z&&g.pw===it.pw&&g.pl===it.pl);
+    if(!g){g={x:it.x,z:it.z,pw:it.pw,pl:it.pl,members:[]};groups.push(g);}
+    g.members.push(index);
+  }
+  for(const g of groups){
+    const stack=g.members.map(i=>items[i]).sort((a,b)=>a.y-b.y);
+    if(stack[0].y!==0||stack.some((it,i)=>i&&it.y!==stack[i-1].y+stack[i-1].pt+stack[i-1].ch)) return null;
+  }
+  const candidates=[];
+  const valid=layout=>layout.every((it,i)=>palletFitsTruck(it,layout.filter((_,j)=>i!==j),spec,side,top));
+  const add=layout=>{if(valid(layout)) candidates.push(layout);};
+  add(items.map(it=>({...it})));
+  for(let strategy=0;strategy<12;strategy++){
+    const order=groups.slice().sort((a,b)=>{
+      const metric=g=>strategy%3===0?g.pw*g.pl:strategy%3===1?Math.max(g.pw,g.pl):Math.min(g.pw,g.pl);
+      return metric(b)-metric(a)||a.members[0]-b.members[0];
+    });
+    const placed=[],layout=new Array(items.length);
+    for(const g of order){
+      let best=null;
+      const xs=[bounds.x,...placed.map(it=>it.x+it.pw)],zs=[bounds.z,...placed.map(it=>it.z+it.pl)];
+      for(const x of xs)for(const z of zs)for(let turn=0;turn<2;turn++){
+        const pw=turn?g.pl:g.pw,pl=turn?g.pw:g.pl;
+        const probe={x,z,y:0,pw,pl,pt:1,ch:0};
+        if(!palletFitsTruck(probe,placed,spec,side,top)) continue;
+        const end=Math.max(x+pw,...placed.map(it=>it.x+it.pw));
+        const score=strategy<6?[end,x,z,turn===(strategy%2)?0:1]:[x,z,end,turn===(strategy%2)?0:1];
+        if(!best||score.some((v,i)=>v<best.score[i]&&score.slice(0,i).every((n,j)=>n===best.score[j]))) best={x,z,pw,pl,turn,score};
+      }
+      if(!best) break;
+      placed.push({...best,y:0,pt:bounds.height,ch:0});
+      for(const i of g.members)layout[i]={...items[i],x:best.x,z:best.z,pw:best.pw,pl:best.pl,rot:best.turn?!items[i].rot:items[i].rot};
+    }
+    if(layout.filter(Boolean).length===items.length) add(layout);
+  }
+  const score=layout=>Math.max(...layout.map(it=>it.x+it.pw))-Math.min(...layout.map(it=>it.x));
+  const seen=new Set();
+  const unique=candidates.sort((a,b)=>score(a)-score(b)).filter(layout=>{
+    const key=JSON.stringify(layout.map(it=>[it.x,it.z,it.pw,it.pl,it.y]));
+    if(seen.has(key))return false;seen.add(key);return true;
+  });
+  if(!unique.length)return null;
+  // Alternatives use the same compact footprint as the best complete solution.
+  const compact=unique.filter(layout=>score(layout)===score(unique[0]));
+  return compact[variant%compact.length];
+}
+let containerLayoutCycle=0,truckLayoutCycle=0;
 function cycleContainerLayout(){
   if(!containerPlanState.spec||containerPlanState.mode!=='pallets'){alert('Disponibile dopo un calcolo container in modalità Su Pallet.');return;}
-  containerLayoutCycle=(containerLayoutCycle+1)%3;
-  const spec=containerPlanState.spec, side=getPracticalMargins(spec,+document.getElementById('cMSide').value||0,+document.getElementById('cMTop').value||0).side;
-  const pL=+document.getElementById('cpL').value||1200, pW=+document.getElementById('cpW').value||800;
-  let positions=[];
-  if(containerLayoutCycle===0) positions=buildVehiclePalletLayout(spec,pL,pW,side).positions;
-  if(containerLayoutCycle===1) positions=buildStripedLayout(spec.iL-side*2,spec.iW-side*2,pL,pW,side,side).positions;
-  if(containerLayoutCycle===2) positions=packRectanglesMaxRects(spec.iL-side*2,spec.iW-side*2,pL,pW,true,600).map(r=>({x:side+r.x,z:side+r.y,pw:r.w,pl:r.h,rot:r.rot}));
-  const base=containerPlanState.items[0]||{pt:+document.getElementById('cpT').value||144,ch:+document.getElementById('cpCH').value||1200,type:'pallet',y:0};
-  containerPlanState.items=positions.slice(0,containerPlanState.items.length||positions.length).map(pos=>({...base,x:pos.x,z:pos.z,pw:pos.pw,pl:pos.pl,rot:pos.rot,type:'pallet',y:0}));
-  const names=['automatico misto','righe alternate','max-rects'];
-  const cur=getActiveContainerPlan(); if(cur){cur.items=clonePlanItems(containerPlanState.items);cur.layout=names[containerLayoutCycle];}
-  renderContainerPlan(spec,containerPlanState.items,containerPlanState.mode,{layout:names[containerLayoutCycle],preserveContainers:true,originalItems:containerPlanState.originalItems});
+  const spec=containerPlanState.spec;
+  const side=+document.getElementById('cMSide').value||0,top=+document.getElementById('cMTop').value||0;
+  const inventory=containerPlanState.items.map(it=>({...it,kg:it.kg??(+document.getElementById('cpKg').value||0)}));
+  const items=optimisePalletInventory(inventory,spec,side,top,containerLayoutCycle++);
+  if(!items){alert('Impossibile collocare tutti i pallet con i vincoli attuali. Il carico inserito è stato mantenuto.');return;}
+  const layout='ottimizzato · pallet inseriti';
+  renderContainerPlan(spec,items,'pallets',{layout,preserveContainers:true,originalItems:containerPlanState.originalItems});
   syncPlanTo3D();
+  buildBoxScene(GRP_C,lastC,0x3b82f6);
   renderRealLoadSimulation();
+}
+function cycleTruckLayout(){
+  if(!lastT||lastT.mode!=='pallets'){alert('Esegui prima un calcolo truck in modalità Su Pallet.');return;}
+  const items=optimisePalletInventory(lastT.items,lastT.spec,+document.getElementById('tMSide').value||0,+document.getElementById('tMTop').value||0,truckLayoutCycle++);
+  if(!items){alert('Impossibile collocare tutti i pallet con i vincoli attuali. Il carico inserito è stato mantenuto.');return;}
+  lastT.items=items;truckSelectedIndex=-1;refreshMixedTruck();
 }
 
 function swTab(n,btn){['box','pallet','visual'].forEach(t=>document.getElementById('tab-'+t).style.display=t===n?'block':'none');btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
@@ -4186,43 +4252,9 @@ let FUEL_LOADED = false;
 let FUEL_SOURCE = ''; // 'direct' | 'proxy' | 'fallback'
 
 const FUEL_CSV_URL = 'https://www.mimit.gov.it/images/stories/carburanti/MediaRegionaleStradale.csv';
-// Prima prova diretta; se il browser blocca per CORS, usa proxy pubblici in fallback.
-const FUEL_PROXIES = [
-  'https://corsproxy.io/?url=' + encodeURIComponent(FUEL_CSV_URL),
-  'https://api.allorigins.win/raw?url=' + encodeURIComponent(FUEL_CSV_URL),
-  'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(FUEL_CSV_URL),
-  'https://thingproxy.freeboard.io/fetch/' + FUEL_CSV_URL,
-  'https://cors.sh/' + FUEL_CSV_URL,
-];
-
-// ── STATIC FALLBACK (MIMIT data 09-03-2026) ─────────────────────────────────
-// Usato solo se tutti i proxy falliscono. Aggiornato automaticamente al prossimo
-// caricamento riuscito.
-const FUEL_FALLBACK_DATE = '09-03-2026';
-const FUEL_FALLBACK = [
-  {name:'Abruzzo',         fuels:{Benzina:{price:1.768,er:'SELF'},Gasolio:{price:1.942,er:'SELF'},GPL:{price:0.706,er:'SERVITO'},Metano:{price:1.429,er:'SERVITO'}}},
-  {name:'Basilicata',      fuels:{Benzina:{price:1.813,er:'SELF'},Gasolio:{price:1.968,er:'SELF'},GPL:{price:0.689,er:'SERVITO'},Metano:{price:1.512,er:'SERVITO'}}},
-  {name:'Calabria',        fuels:{Benzina:{price:1.820,er:'SELF'},Gasolio:{price:1.993,er:'SELF'},GPL:{price:0.744,er:'SERVITO'},Metano:{price:1.578,er:'SERVITO'}}},
-  {name:'Campania',        fuels:{Benzina:{price:1.783,er:'SELF'},Gasolio:{price:1.963,er:'SELF'},GPL:{price:0.657,er:'SERVITO'},Metano:{price:1.445,er:'SERVITO'}}},
-  {name:'Emilia Romagna',  fuels:{Benzina:{price:1.776,er:'SELF'},Gasolio:{price:1.961,er:'SELF'},GPL:{price:0.680,er:'SERVITO'},Metano:{price:1.455,er:'SERVITO'}}},
-  {name:'Friuli Venezia Giulia',fuels:{Benzina:{price:1.782,er:'SELF'},Gasolio:{price:1.972,er:'SELF'},GPL:{price:0.686,er:'SERVITO'},Metano:{price:1.440,er:'SERVITO'}}},
-  {name:'Lazio',           fuels:{Benzina:{price:1.766,er:'SELF'},Gasolio:{price:1.954,er:'SELF'},GPL:{price:0.681,er:'SERVITO'},Metano:{price:1.586,er:'SERVITO'}}},
-  {name:'Liguria',         fuels:{Benzina:{price:1.799,er:'SELF'},Gasolio:{price:1.972,er:'SELF'},GPL:{price:0.780,er:'SERVITO'},Metano:{price:1.460,er:'SERVITO'}}},
-  {name:'Lombardia',       fuels:{Benzina:{price:1.779,er:'SELF'},Gasolio:{price:1.976,er:'SELF'},GPL:{price:0.683,er:'SERVITO'},Metano:{price:1.450,er:'SERVITO'}}},
-  {name:'Marche',          fuels:{Benzina:{price:1.758,er:'SELF'},Gasolio:{price:1.946,er:'SELF'},GPL:{price:0.707,er:'SERVITO'},Metano:{price:1.378,er:'SERVITO'}}},
-  {name:'Molise',          fuels:{Benzina:{price:1.788,er:'SELF'},Gasolio:{price:1.968,er:'SELF'},GPL:{price:0.708,er:'SERVITO'},Metano:{price:1.423,er:'SERVITO'}}},
-  {name:'Piemonte',        fuels:{Benzina:{price:1.775,er:'SELF'},Gasolio:{price:1.976,er:'SELF'},GPL:{price:0.680,er:'SERVITO'},Metano:{price:1.470,er:'SERVITO'}}},
-  {name:'Puglia',          fuels:{Benzina:{price:1.790,er:'SELF'},Gasolio:{price:1.957,er:'SELF'},GPL:{price:0.668,er:'SERVITO'},Metano:{price:1.585,er:'SERVITO'}}},
-  {name:'Sardegna',        fuels:{Benzina:{price:1.784,er:'SELF'},Gasolio:{price:1.975,er:'SELF'},GPL:{price:0.804,er:'SERVITO'}}},
-  {name:'Sicilia',         fuels:{Benzina:{price:1.807,er:'SELF'},Gasolio:{price:1.990,er:'SELF'},GPL:{price:0.762,er:'SERVITO'},Metano:{price:1.761,er:'SERVITO'}}},
-  {name:'Toscana',         fuels:{Benzina:{price:1.774,er:'SELF'},Gasolio:{price:1.964,er:'SELF'},GPL:{price:0.701,er:'SERVITO'},Metano:{price:1.509,er:'SERVITO'}}},
-  {name:'Umbria',          fuels:{Benzina:{price:1.765,er:'SELF'},Gasolio:{price:1.949,er:'SELF'},GPL:{price:0.697,er:'SERVITO'},Metano:{price:1.418,er:'SERVITO'}}},
-  {name:"Valle d'Aosta",   fuels:{Benzina:{price:1.808,er:'SELF'},Gasolio:{price:1.985,er:'SELF'},GPL:{price:0.822,er:'SERVITO'}}},
-  {name:'Veneto',          fuels:{Benzina:{price:1.772,er:'SELF'},Gasolio:{price:1.970,er:'SELF'},GPL:{price:0.693,er:'SERVITO'},Metano:{price:1.415,er:'SERVITO'}}},
-  {name:'Bolzano',         fuels:{Benzina:{price:1.822,er:'SELF'},Gasolio:{price:2.008,er:'SELF'},GPL:{price:0.787,er:'SERVITO'},Metano:{price:1.641,er:'SERVITO'}}},
-  {name:'Trento',          fuels:{Benzina:{price:1.806,er:'SELF'},Gasolio:{price:1.993,er:'SELF'},GPL:{price:0.732,er:'SERVITO'},Metano:{price:1.521,er:'SERVITO'}}},
-];
-// ─────────────────────────────────────────────────────────────────────────────
+// The scheduled updater publishes a same-origin snapshot on GitHub Pages.
+const FUEL_SNAPSHOT_URL = 'data/fuel-prices.json';
+let FUEL_LAST_CHECK = 0, FUEL_IN_FLIGHT = null, FUEL_LAST_VALID = null;
 
 const FUEL_ICONS = {Benzina:'⛽', Gasolio:'🔵', GPL:'🟡', Metano:'⚪'};
 const REGION_FLAGS = {
@@ -4232,43 +4264,66 @@ const REGION_FLAGS = {
   'Umbria':'🌄',"Valle d'Aosta":'⛷','Veneto':'🎭','Bolzano':'🏔','Trento':'🦌'
 };
 
+const FUEL_REGION_NAMES=['Abruzzo','Basilicata','Calabria','Campania','Emilia Romagna','Friuli Venezia Giulia','Lazio','Liguria','Lombardia','Marche','Molise','Piemonte','Puglia','Sardegna','Sicilia','Toscana','Umbria',"Valle d'Aosta",'Veneto','Bolzano','Trento'];
+function canonicalFuelRegion(value){
+  const key=value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/provincia( autonoma)? di /g,'').replace(/[^a-z]/g,'');
+  return FUEL_REGION_NAMES.find(name=>name.toLowerCase().replace(/[^a-z]/g,'')===key);
+}
+function fuelDateISO(value){
+  const match=String(value||'').match(/\b(\d{2})[-/](\d{2})[-/](\d{4})\b/);
+  if(!match)return null;
+  const iso=`${match[3]}-${match[2]}-${match[1]}`;
+  const date=new Date(iso+'T00:00:00Z');
+  return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===iso?iso:null;
+}
 function parseFuelCSV(text){
-  text = text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-  const allLines = text.split('\n').map(l=>l.trim()).filter(Boolean);
-  if(allLines.length < 3) return null;
-  // MIMIT format: line 0 = "Aggiornamento DD-MM-YYYY", line 1 = header, line 2+ = data
-  const sep = allLines[0].includes(';') || allLines[1].includes(';') ? ';' : ',';
-  const updateLine = allLines.find(l => /aggiornamento/i.test(l));
-  const updateDate = updateLine ? updateLine.replace(/aggiornamento\s*/i,'').trim() : null;
-  // Find start of data: skip date line + header line
-  let dataStart = 0;
-  for(let i=0;i<Math.min(3,allLines.length);i++){
-    if(/aggiornamento/i.test(allLines[i])) dataStart = Math.max(dataStart, i+1);
-    if(/REGIONE|TIPOLOGIA/i.test(allLines[i])) dataStart = Math.max(dataStart, i+1);
+  const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const date=lines.slice(0,3).map(line=>line.match(/\b\d{2}[-/]\d{2}[-/]\d{4}\b/)?.[0]).find(Boolean);
+  if(!fuelDateISO(date))return null;
+  const regions={};
+  for(const line of lines){
+    const cols=line.split(line.includes(';')?';':',').map(s=>s.replace(/^"|"$/g,'').trim());
+    if(cols.length<4)continue;
+    const [rawName,rawType,rawMode,rawPrice]=cols;
+    const name=canonicalFuelRegion(rawName);
+    const type=({benzina:'Benzina',gasolio:'Gasolio',gpl:'GPL',metano:'Metano'})[rawType.toLowerCase()];
+    const mode=rawMode.toUpperCase(),price=Number(rawPrice.replace(',','.'));
+    if(!type||!name||!Number.isFinite(price)||price<=0||price>10)continue;
+    if(mode!==(type==='Benzina'||type==='Gasolio'?'SELF':'SERVITO'))continue;
+    if(!regions[name])regions[name]={name,fuels:{}};
+    regions[name].fuels[type]={price,er:mode};
   }
-  const regions = {};
-  for(let i=dataStart; i<allLines.length; i++){
-    const cols = allLines[i].split(sep).map(s=>s.replace(/^["']+|["']+$/g,'').trim());
-    if(cols.length < 4) continue;
-    const region = cols[0];
-    const tipo   = cols[1];
-    const erog   = cols[2].toUpperCase();
-    const price  = parseFloat(cols[3].replace(',','.'));
-    if(!region || !tipo || isNaN(price) || price <= 0 || price > 10) continue;
-    if(!regions[region]) regions[region] = {name:region, fuels:{}};
-    const wantSelf = (tipo==='Benzina' || tipo==='Gasolio');
-    const wantServ = (tipo==='GPL' || tipo==='Metano');
-    const goodMode = (wantSelf && erog==='SELF') || (wantServ && erog==='SERVITO');
-    if(!regions[region].fuels[tipo] || goodMode){
-      regions[region].fuels[tipo] = {price, er:erog};
-    }
+  const data=Object.values(regions);
+  if(data.length<20||data.length>21||data.some(r=>!r.fuels.Benzina||!r.fuels.Gasolio))return null;
+  return {data,date};
+}
+function parseFuelHTML(html){
+  const plain=text=>text.replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/g,' ').replace(/&rsquo;|&#39;|&apos;/g,"'").replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+  const date=plain(html).match(/Aggiornamento\s+(\d{2}[-/]\d{2}[-/]\d{4})/i)?.[1];
+  if(!date)return null;
+  const csv=['Aggiornamento '+date,'Regione;Tipologia;Erogazione;Prezzo'];
+  let region=null;
+  for(const match of html.matchAll(/<h[1-6]\b[^>]*>[\s\S]*?<\/h[1-6]>|<tr\b[^>]*>[\s\S]*?<\/tr>/gi)){
+    const fragment=match[0];
+    if(/^<h/i.test(fragment)){region=canonicalFuelRegion(plain(fragment));continue;}
+    if(!region)continue;
+    const cells=[...fragment.matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(cell=>plain(cell[1]));
+    if(cells.length===3)csv.push([region,...cells].join(';'));
   }
-  const result = Object.values(regions).filter(r=>Object.keys(r.fuels).length>0);
-  if(result.length < 10) return null;
-  return {data: result, date: updateDate};
+  return parseFuelCSV(csv.join('\n'));
+}
+function validateFuelSnapshot(value){
+  if(!value||!fuelDateISO(value.date)||!Array.isArray(value.data))return null;
+  // Reuse exactly the CSV validation used by the scheduled updater.
+  const csv=['Aggiornamento '+value.date,'Regione;Tipologia;Erogazione;Prezzzo'];
+  for(const region of value.data){
+    if(typeof region.name!=='string'||!region.fuels)return null;
+    for(const [type,fuel] of Object.entries(region.fuels))csv.push([region.name,type,fuel.er,fuel.price].join(';'));
+  }
+  return parseFuelCSV(csv.join('\n'));
 }
 
-function fuelPriceFmt(p){ return p ? '€\u202f'+p.toFixed(3) : '—'; }
+function fuelPriceFmt(p){ return Number.isFinite(p)&&p>0 ? '€\u202f'+p.toFixed(3) : '—'; }
 
 function renderFuelCards(){
   if(!FUEL_DATA.length) return;
@@ -4324,101 +4379,59 @@ function renderFuelCards(){
     '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);">Nessuna regione trovata.</div>';
 }
 
-async function fetchWithTimeout(url, timeoutMs, force){
-  const ctrl = new AbortController();
-  const tid = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, {
-      cache: force ? 'no-cache' : 'default',
-      signal: ctrl.signal
-    });
-    clearTimeout(tid);
-    if(!res.ok) return null;
-    return await res.text();
-  } catch(e) {
-    clearTimeout(tid);
-    return null;
-  }
+async function fetchWithTimeout(url, timeoutMs){
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),timeoutMs);
+  try{
+    const response=await fetch(url,{cache:'no-store',signal:ctrl.signal});
+    return response.ok?await response.text():null;
+  }catch(error){return null;}finally{clearTimeout(timer);}
 }
-
-async function tryFetchCSV(url, force){
-  const text = await fetchWithTimeout(url, 7000, force);
-  if(!text) return null;
-  return parseFuelCSV(text);
+function readFuelCache(){
+  try{return validateFuelSnapshot(JSON.parse(localStorage.getItem('chepallet-fuel-v1')));}catch(error){return null;}
 }
-
+function fuelPublicationStatus(date){
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const part=type=>parts.find(p=>p.type===type).value;
+  const today=`${part('year')}-${part('month')}-${part('day')}`;
+  return fuelDateISO(date)===today?'aggiornati oggi':'non aggiornati a oggi';
+}
 async function loadFuelData(force=false){
-  if(FUEL_LOADED && !force) return;
-  FUEL_LOADED = false;
-  const btn = document.getElementById('fuelRefreshBtn');
-  const dot = document.getElementById('fuelDot');
-  const lbl = document.getElementById('fuelUpdateLabel');
-  const noteEl = document.getElementById('fuelNote');
-  const gridEl = document.getElementById('fuelGrid');
-  if(btn) btn.disabled = true;
-  dot.style.background = '#f0a500'; dot.style.animation = 'blink 2s infinite';
-  lbl.textContent = '⏳ Connessione a MIMIT…';
-  gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Recupero prezzi dal CSV ufficiale MIMIT…</div>';
-
-  let parsed = null;
-  let source = '';
-
-  // 1) Fetch diretta (funziona se il browser/estensione rimuove CORS o se MIMIT aggiunge headers)
-  lbl.textContent = '⏳ Tentativo diretto MIMIT…';
-  parsed = await tryFetchCSV(FUEL_CSV_URL, force);
-  if(parsed) source = 'direct';
-
-  // 2) Fetch parallela su tutti i proxy — vince il primo che risponde con dati validi
-  if(!parsed){
-    lbl.textContent = '⏳ Connessione via proxy CORS…';
-    parsed = await new Promise(resolve => {
-      let settled = false;
-      let pending = FUEL_PROXIES.length;
-      if(pending === 0){ resolve(null); return; }
-      FUEL_PROXIES.forEach(async url => {
-        const result = await tryFetchCSV(url, force);
-        pending--;
-        if(!settled && result){ settled = true; resolve(result); }
-        else if(!settled && pending === 0){ resolve(null); }
-      });
-    });
-    if(parsed) source = 'proxy';
-  }
-
-  // 3) Fallback statico
-  if(!parsed){
-    parsed = { data: FUEL_FALLBACK, date: FUEL_FALLBACK_DATE };
-    source = 'fallback';
-  }
-
-  FUEL_DATA   = parsed.data;
-  FUEL_LOADED = true;
-  FUEL_SOURCE = source;
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  const csvDate = parsed.date || '—';
-
-  if(source === 'direct'){
-    dot.style.background = '#22c55e'; dot.style.animation = 'blink 2s infinite';
-    lbl.textContent = `✓ Live MIMIT · aggiornato al ${csvDate} · ${timeStr}`;
-    noteEl.textContent = `Dati letti direttamente da MediaRegionaleStradale.csv (MIMIT). Aggiornamento MIMIT: ${csvDate}. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.`;
-  } else if(source === 'proxy'){
-    dot.style.background = '#22c55e'; dot.style.animation = 'blink 2s infinite';
-    lbl.textContent = `✓ Live via proxy · aggiornato al ${csvDate} · ${timeStr}`;
-    noteEl.innerHTML = `Dati MIMIT via proxy CORS. Aggiornamento MIMIT: <b>${csvDate}</b>. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale.`;
-  } else {
-    dot.style.background = '#f0a500'; dot.style.animation = 'blink 2s infinite';
-    lbl.textContent = `⚠ Offline — dati di riserva del ${FUEL_FALLBACK_DATE}`;
-    noteEl.innerHTML = `Impossibile raggiungere il CSV MIMIT. Dati di riserva del <b>${FUEL_FALLBACK_DATE}</b>. Riprova con 🔄 o <a href="https://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni" target="_blank" style="color:#e11d48;">vai al sito MIMIT →</a>`;
-  }
-
-  renderFuelCards();
-  if(btn) btn.disabled = false;
+  if(FUEL_IN_FLIGHT)return FUEL_IN_FLIGHT;
+  if(FUEL_LOADED&&!force&&Date.now()-FUEL_LAST_CHECK<15*60*1000)return;
+  FUEL_IN_FLIGHT=refreshFuelData();
+  try{await FUEL_IN_FLIGHT;}finally{FUEL_IN_FLIGHT=null;}
 }
-
-async function initFuel(){
-  await loadFuelData(false);
+async function refreshFuelData(){
+  const btn=document.getElementById('fuelRefreshBtn'),dot=document.getElementById('fuelDot'),label=document.getElementById('fuelUpdateLabel'),note=document.getElementById('fuelNote');
+  btn.disabled=true;label.textContent='⏳ Aggiornamento prezzi MIMIT…';
+  try{
+    const [snapshot,direct]=await Promise.all([
+      fetchWithTimeout(FUEL_SNAPSHOT_URL+'?t='+Date.now(),10000).then(text=>{try{return validateFuelSnapshot(JSON.parse(text));}catch(error){return null;}}),
+      fetchWithTimeout(FUEL_CSV_URL,8000).then(text=>text?parseFuelCSV(text):null)
+    ]);
+    const choices=[{data:direct,source:'direct'},{data:snapshot,source:'snapshot'},{data:FUEL_LAST_VALID||readFuelCache(),source:'cache'}].filter(c=>c.data);
+    choices.sort((a,b)=>fuelDateISO(b.data.date).localeCompare(fuelDateISO(a.data.date)));
+    const best=choices[0];
+    if(!best){
+      FUEL_DATA=[];FUEL_LOADED=false;
+      label.textContent='⚠ Prezzi aggiornati non disponibili';
+      document.getElementById('fuelGrid').textContent='Impossibile recuperare i prezzi MIMIT. Riprova con Aggiorna.';
+      ['fk-benz','fk-gas','fk-gpl','fk-met'].forEach(id=>document.getElementById(id).textContent='—');
+      note.textContent='Nessun dato verificato disponibile. Consulta il sito MIMIT.';
+      dot.style.background='#f0a500';dot.style.animation='none';return;
+    }
+    FUEL_LAST_VALID=best.data;FUEL_DATA=best.data.data;FUEL_SOURCE=best.source;FUEL_LOADED=true;FUEL_LAST_CHECK=Date.now();
+    try{localStorage.setItem('chepallet-fuel-v1',JSON.stringify(best.data));}catch(error){}
+    const status=fuelPublicationStatus(best.data.date),fresh=status==='aggiornati oggi';
+    dot.style.background=fresh&&best.source!=='cache'?'#22c55e':'#f0a500';dot.style.animation='none';
+    label.textContent=`${fresh?'✓':'⚠'} MIMIT · ${best.data.date} · ${status}${best.source==='cache'?' · copia salvata':''}`;
+    note.textContent=`Data di pubblicazione MIMIT: ${best.data.date}. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale. Aggiornamento automatico giornaliero; se la fonte non risponde viene mantenuta l’ultima copia verificata con la sua data.`;
+    renderFuelCards();
+  }finally{btn.disabled=false;}
 }
+async function initFuel(){await loadFuelData();}
+setInterval(()=>{if(document.visibilityState==='visible')loadFuelData();},15*60*1000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadFuelData();});
 
 // Init
 toggleOvhField();
