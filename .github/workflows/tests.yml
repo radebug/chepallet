@@ -1,0 +1,27 @@
+name: Load planner regression tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - tests/**
+      - scripts/**
+      - .github/workflows/tests.yml
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node tests/container-capacities.cjs
+          node tests/truck-pallets.cjs
+          node tests/container-floor-mixed.cjs
+          node tests/mixed-layout-alternatives.cjs
+          node tests/fuel-data.cjs
+          node --check scripts/update-fuel.cjs

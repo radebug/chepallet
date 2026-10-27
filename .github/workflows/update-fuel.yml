@@ -1,0 +1,52 @@
+name: Update MIMIT fuel prices
+on:
+  schedule:
+    - cron: '45 7,10 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/update-fuel.cjs
+      - .github/workflows/update-fuel.yml
+permissions:
+  contents: write
+concurrency:
+  group: fuel-prices
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/update-fuel.cjs
+      - name: Publish validated snapshot
+        run: |
+          git add data/fuel-prices.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Refresh official MIMIT fuel prices'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      # GITHUB_TOKEN commits do not trigger a second Pages workflow/build.
+      - name: Build Pages artifact with updated snapshot
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+  deploy:
+    needs: update
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy updated prices to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
