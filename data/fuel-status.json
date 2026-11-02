@@ -1,6 +1,0 @@
-{
-  "state": "unavailable",
-  "date": null,
-  "error": "https://www.mimit.gov.it/images/stories/carburanti/MediaRegionaleStradale.csv: curl: (28) Failed to connect to www.mimit.gov.it port 443 after 15073 ms: Timeout was reached\ncurl: (28) Failed to connect to www.mimit.gov.it port 443 after 15009 ms: Timeout was reached\ncurl: (28) Failed to connect to www.mimit.gov.it port 443 after 15039 ms: Timeout was reached\nhttps://www.mimit.gov.it/it/prezzo-medio-carburanti/regioni: curl: (28) Failed to connect to www.mimit.gov.it port 443 after 15077 ms: Timeout was reached\ncurl: (28) Failed to connect to www.mimit.gov.it port 443 after 15082 ms: Timeout was reached\ncurl: (28) Failed to connect to www.mimit.gov.it port 443 after 15066 ms: Timeout was reached",
-  "checkedAt": "2026-11-02T13:32:25.702Z"
-}

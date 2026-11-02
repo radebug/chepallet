@@ -21,7 +21,7 @@
 #mixedFloorRows input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 5px;color:var(--text);font:inherit}
 #mixedFloorRows input:focus{outline:1px solid var(--blue)}
 @media(max-width:700px){#page-container .rc>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}#page-container .csg{grid-template-columns:repeat(2,minmax(0,1fr))}#page-container .plan-dimrow{flex-wrap:wrap;gap:6px}}
-:root{--bg:#0a0c10;--surface:#111318;--surface2:#181b22;--border:#252932;--accent:#f0a500;--accent2:#e05c2a;--blue:#3b82f6;--teal:#14b8a6;--fuel:#e11d48;--text:#eef0f4;--muted:#6b7280;--green:#22c55e;--radius:12px;}
+:root{--bg:#0a0c10;--surface:#111318;--surface2:#181b22;--border:#252932;--accent:#f0a500;--accent2:#e05c2a;--blue:#3b82f6;--teal:#14b8a6;--text:#eef0f4;--muted:#6b7280;--green:#22c55e;--radius:12px;}
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;background-size:cover;background-position:center;background-attachment:fixed;}
 body.bg-soft{background-image:radial-gradient(circle at 20% 10%,rgba(59,130,246,.16),transparent 30%),radial-gradient(circle at 80% 20%,rgba(240,165,0,.12),transparent 28%);}
@@ -228,40 +228,6 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .plan-dimrow.top{margin-bottom:2px;}
 .plan-dimrow.bottom{margin-top:2px;}
 
-/* FUEL PAGE */
-.nav-btn.nf{background:rgba(225,29,72,0.08);}
-.nav-btn.nf.active{background:var(--fuel,#e11d48);color:#fff;}
-.hero.fh::before{background:radial-gradient(ellipse,rgba(225,29,72,0.1) 0%,transparent 70%);}
-.hero h1 em.f{color:#e11d48;}
-.fuel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;padding:20px 32px 56px;max-width:1440px;margin:0 auto;}
-.fuel-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s;}
-.fuel-card:hover{border-color:#e11d48;}
-.fuel-card-head{padding:11px 15px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.fuel-card-head h3{font-family:'Syne',sans-serif;font-size:.84rem;font-weight:700;letter-spacing:.02em;}
-.fuel-card-body{padding:12px 15px;display:flex;flex-direction:column;gap:8px;}
-.fuel-row{display:flex;align-items:center;gap:10px;}
-.fuel-icon{font-size:1.1rem;width:26px;text-align:center;flex-shrink:0;}
-.fuel-label{font-size:.7rem;color:var(--muted);flex:1;}
-.fuel-price{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);}
-.fuel-price.low{color:#22c55e;}
-.fuel-price.high{color:#e11d48;}
-.fuel-badge{font-size:.58rem;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.07);color:var(--muted);white-space:nowrap;}
-.fuel-meta{display:flex;justify-content:space-between;align-items:center;font-size:.62rem;color:var(--muted);padding:3px 0 0;}
-.fuel-bar{height:3px;border-radius:2px;margin-top:3px;background:linear-gradient(90deg,#22c55e,#e11d48);}
-.fuel-status{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--muted);margin-bottom:4px;}
-.fuel-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
-.fuel-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 32px 14px;max-width:1440px;margin:0 auto;}
-.fuel-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center;}
-.fuel-kpi .k{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#e11d48;}
-.fuel-kpi .l{font-size:.64rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
-.fuel-filter-bar{display:flex;align-items:center;gap:10px;padding:0 32px 14px;max-width:1440px;margin:0 auto;flex-wrap:wrap;}
-.fuel-filter-bar select,.fuel-filter-bar input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:.75rem;outline:none;}
-.fuel-filter-bar select:focus,.fuel-filter-bar input:focus{border-color:#e11d48;}
-.fuel-refresh-btn{padding:7px 14px;background:#e11d48;color:#fff;border:none;border-radius:7px;font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:filter .2s;}
-.fuel-refresh-btn:hover{filter:brightness(1.15);}
-.fuel-refresh-btn:disabled{opacity:.5;cursor:not-allowed;}
-.fuel-note{font-size:.65rem;color:var(--muted);padding:0 32px 20px;max-width:1440px;margin:0 auto;line-height:1.6;}
 .theme-ctl{display:flex;gap:6px;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:4px 8px;font-size:.62rem;color:var(--muted);}
 .theme-ctl select{background:transparent;border:none;color:var(--text);font-family:'DM Mono',monospace;font-size:.66rem;outline:none;cursor:pointer;}
 body.theme-ocean{--accent:#38bdf8;--accent2:#0ea5e9;--blue:#2563eb;--teal:#06b6d4;}
@@ -278,7 +244,6 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
 .form-icon{width:34px;height:34px;display:grid;gap:1px;padding:2px;border:1px solid currentColor;}
 .form-icon span{border:1px solid currentColor;min-width:3px;min-height:3px;opacity:.9;}
 
-@media(max-width:960px){.fuel-grid{padding:12px;}.fuel-kpi-grid{grid-template-columns:repeat(2,1fr);padding:0 12px 12px;}.fuel-filter-bar{padding:0 12px 12px;}.fuel-note{padding:0 12px 16px;}}
 
 /* TOOLS */
 .nav-btn.ns{background:rgba(99,102,241,0.08);}
@@ -375,7 +340,6 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
     <button class="nav-btn nt" onclick="showPage('truck',this)">🚛 Truck</button>
     <button class="nav-btn nt" onclick="showPage('remaining',this)">🪵 Spazio residuo</button>
     <button class="nav-btn nr" onclick="showPage('routes',this);initRoutes()">🌍 Routes</button>
-    <button class="nav-btn nf" onclick="showPage('fuel',this);initFuel()">⛽ Carburanti</button>
     <button class="nav-btn ns" onclick="showPage('tools',this);initTools()">🛠 Strumenti</button>
   </nav>
   <div class="header-badge">v4.6</div><div class="theme-ctl">Tema <select id="siteTheme" onchange="setSiteTheme(this.value)"><option value="dark">Dark</option><option value="light">Light</option><option value="ocean">Ocean</option><option value="redblue">Rosso/Blu</option><option value="green">Green</option><option value="purple">Purple</option></select> Sfondo <select id="siteBg" onchange="setSiteBackground(this.value)"><option value="none">Base</option><option value="soft">Soft</option><option value="grid">Griglia</option></select></div>
@@ -911,38 +875,6 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
 </div>
 </div>
 
-<!-- ═══════════════════ FUEL PAGE ═══════════════════ -->
-<div id="page-fuel" class="page">
-<section class="hero fh">
-  <h1>Prezzi <br><em class="f">carburanti</em> per regione</h1>
-  <p>Dati ufficiali MIMIT aggiornati ogni mattina. Fonte: MediaRegionaleStradale.csv · Rete extra-autostradale.</p>
-</section>
-
-<div class="fuel-kpi-grid">
-  <div class="fuel-kpi"><div class="k" id="fk-benz">—</div><div class="l">⛽ Benzina minima</div></div>
-  <div class="fuel-kpi"><div class="k" id="fk-gas">—</div><div class="l">🔵 Gasolio minimo</div></div>
-  <div class="fuel-kpi"><div class="k" id="fk-gpl">—</div><div class="l">🟡 GPL minimo</div></div>
-  <div class="fuel-kpi"><div class="k" id="fk-met">—</div><div class="l">⚪ Metano minimo</div></div>
-</div>
-
-<div class="fuel-filter-bar">
-  <div class="fuel-status"><div class="fuel-dot" id="fuelDot" style="background:#6b7280;animation:none;"></div><span id="fuelUpdateLabel">Scheda non ancora caricata</span></div>
-  <select id="fuelSortBy" onchange="renderFuelCards()">
-    <option value="region">Ordina per regione</option>
-    <option value="benz_asc">Benzina ↑</option>
-    <option value="benz_desc">Benzina ↓</option>
-    <option value="gas_asc">Gasolio ↑</option>
-    <option value="gas_desc">Gasolio ↓</option>
-  </select>
-  <input type="text" id="fuelSearch" placeholder="Filtra regione…" oninput="renderFuelCards()" style="max-width:160px;">
-  <button class="fuel-refresh-btn" id="fuelRefreshBtn" onclick="loadFuelData(true)">🔄 Aggiorna</button>
-</div>
-
-<div class="fuel-grid" id="fuelGrid">
-  <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">⏳ Caricamento prezzi carburanti in corso…</div>
-</div>
-<div class="fuel-note" id="fuelNote"></div>
-</div>
 <div id="page-tools" class="page">
 <section class="hero sh">
   <h1>Strumenti <em class="si">logistici</em></h1>
@@ -4246,200 +4178,11 @@ function syncContainerUnitsType(){
   }
 }
 
-// ══════ CARBURANTI (MIMIT CSV) ══════
-let FUEL_DATA = [];
-let FUEL_LOADED = false;
-let FUEL_SOURCE = ''; // 'direct' | 'proxy' | 'fallback'
-
-const FUEL_CSV_URL = 'https://www.mimit.gov.it/images/stories/carburanti/MediaRegionaleStradale.csv';
-// The scheduled updater publishes a same-origin snapshot on GitHub Pages.
-const FUEL_SNAPSHOT_URL = 'data/fuel-prices.json';
-let FUEL_LAST_CHECK = 0, FUEL_IN_FLIGHT = null, FUEL_LAST_VALID = null;
-
-const FUEL_ICONS = {Benzina:'⛽', Gasolio:'🔵', GPL:'🟡', Metano:'⚪'};
-const REGION_FLAGS = {
-  'Abruzzo':'🏔','Basilicata':'🌾','Calabria':'🌊','Campania':'🌋','Emilia Romagna':'🧀',
-  'Friuli Venezia Giulia':'🦅','Lazio':'🏛','Liguria':'⚓','Lombardia':'🏭','Marche':'🌅',
-  'Molise':'🌿','Piemonte':'🍷','Puglia':'🫒','Sardegna':'🏖','Sicilia':'🍊','Toscana':'🌻',
-  'Umbria':'🌄',"Valle d'Aosta":'⛷','Veneto':'🎭','Bolzano':'🏔','Trento':'🦌'
-};
-
-const FUEL_REGION_NAMES=['Abruzzo','Basilicata','Calabria','Campania','Emilia Romagna','Friuli Venezia Giulia','Lazio','Liguria','Lombardia','Marche','Molise','Piemonte','Puglia','Sardegna','Sicilia','Toscana','Umbria',"Valle d'Aosta",'Veneto','Bolzano','Trento'];
-function canonicalFuelRegion(value){
-  const key=value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/provincia( autonoma)? di /g,'').replace(/[^a-z]/g,'');
-  return FUEL_REGION_NAMES.find(name=>name.toLowerCase().replace(/[^a-z]/g,'')===key);
-}
-function fuelDateISO(value){
-  const match=String(value||'').match(/\b(\d{2})[-/](\d{2})[-/](\d{4})\b/);
-  if(!match)return null;
-  const iso=`${match[3]}-${match[2]}-${match[1]}`;
-  const date=new Date(iso+'T00:00:00Z');
-  return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===iso?iso:null;
-}
-function parseFuelCSV(text){
-  const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-  const date=lines.slice(0,3).map(line=>line.match(/\b\d{2}[-/]\d{2}[-/]\d{4}\b/)?.[0]).find(Boolean);
-  if(!fuelDateISO(date))return null;
-  const regions={};
-  for(const line of lines){
-    const cols=line.split(line.includes(';')?';':',').map(s=>s.replace(/^"|"$/g,'').trim());
-    if(cols.length<4)continue;
-    const [rawName,rawType,rawMode,rawPrice]=cols;
-    const name=canonicalFuelRegion(rawName);
-    const type=({benzina:'Benzina',gasolio:'Gasolio',gpl:'GPL',metano:'Metano'})[rawType.toLowerCase()];
-    const mode=rawMode.toUpperCase(),price=Number(rawPrice.replace(',','.'));
-    if(!type||!name||!Number.isFinite(price)||price<=0||price>10)continue;
-    if(mode!==(type==='Benzina'||type==='Gasolio'?'SELF':'SERVITO'))continue;
-    if(!regions[name])regions[name]={name,fuels:{}};
-    regions[name].fuels[type]={price,er:mode};
-  }
-  const data=Object.values(regions);
-  if(data.length<20||data.length>21||data.some(r=>!r.fuels.Benzina||!r.fuels.Gasolio))return null;
-  return {data,date};
-}
-function parseFuelHTML(html){
-  const plain=text=>text.replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/g,' ').replace(/&rsquo;|&#39;|&apos;/g,"'").replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
-  const date=plain(html).match(/Aggiornamento\s+(\d{2}[-/]\d{2}[-/]\d{4})/i)?.[1];
-  if(!date)return null;
-  const csv=['Aggiornamento '+date,'Regione;Tipologia;Erogazione;Prezzo'];
-  let region=null;
-  for(const match of html.matchAll(/<h[1-6]\b[^>]*>[\s\S]*?<\/h[1-6]>|<tr\b[^>]*>[\s\S]*?<\/tr>/gi)){
-    const fragment=match[0];
-    if(/^<h/i.test(fragment)){region=canonicalFuelRegion(plain(fragment));continue;}
-    if(!region)continue;
-    const cells=[...fragment.matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(cell=>plain(cell[1]));
-    if(cells.length===3)csv.push([region,...cells].join(';'));
-  }
-  return parseFuelCSV(csv.join('\n'));
-}
-function validateFuelSnapshot(value){
-  if(!value||!fuelDateISO(value.date)||!Array.isArray(value.data))return null;
-  // Reuse exactly the CSV validation used by the scheduled updater.
-  const csv=['Aggiornamento '+value.date,'Regione;Tipologia;Erogazione;Prezzzo'];
-  for(const region of value.data){
-    if(typeof region.name!=='string'||!region.fuels)return null;
-    for(const [type,fuel] of Object.entries(region.fuels))csv.push([region.name,type,fuel.er,fuel.price].join(';'));
-  }
-  return parseFuelCSV(csv.join('\n'));
-}
-
-function fuelPriceFmt(p){ return Number.isFinite(p)&&p>0 ? '€\u202f'+p.toFixed(3) : '—'; }
-
-function renderFuelCards(){
-  if(!FUEL_DATA.length) return;
-  const sort   = document.getElementById('fuelSortBy').value;
-  const search = (document.getElementById('fuelSearch').value||'').toLowerCase();
-
-  const prices = t => FUEL_DATA.map(r=>r.fuels[t]?.price).filter(Boolean);
-  const minOf  = t => Math.min(...prices(t));
-  const maxOf  = t => Math.max(...prices(t));
-  const mins   = {Benzina:minOf('Benzina'),Gasolio:minOf('Gasolio'),GPL:minOf('GPL'),Metano:minOf('Metano')};
-  const maxs   = {Benzina:maxOf('Benzina'),Gasolio:maxOf('Gasolio')};
-
-  // KPIs
-  ['Benzina','Gasolio','GPL','Metano'].forEach((t,i)=>{
-    const id=['fk-benz','fk-gas','fk-gpl','fk-met'][i];
-    const m=mins[t]; const r=FUEL_DATA.find(x=>x.fuels[t]?.price===m);
-    document.getElementById(id).innerHTML=`${fuelPriceFmt(m)}<br><span style="font-size:.6rem;font-weight:400;color:var(--muted)">${r?.name||'—'}</span>`;
-  });
-
-  let data = [...FUEL_DATA];
-  if(search) data = data.filter(r=>r.name.toLowerCase().includes(search));
-  const g = k => (f,v) => (f.fuels[k]?.price||v);
-  if     (sort==='benz_asc')  data.sort((a,b)=>g('Benzina')(a,99) - g('Benzina')(b,99));
-  else if(sort==='benz_desc') data.sort((a,b)=>g('Benzina')(b,0)  - g('Benzina')(a,0));
-  else if(sort==='gas_asc')   data.sort((a,b)=>g('Gasolio')(a,99) - g('Gasolio')(b,99));
-  else if(sort==='gas_desc')  data.sort((a,b)=>g('Gasolio')(b,0)  - g('Gasolio')(a,0));
-  else data.sort((a,b)=>a.name.localeCompare(b.name,'it'));
-
-  const pc = (p,t) => {
-    if(!p) return '';
-    if(p===mins[t]) return ' low';
-    if(maxs[t]&&p===maxs[t]) return ' high';
-    return '';
-  };
-
-  const html = data.map(r=>{
-    const flag = REGION_FLAGS[r.name]||'📍';
-    const rows = ['Benzina','Gasolio','GPL','Metano'].map(t=>{
-      const f=r.fuels[t]; if(!f) return '';
-      return `<div class="fuel-row">
-        <span class="fuel-icon">${FUEL_ICONS[t]}</span>
-        <span class="fuel-label">${t} <span class="fuel-badge">${f.er}</span></span>
-        <span class="fuel-price${pc(f.price,t)}">${fuelPriceFmt(f.price)}</span>
-      </div>`;
-    }).join('');
-    return `<div class="fuel-card">
-      <div class="fuel-card-head"><h3>${flag} ${r.name}</h3></div>
-      <div class="fuel-card-body">${rows||'<span style="color:var(--muted);font-size:.74rem;">Dati non disponibili</span>'}</div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('fuelGrid').innerHTML = html ||
-    '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);">Nessuna regione trovata.</div>';
-}
-
-async function fetchWithTimeout(url, timeoutMs){
-  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),timeoutMs);
-  try{
-    const response=await fetch(url,{cache:'no-store',signal:ctrl.signal});
-    return response.ok?await response.text():null;
-  }catch(error){return null;}finally{clearTimeout(timer);}
-}
-function readFuelCache(){
-  try{return validateFuelSnapshot(JSON.parse(localStorage.getItem('chepallet-fuel-v1')));}catch(error){return null;}
-}
-function fuelPublicationStatus(date){
-  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
-  const part=type=>parts.find(p=>p.type===type).value;
-  const today=`${part('year')}-${part('month')}-${part('day')}`;
-  return fuelDateISO(date)===today?'aggiornati oggi':'non aggiornati a oggi';
-}
-async function loadFuelData(force=false){
-  if(FUEL_IN_FLIGHT)return FUEL_IN_FLIGHT;
-  if(FUEL_LOADED&&!force&&Date.now()-FUEL_LAST_CHECK<15*60*1000)return;
-  FUEL_IN_FLIGHT=refreshFuelData();
-  try{await FUEL_IN_FLIGHT;}finally{FUEL_IN_FLIGHT=null;}
-}
-async function refreshFuelData(){
-  const btn=document.getElementById('fuelRefreshBtn'),dot=document.getElementById('fuelDot'),label=document.getElementById('fuelUpdateLabel'),note=document.getElementById('fuelNote');
-  btn.disabled=true;label.textContent='⏳ Aggiornamento prezzi MIMIT…';
-  try{
-    const [snapshot,direct]=await Promise.all([
-      fetchWithTimeout(FUEL_SNAPSHOT_URL+'?t='+Date.now(),10000).then(text=>{try{return validateFuelSnapshot(JSON.parse(text));}catch(error){return null;}}),
-      fetchWithTimeout(FUEL_CSV_URL,8000).then(text=>text?parseFuelCSV(text):null)
-    ]);
-    const choices=[{data:direct,source:'direct'},{data:snapshot,source:'snapshot'},{data:FUEL_LAST_VALID||readFuelCache(),source:'cache'}].filter(c=>c.data);
-    choices.sort((a,b)=>fuelDateISO(b.data.date).localeCompare(fuelDateISO(a.data.date)));
-    const best=choices[0];
-    if(!best){
-      FUEL_DATA=[];FUEL_LOADED=false;
-      label.textContent='⚠ Prezzi aggiornati non disponibili';
-      document.getElementById('fuelGrid').textContent='Impossibile recuperare i prezzi MIMIT. Riprova con Aggiorna.';
-      ['fk-benz','fk-gas','fk-gpl','fk-met'].forEach(id=>document.getElementById(id).textContent='—');
-      note.textContent='Nessun dato verificato disponibile. Consulta il sito MIMIT.';
-      dot.style.background='#f0a500';dot.style.animation='none';return;
-    }
-    FUEL_LAST_VALID=best.data;FUEL_DATA=best.data.data;FUEL_SOURCE=best.source;FUEL_LOADED=true;FUEL_LAST_CHECK=Date.now();
-    try{localStorage.setItem('chepallet-fuel-v1',JSON.stringify(best.data));}catch(error){}
-    const status=fuelPublicationStatus(best.data.date),fresh=status==='aggiornati oggi';
-    dot.style.background=fresh&&best.source!=='cache'?'#22c55e':'#f0a500';dot.style.animation='none';
-    label.textContent=`${fresh?'✓':'⚠'} MIMIT · ${best.data.date} · ${status}${best.source==='cache'?' · copia salvata':''}`;
-    note.textContent=`Data di pubblicazione MIMIT: ${best.data.date}. Benzina/Gasolio: self-service. GPL/Metano: servito. Rete extra-autostradale. Aggiornamento automatico giornaliero; se la fonte non risponde viene mantenuta l’ultima copia verificata con la sua data.`;
-    renderFuelCards();
-  }finally{btn.disabled=false;}
-}
-async function initFuel(){await loadFuelData();}
-setInterval(()=>{if(document.visibilityState==='visible')loadFuelData();},15*60*1000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadFuelData();});
-
 // Init
 toggleOvhField();
 calcPallet();
 syncContainerUnitsType();
 routeDefaultDates();
-// Auto-load fuel data in background on page open (silent, non-blocking)
-loadFuelData(false);
 applyShareParams();
 calcVW();
 
