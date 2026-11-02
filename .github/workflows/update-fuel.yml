@@ -1,12 +1,13 @@
 name: Update MIMIT fuel prices
 on:
   schedule:
-    - cron: '45 7,10 * * *'
+    - cron: '17 8,11,15 * * *'
   workflow_dispatch:
   push:
     branches: [main]
     paths:
       - scripts/update-fuel.cjs
+      - index.html
       - .github/workflows/update-fuel.yml
 permissions:
   contents: write
@@ -15,17 +16,21 @@ concurrency:
   cancel-in-progress: false
 jobs:
   update:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # Use a different egress network from the Linux runners that timed out at MIMIT.
+    runs-on: macos-15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node scripts/update-fuel.cjs
+      - name: Fetch official publication (retain verified data during outages)
+        id: fuel
+        run: node scripts/update-fuel.cjs
       - name: Publish validated snapshot
         run: |
-          git add data/fuel-prices.json
+          git add data/fuel-status.json
+          if [ -f data/fuel-prices.json ]; then git add data/fuel-prices.json; fi
           if git diff --cached --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
