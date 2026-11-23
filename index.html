@@ -450,6 +450,7 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
         <button class="bc" onclick="calcPallet()">▶ CALCOLA &amp; AGGIORNA 3D</button>
         <button class="btn-xfer" onclick="transferToContainer()">↗ Trasferisci dati in Container</button>
         <button class="btn-xfer" onclick="transferToTruck()" style="margin-top:4px;">↗ Trasferisci dati in Truck</button>
+        <button class="btn-xfer" onclick="transferToPackagingStudio()" style="margin-top:4px;background:linear-gradient(90deg,#2563eb,#7c3aed);color:#fff;">🎨 Personalizza pallet in Packaging Studio 3D</button>
         <div class="alert" id="al-p">✓ Calcolo completato!</div>
       </div>
     </div>
@@ -3696,6 +3697,31 @@ function buildBoxScene(grp,res,accentColor){
   });
 }
 
+// Transfer calculated positions in millimetres into the independent Studio editor in centimetres.
+function transferToPackagingStudio(){
+  if(!lastP||!Array.isArray(lastP.schemaItems)||!lastP.schemaItems.length){alert('Esegui prima un calcolo pallet standard per trasferire lo schema.');return}
+  const L=Number(lastP.pL),W=Number(lastP.pW),base=Number(lastP.pT||document.getElementById('pT').value||144);
+  const boxL=Number(document.getElementById('bL').value),boxW=Number(document.getElementById('bW').value),boxH=Number(document.getElementById('bH').value);
+  const layers=Math.max(1,Math.min(25,Number(lastP.layers)||1));
+  if(![L,W,base,boxL,boxW,boxH].every(v=>Number.isFinite(v)&&v>0))return alert('Dimensioni del pallet non valide.');
+  const items=[];
+  for(let layer=0;layer<layers;layer++){
+    for(const p of lastP.schemaItems){
+      if(![p.x,p.z,p.w,p.l].every(Number.isFinite))continue;
+      items.push({x:(p.x+p.w/2-L/2)/10,z:(p.z+p.l/2-W/2)/10,y:(base+layer*boxH)/10,ry:p.rot?90:0});
+    }
+  }
+  if(!items.length)return alert('Nessun collo da trasferire.');
+  if(items.length>1000)return alert('Schema troppo grande per il configuratore 3D (massimo 1000 colli).');
+  const payload={pallet:{w:L/10,d:W/10,h:base/10},box:{w:boxL/10,d:boxW/10,h:boxH/10},items};
+  const tab=[...document.querySelectorAll('.nav-btn')].find(b=>b.textContent.includes('Packaging Studio'));
+  if(!tab)return alert('Packaging Studio non trovato.');
+  showPage('studio',tab);
+  const iframe=document.querySelector('#page-studio iframe');
+  if(!iframe)return alert('Editor Studio non disponibile.');
+  const send=()=>{if(iframe.contentWindow)iframe.contentWindow.postMessage({type:'chepallet-to-studio',payload},location.origin)};
+  if(iframe.dataset.loaded==='yes')send();else iframe.addEventListener('load',()=>{iframe.dataset.loaded='yes';send()},{once:true});
+}
 // ══════ TRANSFER DATA ══════
 function transferToContainer(){
   if(!lastP){alert('Esegui prima un calcolo pallet.');return;}
