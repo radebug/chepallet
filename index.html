@@ -3720,7 +3720,8 @@ function transferToPackagingStudio(){
   const iframe=document.querySelector('#page-studio iframe');
   if(!iframe)return alert('Editor Studio non disponibile.');
   const send=()=>{if(iframe.contentWindow)iframe.contentWindow.postMessage({type:'chepallet-to-studio',payload},location.origin)};
-  if(iframe.dataset.loaded==='yes')send();else iframe.addEventListener('load',()=>{iframe.dataset.loaded='yes';send()},{once:true});
+  try{if(iframe.contentDocument?.readyState==='complete'){iframe.dataset.loaded='yes';send();return}}catch(_){}
+  iframe.addEventListener('load',()=>{iframe.dataset.loaded='yes';send()},{once:true});
 }
 // ══════ TRANSFER DATA ══════
 function transferToContainer(){
