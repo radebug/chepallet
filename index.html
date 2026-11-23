@@ -504,7 +504,19 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
             <button class="be" onclick="removeSelectedPalletPlanItem()">🗑 Rimuovi</button>
             <button class="be" onclick="duplicateSelectedPalletPlanItem()">⧉ Duplica</button>
           </div>
-          <div class="plan-wrap" id="pschemaWrap">
+          <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin:10px 0;background:var(--surface2)">
+<strong>🧱 Strati alternati A / B</strong>
+<label style="display:block;margin:9px 0"><input type="checkbox" id="alternateLayers" onchange="toggleAlternatePalletLayers()"> Schemi differenti per strati dispari e pari</label>
+<div id="alternateLayerControls" style="display:none">
+<div style="display:flex;gap:8px;margin:8px 0"><button class="be" id="layerBtnA" onclick="selectPalletLayerPlan('A')">A · dispari</button><button class="be" id="layerBtnB" onclick="selectPalletLayerPlan('B')">B · pari</button></div>
+<label>Genera schema B</label><select id="alternateTransform" onchange="regenerateBLayer()" style="width:100%;padding:7px;background:var(--surface);color:var(--text)">
+<option value="rotate180">Ruota 180°</option><option value="mirrorX">Specchia orizzontalmente</option><option value="mirrorZ">Specchia verticalmente</option></select>
+<button class="be" onclick="regenerateBLayer()" style="margin-top:8px">↻ Rigenera B da A</button>
+<div id="alternateLayerSummary" style="font-size:.7rem;color:var(--muted);margin-top:8px"></div>
+</div>
+<div style="display:flex;gap:10px;align-items:center;margin:12px 0 4px"><label><input id="interlayerOn" type="checkbox" onchange="updatePalletPlanResults()"> Intercalari</label><label>Spessore mm <input id="interlayerThickness" type="number" value="3" min="0" max="30" step=".5" style="width:65px" onchange="updatePalletPlanResults()"></label></div>
+<p style="font-size:.67rem;color:var(--muted)">Puoi modificare A e B indipendentemente tramite l'editor sottostante. Il controllo d'appoggio è geometrico, non certifica la stabilità.</p></div>
+<div class="plan-wrap" id="pschemaWrap">
             <div class="plan-head"><span id="pschemaTitle">Schema strato</span><span id="pschemaMeta" style="font-size:.63rem;">—</span></div>
             <div class="plan-dimrow top"><span id="pschemaLenLabel" style="font-size:.63rem;color:var(--muted);">—</span><span id="pschemaModeLabel" style="font-size:.62rem;color:var(--muted);">—</span></div>
             <div class="plan-box" id="pschema"></div>
@@ -1342,6 +1354,20 @@ function addEdges(grp,geo,pos){const l=new THREE.LineSegments(new THREE.EdgesGeo
 // ══════ PALLET CALC ══════
 let lastP=null,customTex=null;
 let palletPlanState={spec:null,items:[],originalItems:[],selectedIndex:-1,editing:false,manual:false,showGuide:true,scaleX:1,scaleY:1,boxW:1,boxH:1,layoutLabel:'automatico'};
+let layerPlans={A:[],B:[],active:'A',customB:false};
+function alternationOn(){return !!document.getElementById('alternateLayers')?.checked}
+function interlayerMm(){return document.getElementById('interlayerOn')?.checked?Math.max(0,Math.min(30,Number(document.getElementById('interlayerThickness')?.value)||0)):0}
+function transformPalletLayer(items,spec,mode){return items.map(it=>{const x=mode==='mirrorZ'?it.x:spec.areaL-it.x-it.w,z=mode==='mirrorX'?it.z:spec.areaW-it.z-it.l;return {...it,x:+x.toFixed(3),z:+z.toFixed(3),id:String(it.id||'item')+'-B'}})}
+function saveActiveLayerPlan(){if(!palletPlanState.spec)return;layerPlans[layerPlans.active]=clonePlanItems(palletPlanState.items);if(layerPlans.active==='B')layerPlans.customB=true}
+function updateAlternateUi(){const on=alternationOn();document.getElementById('alternateLayerControls').style.display=on?'block':'none';for(const name of ['A','B']){let b=document.getElementById('layerBtn'+name);b.style.background=layerPlans.active===name?'var(--blue)':'';b.style.color=layerPlans.active===name?'#fff':''}let e=document.getElementById('pschemaTitle');if(e)e.textContent=on?'Schema '+layerPlans.active+' · '+(layerPlans.active==='A'?'dispari':'pari'):'Schema strato'}
+function refreshLayerView(){if(!palletPlanState.spec)return;let items=clonePlanItems(layerPlans[layerPlans.active]),spec=palletPlanState.spec;renderPalletPlan(spec,items,{layout:'schema '+layerPlans.active,originalItems:items,manual:true});updateAlternateUi();updatePalletPlanResults()}
+function toggleAlternatePalletLayers(){if(!palletPlanState.spec){updateAlternateUi();return}saveActiveLayerPlan();if(alternationOn()){layerPlans.A=clonePlanItems(layerPlans.A.length?layerPlans.A:palletPlanState.items);if(!layerPlans.customB)layerPlans.B=transformPalletLayer(layerPlans.A,palletPlanState.spec,document.getElementById('alternateTransform').value)}layerPlans.active='A';refreshLayerView()}
+function selectPalletLayerPlan(name){if(!alternationOn()||!palletPlanState.spec||name===layerPlans.active)return;saveActiveLayerPlan();layerPlans.active=name;refreshLayerView()}
+function regenerateBLayer(){if(!palletPlanState.spec)return;if(layerPlans.active==='A')saveActiveLayerPlan();layerPlans.B=transformPalletLayer(layerPlans.A,palletPlanState.spec,document.getElementById('alternateTransform').value);layerPlans.customB=false;layerPlans.active='B';refreshLayerView()}
+function layerOverlap(items){let count=0;for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){let a=items[i],b=items[j];if(Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>0.01&&Math.min(a.z+a.l,b.z+b.l)-Math.max(a.z,b.z)>0.01)count++}return count}
+function layerOutside(items,spec){return items.filter(i=>i.x<-.01||i.z<-.01||i.x+i.w>spec.areaL+.01||i.z+i.l>spec.areaW+.01).length}
+function layerSupport(a,b){if(!a.length||!b.length)return 0;let area=0,supported=0;for(let it of b){let A=it.w*it.l;area+=A;let cover=0;for(let below of a){let w=Math.max(0,Math.min(it.x+it.w,below.x+below.w)-Math.max(it.x,below.x)),l=Math.max(0,Math.min(it.z+it.l,below.z+below.l)-Math.max(it.z,below.z));cover+=w*l}supported+=Math.min(A,cover)}return area?supported/area*100:0}
+
 
 function clampPalletPlanItemToSpec(item,spec){
   if(!item||!spec) return item;
@@ -1621,6 +1647,7 @@ function calcPallet(){
   const sameSpec=palletPlanState.spec && palletPlanState.spec.baseL===pL && palletPlanState.spec.baseW===pW && palletPlanState.spec.overhang===oh;
   const keepManual=!!(palletPlanState.manual && sameSpec && palletPlanState.items.length && (!palletFormation || palletFormation==='Auto'));
   const items=keepManual?clonePlanItems(palletPlanState.items):clonePlanItems(autoLayerItems);
+  layerPlans={A:clonePlanItems(items),B:transformPalletLayer(items,spec,document.getElementById('alternateTransform').value),active:'A',customB:false};
   const layoutLabel=keepManual?'manuale personalizzato':autoLayoutLabel;
 
   renderPalletPlan(spec,items,{layout:layoutLabel,originalItems:autoLayerItems,manual:keepManual || (palletFormation&&palletFormation!=='Auto')});
