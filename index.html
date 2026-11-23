@@ -1666,19 +1666,24 @@ function updatePalletPlanResults(){
   const maxKg=+document.getElementById('maxKg').value;
   const nL=+document.getElementById('layers').value;
   const wf=document.getElementById('wf').checked,showBase=document.getElementById('showP').checked;
-  const maxLayersByHeight=Math.max(0,Math.floor((maxH-pT)/Math.max(1,bH)));
+  const sheet=interlayerMm();
+  const maxLayersByHeight=Math.max(0,Math.floor((maxH-pT+sheet)/Math.max(1,bH+sheet)));
   const actL=Math.min(nL,maxLayersByHeight);
   const layerItems=clonePlanItems(palletPlanState.items).map(it=>clampPalletPlanItemToSpec(it,spec));
   palletPlanState.items=clonePlanItems(layerItems);
+  const alternating=alternationOn();
+  if(alternating){layerPlans[layerPlans.active]=clonePlanItems(layerItems);if(layerPlans.active==='B')layerPlans.customB=true;else if(!layerPlans.customB)layerPlans.B=transformPalletLayer(layerPlans.A,spec,document.getElementById('alternateTransform').value)}
+  else{layerPlans.A=clonePlanItems(layerItems);layerPlans.active='A'}
+  const A=alternating?layerPlans.A:layerItems,B=alternating?layerPlans.B:layerItems;
   const perLayer=layerItems.length;
-  const tot=perLayer*actL;
+  const tot=A.length*Math.ceil(actL/2)+B.length*Math.floor(actL/2);
   const usedArea=layerItems.reduce((sum,it)=>sum+(it.w*it.l),0);
   const eff=Math.round((usedArea/Math.max(1,(spec.areaL*spec.areaW)))*100);
   const totKg=tot*bKg;
-  const totH=pT+actL*bH;
+  const totH=pT+actL*bH+Math.max(0,actL-1)*sheet;
   const all=[];
   for(let l=0;l<actL;l++){
-    layerItems.forEach(it=>all.push({x:it.x,z:it.z,w:it.w,l:it.l,layer:l,rot:!!it.rot}));
+    (l%2===0?A:B).forEach(it=>all.push({x:it.x,z:it.z,w:it.w,l:it.l,layer:l,rot:!!it.rot}));
   }
 
   document.getElementById('sp-tot').textContent=tot;
@@ -1687,16 +1692,26 @@ function updatePalletPlanResults(){
   document.getElementById('sp-eff').textContent=eff+'%';
   document.querySelectorAll('.sc').forEach(c=>c.classList.add('on'));
 
-  const layoutLbl=palletPlanState.layoutLabel||'automatico';
+  const layoutLbl=alternating?'alternanza A/B':(palletPlanState.layoutLabel||'automatico');
+  const outsideA=layerOutside(A,spec),outsideB=layerOutside(B,spec),overlapA=layerOverlap(A),overlapB=layerOverlap(B);
+  const support=alternating?Math.min(layerSupport(A,B),layerSupport(B,A)):100;
+  const warnings=[];
+  if(outsideA||outsideB)warnings.push('Fuori perimetro: A '+outsideA+' · B '+outsideB);
+  if(overlapA||overlapB)warnings.push('Sovrapposizioni: A '+overlapA+' · B '+overlapB);
+  if(alternating&&support<70)warnings.push('Appoggio geometrico ridotto ('+support.toFixed(0)+'%)');
+  if(totKg>maxKg)warnings.push('Peso oltre il limite');
+  const altSummary=document.getElementById('alternateLayerSummary');
+  if(altSummary)altSummary.textContent=alternating?'A: '+A.length+' colli · B: '+B.length+' colli · appoggio minimo: '+support.toFixed(0)+'%':'';
+  updateAlternateUi();
   const mix=summarizePalletPlanMix(layerItems);
   const metaEl=document.getElementById('pschemaMeta');
   if(metaEl) metaEl.textContent=`Layout: ${layoutLbl}`;
-  document.getElementById('pdet').innerHTML=`<div>📦 Box base: <b style="color:var(--text)">${document.getElementById('bL').value}×${document.getElementById('bW').value}×${document.getElementById('bH').value}mm</b></div><div>🏗 Pallet: <b style="color:var(--text)">${spec.baseL}×${spec.baseW}mm</b></div><div>🧠 Layout attivo: <b style="color:var(--text)">${layoutLbl}</b></div><div>🧩 Mix formati nello schema: <b style="color:var(--text)">${mix}</b></div><div>📦 Per strato: <b style="color:var(--text)">${perLayer}</b> scatole</div><div>📏 Area utile totale: <b style="color:var(--text)">${spec.areaL}×${spec.areaW}mm</b></div><div>📏 Overhang disponibile: <b style="color:var(--text)">${spec.overhang}mm</b></div><div>🔢 Strati utili: <b style="color:var(--text)">${actL}</b></div><div>📏 H tot: <b style="color:${totH>maxH?'var(--accent2)':'var(--text)'}">${Math.round(totH)}mm${totH>maxH?' ⚠':''}</b></div><div>⚖️ Peso: <b style="color:${totKg>maxKg?'var(--accent2)':'var(--text)'}">${Math.round(totKg*10)/10}kg${totKg>maxKg?' ⚠':''}</b></div><div>🎯 Fill area utile: <b style="color:${eff>100?'var(--accent2)':'var(--green)'}">${eff}%</b></div>`;
+  document.getElementById('pdet').innerHTML=`${warnings.length?'<div style="color:var(--accent2);font-weight:700">⚠ '+warnings.join(' | ')+'</div>':''}${alternating?'<div>🧱 A: '+A.length+' · B: '+B.length+' · Appoggio geometrico min.: '+support.toFixed(0)+'%</div>':''}<div>📦 Box base: <b style="color:var(--text)">${document.getElementById('bL').value}×${document.getElementById('bW').value}×${document.getElementById('bH').value}mm</b></div><div>🏗 Pallet: <b style="color:var(--text)">${spec.baseL}×${spec.baseW}mm</b></div><div>🧠 Layout attivo: <b style="color:var(--text)">${layoutLbl}</b></div><div>🧩 Mix formati nello schema: <b style="color:var(--text)">${mix}</b></div><div>📦 Per strato: <b style="color:var(--text)">${perLayer}</b> scatole</div><div>📏 Area utile totale: <b style="color:var(--text)">${spec.areaL}×${spec.areaW}mm</b></div><div>📏 Overhang disponibile: <b style="color:var(--text)">${spec.overhang}mm</b></div><div>🔢 Strati utili: <b style="color:var(--text)">${actL}</b></div><div>📏 H tot: <b style="color:${totH>maxH?'var(--accent2)':'var(--text)'}">${Math.round(totH)}mm${totH>maxH?' ⚠':''}</b></div><div>⚖️ Peso: <b style="color:${totKg>maxKg?'var(--accent2)':'var(--text)'}">${Math.round(totKg*10)/10}kg${totKg>maxKg?' ⚠':''}</b></div><div>🎯 Fill area utile: <b style="color:${eff>100?'var(--accent2)':'var(--green)'}">${eff}%</b></div>`;
 
   const realOverhangCount=layerItems.filter(it=>getPalletPlanItemOverhang(it).max>0).length;
   document.getElementById('pleg').innerHTML=`${palletPlanState.showGuide?'<div class="li"><div class="ld" style="background:transparent;border:1px dashed rgba(148,163,184,.8)"></div>Impronta pallet</div>':''}${spec.overhang>0?'<div class="li"><div class="ld" style="background:transparent;border:1px solid rgba(148,163,184,.35)"></div>Area utile / overhang</div>':''}<div class="li"><div class="ld" style="background:#60a5fa"></div>Scatole (trascina · doppio clic = ruota)</div>${spec.overhang>0?`<div class="li"><div class="ld" style="background:#dc2626"></div>Overhang reale: ${realOverhangCount}</div>`:''}`;
 
-  lastP={pL:spec.baseL,pW:spec.baseW,areaL:spec.areaL,areaW:spec.areaW,pT,layers:actL,positions:all,wf,showBase,overhang:spec.overhang,schemaItems:clonePlanItems(layerItems)};
+  lastP={pL:spec.baseL,pW:spec.baseW,areaL:spec.areaL,areaW:spec.areaW,pT,layers:actL,positions:all,wf,showBase,overhang:spec.overhang,schemaItems:clonePlanItems(A),schemaItemsB:clonePlanItems(B),interlayer:sheet};
   buildPScene(lastP);
   setupLightsP();
   calcHowManyPallets();
@@ -2101,10 +2116,11 @@ function buildPScene(res){
     const bh=+document.getElementById('bH').value;
     const geo=new THREE.BoxGeometry(bw,bh,bl);
     const mesh=new THREE.Mesh(geo,mats);
-    const px=x+bw/2-areaL/2,py=pT+layer*bh+bh/2,pz=z+bl/2-areaW/2;
+    const px=x+bw/2-areaL/2,py=pT+layer*(bh+(res.interlayer||0))+bh/2,pz=z+bl/2-areaW/2;
     mesh.position.set(px,py,pz);mesh.castShadow=true;GRP_P.add(mesh);addEdges(GRP_P,geo,mesh.position);
   });
-  const midY=pT+(res.layers||1)*(+document.getElementById('bH').value)/2;
+  if(res.interlayer>0){let mat=new THREE.MeshStandardMaterial({color:0xc9aa7a,roughness:.92});for(let l=1;l<(res.layers||0);l++){let divider=new THREE.Mesh(new THREE.BoxGeometry(pL,res.interlayer,pW),mat);divider.position.set(0,pT+l*(+document.getElementById('bH').value)+(l-.5)*res.interlayer,0);GRP_P.add(divider)}}
+  const midY=pT+((res.layers||1)*(+document.getElementById('bH').value)+Math.max(0,(res.layers||1)-1)*(res.interlayer||0))/2;
   CAM_P.tgt=new THREE.Vector3(0,midY,0);
   CAM_P.r=Math.max(2000,(areaL+areaW+(res.layers||1)*(+document.getElementById('bH').value))*1.6);CAM_P.upd();
 }
@@ -3733,9 +3749,9 @@ function transferToPackagingStudio(){
   if(![L,W,base,boxL,boxW,boxH].every(v=>Number.isFinite(v)&&v>0))return alert('Dimensioni del pallet non valide.');
   const items=[];
   for(let layer=0;layer<layers;layer++){
-    for(const p of lastP.schemaItems){
+    for(const p of (layer%2===0?lastP.schemaItems:(lastP.schemaItemsB||lastP.schemaItems))){
       if(![p.x,p.z,p.w,p.l].every(Number.isFinite))continue;
-      items.push({x:(p.x+p.w/2-L/2)/10,z:(p.z+p.l/2-W/2)/10,y:(base+layer*boxH)/10,ry:p.rot?90:0});
+      items.push({x:(p.x+p.w/2-L/2)/10,z:(p.z+p.l/2-W/2)/10,y:(base+layer*(boxH+(lastP.interlayer||0)))/10,ry:p.rot?90:0});
     }
   }
   if(!items.length)return alert('Nessun collo da trasferire.');
