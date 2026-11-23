@@ -827,7 +827,7 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
 <div id="page-routes" class="page">
 <section class="hero bh">
   <h1>Stima <br><em class="b">route & demurrage</em></h1>
-  <p>Solo selezione e click: porti caricati da fonte remota, rotta stimata automaticamente e quadro operativo D&amp;D senza API key.</p>
+  <p>Seleziona i porti per consultare una stima della rotta e dei tempi di sosta, con un riepilogo operativo D&amp;D.</p>
 </section>
 <div class="app-grid">
   <div class="route-grid">
@@ -880,7 +880,7 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
           <div class="routes-line"><span>Free detention</span><b>—</b></div>
           <div class="routes-line"><span>Chargeable detention</span><b>—</b></div>
         </div>
-        <div class="routes-warn" id="rWarn">Le tariffe monetarie cambiano per compagnia/porto/data: qui trovi una stima operativa dei giorni, pronta senza API key.</div>
+        <div class="routes-warn" id="rWarn">I giorni indicati sono stime operative. Franchigie e costi effettivi dipendono da compagnia marittima, porto e data di spedizione.</div>
       </div>
     </div>
   </div>
@@ -4082,7 +4082,7 @@ function loadTex(input){const f=input.files[0];if(!f)return;document.getElementB
 
 
 
-// ══════ ROUTES (remote ports, no API key) ══════
+// ══════ ROUTES (remote ports) ══════
 const ROUTE_REMOTE_PORTS = 'https://cdn.jsdelivr.net/gh/marchah/sea-ports@master/lib/ports.json';
 let ROUTE_PORTS = [];
 let ROUTE_COUNTRIES = [];
