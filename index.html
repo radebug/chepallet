@@ -2921,7 +2921,7 @@ function calcHowManyPallets(){
     const pT=spec.pT||+document.getElementById('pT').value||144;
     const bH=spec.bH||+document.getElementById('bH').value||1;
     const nL=+document.getElementById('layers').value||1;
-    actL=Math.min(nL,Math.max(1,Math.floor((maxH-pT)/Math.max(1,bH))));
+    actL=Math.min(nL,Math.max(0,Math.floor((maxH-pT+interlayerMm())/Math.max(1,bH+interlayerMm()))));
   } else if(!perLayer){
     // fallback: calculate from inputs even before first run
     const bL=+document.getElementById('bL').value||400;
@@ -2935,15 +2935,16 @@ function calcHowManyPallets(){
     const oh=document.getElementById('ovhFlag')?.checked?(+document.getElementById('ovh').value||0):0;
     const layer=buildBestBoxLayer(pL+oh*2,pW+oh*2,bL,bW);
     perLayer=layer.count;
-    actL=Math.min(nL,Math.max(1,Math.floor((maxH-pT)/Math.max(1,bH))));
+    actL=Math.min(nL,Math.max(0,Math.floor((maxH-pT+interlayerMm())/Math.max(1,bH+interlayerMm()))));
   }
   if(perLayer<=0){ document.getElementById('pNResult').style.display='none'; return; }
-  const boxesPerPallet=perLayer*actL;
+  const boxesPerPallet=lastP&&alternationOn()&&!overridePerLayer?lastP.positions.length:perLayer*actL;
+  if(boxesPerPallet<=0){document.getElementById('pNResult').style.display='none';return}
   const pallets=Math.ceil(nBoxes/boxesPerPallet);
   const totalBoxes=pallets*boxesPerPallet;
   document.getElementById('pNResult').style.display='block';
   document.getElementById('pNVal').textContent=pallets+' pallet';
-  document.getElementById('pNDesc').innerHTML=`Per ${nBoxes.toLocaleString()} scatole · <b style="color:var(--text)">${boxesPerPallet}</b> sc/pallet (${perLayer}/strato × ${actL} strati) · Totale spedibili: <b style="color:var(--text)">${totalBoxes.toLocaleString()}</b>`;
+  document.getElementById('pNDesc').innerHTML=`Per ${nBoxes.toLocaleString()} scatole · <b style="color:var(--text)">${boxesPerPallet}</b> sc/pallet (${alternationOn()&&lastP&&!overridePerLayer?lastP.schemaItems.length+' A / '+lastP.schemaItemsB.length+' B':perLayer+'/strato'} × ${actL} strati) · Totale spedibili: <b style="color:var(--text)">${totalBoxes.toLocaleString()}</b>`;
 }
 
 
@@ -3922,7 +3923,7 @@ function doScreenshot(id){
 }
 function exportJSON(page){
   let d;
-  if(page==='pallet'){if(!lastP){alert('Esegui prima un calcolo.');return;}d={tipo:'pallet',scatola:{L:document.getElementById('bL').value,W:document.getElementById('bW').value,H:document.getElementById('bH').value,kg:document.getElementById('bKg').value},pallet:{L:document.getElementById('pL').value,W:document.getElementById('pW').value},risultati:{totale:document.getElementById('sp-tot').textContent,perStrato:document.getElementById('sp-lay').textContent,pesoKg:document.getElementById('sp-wgt').textContent,efficienza:document.getElementById('sp-eff').textContent}};}
+  if(page==='pallet'){if(!lastP){alert('Esegui prima un calcolo.');return;}d={tipo:'pallet',scatola:{L:document.getElementById('bL').value,W:document.getElementById('bW').value,H:document.getElementById('bH').value,kg:document.getElementById('bKg').value},pallet:{L:document.getElementById('pL').value,W:document.getElementById('pW').value},risultati:{totale:document.getElementById('sp-tot').textContent,perStrato:document.getElementById('sp-lay').textContent,pesoKg:document.getElementById('sp-wgt').textContent,efficienza:document.getElementById('sp-eff').textContent},schemaA:lastP.schemaItems,schemaB:lastP.schemaItemsB,intercalareMm:lastP.interlayer,strati:lastP.layers};}
   else if(page==='container'){if(!lastC){alert('Esegui prima un calcolo.');return;}d={tipo:'container',nome:lastC.name,unita:document.getElementById('cs-tot').textContent,vol:document.getElementById('cs-vol').textContent,pesoKg:document.getElementById('cs-wgt').textContent};}
   else{if(!lastT){alert('Esegui prima un calcolo.');return;}d={tipo:'truck',nome:lastT.name,unita:document.getElementById('ts-tot').textContent,vol:document.getElementById('ts-vol').textContent,pesoKg:document.getElementById('ts-wgt').textContent};}
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download=page+'.json';a.click();
