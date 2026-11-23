@@ -341,9 +341,20 @@ body.theme-light{--bg:#f4f7fb;--surface:#ffffff;--surface2:#edf2f7;--border:#cbd
     <button class="nav-btn nt" onclick="showPage('remaining',this)">🪵 Spazio residuo</button>
     <button class="nav-btn nr" onclick="showPage('routes',this);initRoutes()">🌍 Routes</button>
     <button class="nav-btn ns" onclick="showPage('tools',this);initTools()">🛠 Strumenti</button>
+    <button class="nav-btn nb" onclick="showPage('studio',this)">🎨 Packaging Studio 3D</button>
   </nav>
   <div class="header-badge">v4.6</div><div class="theme-ctl">Tema <select id="siteTheme" onchange="setSiteTheme(this.value)"><option value="dark">Dark</option><option value="light">Light</option><option value="ocean">Ocean</option><option value="redblue">Rosso/Blu</option><option value="green">Green</option><option value="purple">Purple</option></select> Sfondo <select id="siteBg" onchange="setSiteBackground(this.value)"><option value="none">Base</option><option value="soft">Soft</option><option value="grid">Griglia</option></select></div>
 </header>
+
+<!-- ═══════════════════ PACKAGING STUDIO 3D ═══════════════════ -->
+<div id="page-studio" class="page">
+  <section class="hero bh" style="padding:26px 24px 17px">
+    <h1 style="font-size:clamp(1.5rem,3vw,2.2rem)">Packaging <em class="b">Studio 3D</em></h1>
+    <p>Personalizza ogni lato di tray e scatole, componi il pallet ed esporta rendering ad alta risoluzione.</p>
+    <p style="margin-top:8px"><a href="./studio/" target="_blank" rel="noopener" style="color:var(--blue);font-size:.78rem">Apri a schermo intero ↗</a></p>
+  </section>
+  <iframe title="Packaging Studio 3D" src="./studio/" loading="lazy" style="display:block;border:0;width:100%;height:calc(100vh - 245px);min-height:650px;background:#edf1f5" allow="fullscreen"></iframe>
+</div>
 
 <!-- ═══════════════════ PALLET PAGE ═══════════════════ -->
 <div id="page-pallet" class="page active">
